@@ -4,7 +4,12 @@
   "description": "The ugamy project monorepo",
   "private": true,
   "packageManager": "pnpm@9.11.0",
-  "scripts": {},
+  "scripts": {
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "dev:package:api": "turbo dev --filter=@ugamy/api",
+    "dev:app:dashboard": "turbo dev --filter=@ugamy/api"
+  },
   "keywords": [
     "Video",
     "Streaming",
