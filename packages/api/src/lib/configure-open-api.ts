@@ -9,7 +9,7 @@ export default function configureOpenAPI(app: AppOpenAPI) {
     openapi: "3.0.0",
     info: {
       version: packageJSON.version,
-      title: "Tasks API",
+      title: "Ugamy API",
     },
   });
 
@@ -19,10 +19,12 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       url: "/doc",
       theme: "kepler",
       layout: "classic",
+      servers: [{ url: "http://localhost:9000", description: "Local server" }, { url: "https://api.ugamy.com", description: "Production server" }],
       defaultHttpClient: {
         targetKey: "js",
         clientKey: "fetch",
       },
+      hideModels: true,
     }),
   );
 }
