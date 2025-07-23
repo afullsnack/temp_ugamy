@@ -2,7 +2,10 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
-  name: text("name").notNull(),
+  fullName: text("name").notNull(),
+  username: text("username").notNull(),
+  phone: text("phone").notNull(),
+  password: text("password").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: integer("email_verified", { mode: "boolean" }).$defaultFn(() => false).notNull(),
   image: text("image"),
