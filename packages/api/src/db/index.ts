@@ -12,7 +12,7 @@ const client = createClient({
 });
 
 const db = drizzle(client, {
-  schema: { schema, authSchema },
+  schema: { ...schema, ...authSchema },
 });
 
 export default db;
