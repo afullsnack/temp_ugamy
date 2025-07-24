@@ -20,6 +20,10 @@ const EnvSchema = z.object({
   // Better auth
   BETTER_AUTH_SERCRET: z.string().min(1),
   BETTER_AUTH_URL: z.string().url(),
+
+  // Mailing provider
+  PLUNK_API_KEY: z.string().min(1),
+  PLUNK_API_URL: z.string().url(),
 }).superRefine((input, ctx) => {
   if (input.NODE_ENV === "production" && !input.DATABASE_AUTH_TOKEN) {
     ctx.addIssue({
