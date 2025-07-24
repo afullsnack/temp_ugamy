@@ -51,7 +51,8 @@ function Signup() {
             password,
             name: username,
             username,
-            phoneNumber: phone,
+            displayUsername: username,
+            phoneNumber: phone
           })
 
           if (error) {
