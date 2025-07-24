@@ -4,7 +4,6 @@ import { z } from 'zod'
 export const env = createEnv({
   server: {
     SERVER_URL: z.string().url().optional(),
-    API_URL: z.string().url(),
   },
 
   /**
@@ -15,6 +14,7 @@ export const env = createEnv({
 
   client: {
     VITE_APP_TITLE: z.string().min(1).optional(),
+    VITE_API_URL: z.string().url(),
   },
 
   /**

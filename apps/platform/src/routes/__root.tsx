@@ -1,6 +1,6 @@
 import {
-  Outlet,
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
@@ -49,6 +49,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
       <TanStackQueryLayout />
     </RootDocument>
+  ),
+  notFoundComponent: () => (
+    <div>
+      <h1>Not Found</h1>
+      <p>The requested page could not be found.</p>
+    </div>
   ),
 })
 
