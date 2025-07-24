@@ -22,6 +22,20 @@
       "when": 1753264150328,
       "tag": "0002_fresh_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1753268483411,
+      "tag": "0003_fancy_wolfsbane",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1753269814094,
+      "tag": "0004_breezy_vindicator",
+      "breakpoints": true
     }
   ]
 }
