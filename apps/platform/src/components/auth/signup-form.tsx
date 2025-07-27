@@ -1,38 +1,99 @@
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
+import { Form, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { toast } from "sonner"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import AppleLoginIcon from "../common/apple-login-icon"
 import FacebookLoginIcon from "../common/facebook-login-icon"
 import GoogleLoginIcon from "../common/google-login-icon"
 import { BrandLogoDark } from "../common/brand-logo-dark"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { authClient } from "@/lib/auth-client"
+
+const SignupSchema = z
+    .object({
+        fullname: z.string().min(1, "Fullname is required"),
+        username: z.string().min(1, "Username is required"),
+        email: z.string().min(1, "Email is required").email("Invalid email address"),
+        verificationCode: z
+            .string()
+            .min(1, "Verification code is required")
+            .length(6, "Verification code must be 6 digits")
+            .regex(/^\d{6}$/, "Verification code must be numeric"),
+        phone: z.string().min(1, "Phone number is required"),
+        password: z.string().min(8, "Password must be at least 8 characters long"),
+        confirmPassword: z.string().min(1, "Confirm password is required"),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"], // Path of the error
+    })
+
+type SignupFormValues = z.infer<typeof SignupSchema>
+
+const signUp = async (data: SignupFormValues) => {
+    const { error } = await authClient.signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.username,
+    })
+
+    if (error) {
+        toast.error(error.message ?? "")
+    }
+
+    return data
+}
 
 export default function SignupForm() {
-    const [formData, setFormData] = useState({
-        fullname: "",
-        username: "",
-        email: "",
-        verificationCode: "",
-        phone: "",
-        password: "",
-        confirmPassword: "",
-    })
+    const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [emailSent, setEmailSent] = useState(false)
 
-    const handleInputChange = (field: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }))
+    const form = useForm<SignupFormValues>({
+        resolver: zodResolver(SignupSchema),
+        mode: "onTouched", // Validate on blur/change
+        defaultValues: {
+            fullname: "",
+            username: "",
+            email: "",
+            verificationCode: "",
+            phone: "",
+            password: "",
+            confirmPassword: "",
+        },
+    })
+
+    // Sign up mutation
+    const signUpMutation = useMutation({
+        mutationFn: signUp,
+        onSuccess: (response) => {
+            toast.success(`Proceed to sign in`)
+
+            queryClient.resetQueries()
+            navigate({ to: "/signin" })
+        },
+    })
+
+    const onSubmit = async (values: SignupFormValues) => {
+        await signUpMutation.mutateAsync(values)
     }
 
-    const handleVerifyEmail = () => {
-        if (formData.email) {
+    const handleVerifyEmail = async () => {
+        // Trigger validation for the email field specifically
+        const isEmailValid = await form.trigger("email")
+        if (isEmailValid) {
             setEmailSent(true)
             // Simulate sending verification email
-            console.log("Verification email sent to:", formData.email)
+            // console.log("Verification email sent to:", form.register.email?.value)
         }
     }
 
@@ -40,216 +101,224 @@ export default function SignupForm() {
         console.log(`Login with ${provider}`)
     }
 
-    const isFormValid = () => {
-        return (
-            formData.fullname &&
-            formData.username &&
-            formData.email &&
-            formData.phone &&
-            formData.password &&
-            formData.confirmPassword &&
-            formData.password === formData.confirmPassword
-        )
-    }
-
     return (
-        <div className="z-10 bg-white min-h-screen flex items-center justify-center">
-            <div className="bg-white w-full pt-[80px] md:pt-8 p-8">
-                <div className="md:hidden w-full flex items-center justify-center pb-[50px] p-0">
+        <div className="z-10 flex min-h-screen items-center justify-center bg-white">
+            <div className="w-full p-8 pt-[80px] md:pt-8">
+                <div className="mb-[50px] flex w-full items-center justify-center p-0 md:hidden">
                     <BrandLogoDark />
                 </div>
                 {/* Header */}
-                <div className="text-center mb-8 space-y-[24px]">
+                <div className="mb-8 space-y-[24px] text-center">
                     <h1 className="text-2xl font-bold text-gray-900">Create Your Ugamy Account</h1>
-                    <p className="text-[hsla(221,39%,11%,1)] text-sm">Join The Community. Start Mastering Your Favorite Games.</p>
+                    <p className="text-sm text-[hsla(221,39%,11%,1)]">Join The Community. Start Mastering Your Favorite Games.</p>
                 </div>
-
                 {/* Form */}
-                <form className="space-y-4">
-                    {/* Fullname */}
-                    <div>
-                        <Label htmlFor="fullname" className="text-sm text-gray-700 mb-1 block">
-                            Fullname:
-                        </Label>
-                        <Input
-                            id="fullname"
-                            type="text"
-                            value={formData.fullname}
-                            onChange={(e) => handleInputChange("fullname", e.target.value)}
-                            className="w-full focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 border-gray-300"
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        {/* Fullname */}
+                        <FormField
+                            control={form.control}
+                            name="fullname"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-sm text-gray-700">Fullname:</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            placeholder="Enter info"
+                                            {...field}
+                                            className="w-full border-gray-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
-                    </div>
 
-                    {/* Username */}
-                    <div>
-                        <Label htmlFor="username" className="text-sm text-gray-700 mb-1 block">
-                            Username:
-                        </Label>
-                        <Input
-                            id="username"
-                            type="text"
-                            placeholder="Enter info"
-                            value={formData.username}
-                            onChange={(e) => handleInputChange("username", e.target.value)}
-                            className="w-full"
+                        {/* Username */}
+                        <FormField
+                            control={form.control}
+                            name="username"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-sm text-gray-700">Username:</FormLabel>
+                                    <FormControl>
+                                        <Input type="text" placeholder="Enter info" {...field} className="w-full" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
-                    </div>
 
-                    {/* Email */}
-                    <div>
-                        <div className="flex justify-between items-center mb-1">
-                            <Label htmlFor="email" className="text-sm text-gray-700">
-                                Email:
-                            </Label>
-                            <Button
-                                type="button"
-                                variant="link"
-                                size="sm"
-                                onClick={handleVerifyEmail}
-                                className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700 p-0 h-auto text-sm"
-                            >
-                                Verify Email:
-                            </Button>
-                        </div>
-                        <div className="flex gap-2">
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="Enter info"
-                                value={formData.email}
-                                onChange={(e) => handleInputChange("email", e.target.value)}
-                                className="flex-1"
-                            />
-                            <Input
-                                type="text"
-                                placeholder="000000"
-                                value={formData.verificationCode}
-                                onChange={(e) => handleInputChange("verificationCode", e.target.value)}
-                                className="w-20 text-center"
-                                maxLength={6}
-                            />
-                        </div>
-                        {emailSent && (
-                            <p className="text-xs text-[hsla(160,84%,39%,1)] mt-1">(Confirm the verification code that was sent to you email.)</p>
-                        )}
-                    </div>
-
-                    {/* Phone */}
-                    <div>
-                        <Label htmlFor="phone" className="text-sm text-gray-700 mb-1 block">
-                            Phone:
-                        </Label>
-                        <Input
-                            id="phone"
-                            type="tel"
-                            placeholder="Enter info"
-                            value={formData.phone}
-                            onChange={(e) => handleInputChange("phone", e.target.value)}
-                            className="w-full"
-                        />
-                    </div>
-
-                    {/* Password */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="password" className="text-sm text-gray-700 mb-1 block">
-                                Password:
-                            </Label>
-                            <div className="relative">
-                                <Input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="Enter info"
-                                    value={formData.password}
-                                    onChange={(e) => handleInputChange("password", e.target.value)}
-                                    className="w-full pr-10"
-                                />
-                                <button
+                        {/* Email and Verification Code */}
+                        <FormItem>
+                            <div className="mb-1 flex items-center justify-between">
+                                <FormLabel className="text-sm text-gray-700">Email:</FormLabel>
+                                <Button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    variant="link"
+                                    size="sm"
+                                    onClick={handleVerifyEmail}
+                                    className="h-auto p-0 text-sm text-[hsla(160,84%,39%,1)] hover:text-cyan-700"
                                 >
-                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
+                                    Verify Email:
+                                </Button>
                             </div>
-                        </div>
-
-                        <div>
-                            <Label htmlFor="confirmPassword" className="text-sm text-gray-700 mb-1 block">
-                                Confirm Password:
-                            </Label>
-                            <div className="relative">
-                                <Input
-                                    id="confirmPassword"
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    placeholder="Enter info"
-                                    value={formData.confirmPassword}
-                                    onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                                    className="w-full pr-10"
+                            <div className="flex gap-2">
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormControl>
+                                            <Input type="email" placeholder="Enter info" {...field} className="flex-1" />
+                                        </FormControl>
+                                    )}
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
+                                <FormField
+                                    control={form.control}
+                                    name="verificationCode"
+                                    render={({ field }) => (
+                                        <FormControl>
+                                            <Input type="text" placeholder="000000" {...field} className="w-20 text-center" maxLength={6} />
+                                        </FormControl>
+                                    )}
+                                />
                             </div>
-                        </div>
-                    </div>
+                            {/* Display messages for both email and verificationCode fields */}
+                            {form.formState.errors.email && <FormMessage>{form.formState.errors.email.message}</FormMessage>}
+                            {form.formState.errors.verificationCode && (
+                                <FormMessage>{form.formState.errors.verificationCode.message}</FormMessage>
+                            )}
+                            {emailSent && (
+                                <p className="mt-1 text-xs text-[hsla(160,84%,39%,1)]">
+                                    (Confirm the verification code that was sent to you email.)
+                                </p>
+                            )}
+                        </FormItem>
 
-                    {/* Next Button */}
-                    <Button
-                        type="submit"
-                        disabled={!isFormValid()}
-                        className="w-full bg-gray-300 hover:bg-gray-400 text-gray-600 disabled:bg-gray-200 disabled:text-gray-400 mt-6"
-                    >
-                        Next
-                    </Button>
-                </form>
+                        {/* Phone */}
+                        <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-sm text-gray-700">Phone:</FormLabel>
+                                    <FormControl>
+                                        <Input type="tel" placeholder="Enter info" {...field} className="w-full" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Password and Confirm Password */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-sm text-gray-700">Password:</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Input
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="Enter info"
+                                                    {...field}
+                                                    className="w-full pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
+                                                >
+                                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                </button>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-sm text-gray-700">Confirm Password:</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    placeholder="Enter info"
+                                                    {...field}
+                                                    className="w-full pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
+                                                >
+                                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                </button>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        {/* Next Button */}
+                        <Button
+                            type="submit"
+                            disabled={!form.formState.isValid || form.formState.isSubmitting}
+                            className="mt-6 w-full bg-gray-300 text-gray-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-gray-400"
+                        >
+                            Next
+                        </Button>
+                    </form>
+                </Form>
 
                 {/* Divider */}
-                <div className="flex items-center my-6">
+                <div className="my-6 flex items-center">
                     <div className="flex-1 border-t border-gray-300"></div>
-                    <span className="px-4 text-gray-500 text-sm">OR</span>
+                    <span className="px-4 text-sm text-gray-500">OR</span>
                     <div className="flex-1 border-t border-gray-300"></div>
                 </div>
 
                 {/* Social Login */}
-                <div className="flex justify-center gap-4 mb-6">
+                <div className="mb-6 flex justify-center gap-4">
                     {/* Google login */}
                     <button
                         onClick={() => handleSocialLogin("Google")}
-                        className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
+                        className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white transition-colors hover:bg-gray-50"
                     >
                         <GoogleLoginIcon />
                     </button>
-
                     {/* Facebook login */}
                     <button
                         onClick={() => handleSocialLogin("Facebook")}
-                        className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
+                        className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white transition-colors hover:bg-gray-50"
                     >
                         <FacebookLoginIcon />
                     </button>
-
                     {/* Apple login */}
                     <button
                         onClick={() => handleSocialLogin("Apple")}
-                        className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
+                        className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white transition-colors hover:bg-gray-50"
                     >
                         <AppleLoginIcon />
                     </button>
                 </div>
 
                 {/* Sign In Link */}
-                <div className="text-center mb-4">
-                    <span className="text-gray-600 text-sm">Already have an account? </span>
-                    <Link to="/signin" className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700 text-sm font-medium">
+                <div className="mb-4 text-center">
+                    <span className="text-sm text-gray-600">Already have an account? </span>
+                    <Link to="/signin" className="text-sm font-medium text-[hsla(160,84%,39%,1)] hover:text-cyan-700">
                         Sign In
                     </Link>
                 </div>
-
                 {/* Terms */}
                 <div className="text-center text-xs text-gray-500">
                     By signing up, you agree to our{" "}
