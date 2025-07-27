@@ -1,7 +1,9 @@
+"use client"
+
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { Form, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "sonner"
@@ -10,7 +12,7 @@ import AppleLoginIcon from "../common/apple-login-icon"
 import FacebookLoginIcon from "../common/facebook-login-icon"
 import GoogleLoginIcon from "../common/google-login-icon"
 import { BrandLogoDark } from "../common/brand-logo-dark"
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
@@ -60,7 +62,7 @@ export default function SignupForm() {
 
     const form = useForm<SignupFormValues>({
         resolver: zodResolver(SignupSchema),
-        mode: "onTouched", // Validate on blur/change
+        mode: "onChange", // Validate on blur/change
         defaultValues: {
             fullname: "",
             username: "",
@@ -150,51 +152,51 @@ export default function SignupForm() {
                             )}
                         />
 
-                        {/* Email and Verification Code */}
-                        <FormItem>
-                            <div className="mb-1 flex items-center justify-between">
-                                <FormLabel className="text-sm text-gray-700">Email:</FormLabel>
-                                <Button
-                                    type="button"
-                                    variant="link"
-                                    size="sm"
-                                    onClick={handleVerifyEmail}
-                                    className="h-auto p-0 text-sm text-[hsla(160,84%,39%,1)] hover:text-cyan-700"
-                                >
-                                    Verify Email:
-                                </Button>
-                            </div>
-                            <div className="flex gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormControl>
-                                            <Input type="email" placeholder="Enter info" {...field} className="flex-1" />
-                                        </FormControl>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="verificationCode"
-                                    render={({ field }) => (
-                                        <FormControl>
-                                            <Input type="text" placeholder="000000" {...field} className="w-20 text-center" maxLength={6} />
-                                        </FormControl>
-                                    )}
-                                />
-                            </div>
-                            {/* Display messages for both email and verificationCode fields */}
-                            {form.formState.errors.email && <FormMessage>{form.formState.errors.email.message}</FormMessage>}
-                            {form.formState.errors.verificationCode && (
-                                <FormMessage>{form.formState.errors.verificationCode.message}</FormMessage>
+                        {/* Email */}
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <div className="mb-1 flex items-center justify-between">
+                                        <FormLabel className="text-sm text-gray-700">Email:</FormLabel>
+                                        <Button
+                                            type="button"
+                                            variant="link"
+                                            size="sm"
+                                            onClick={handleVerifyEmail}
+                                            className="h-auto p-0 text-sm text-[hsla(160,84%,39%,1)] hover:text-cyan-700"
+                                        >
+                                            Verify Email:
+                                        </Button>
+                                    </div>
+                                    <FormControl>
+                                        <Input type="email" placeholder="Enter info" {...field} className="flex-1" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
                             )}
-                            {emailSent && (
-                                <p className="mt-1 text-xs text-[hsla(160,84%,39%,1)]">
-                                    (Confirm the verification code that was sent to you email.)
-                                </p>
+                        />
+
+                        {/* Verification Code */}
+                        <FormField
+                            control={form.control}
+                            name="verificationCode"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="sr-only">Verification Code</FormLabel> {/* Screen reader only label */}
+                                    <FormControl>
+                                        <Input type="text" placeholder="000000" {...field} className="w-full text-center" maxLength={6} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
                             )}
-                        </FormItem>
+                        />
+                        {emailSent && (
+                            <p className="mt-1 text-xs text-[hsla(160,84%,39%,1)]">
+                                (Confirm the verification code that was sent to you email.)
+                            </p>
+                        )}
 
                         {/* Phone */}
                         <FormField
@@ -329,7 +331,6 @@ export default function SignupForm() {
                     <Link to="/privacy" className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700">
                         Privacy Policy
                     </Link>
-                    .
                 </div>
             </div>
         </div>
