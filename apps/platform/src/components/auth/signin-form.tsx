@@ -59,7 +59,7 @@ export default function SigninForm() {
             toast.success(`Hey ${response?.user.name}, welcome back!`)
 
             queryClient.resetQueries()
-            navigate({ to: "/pay" })
+            navigate({ to: "/dashboard" })
         },
     })
 
