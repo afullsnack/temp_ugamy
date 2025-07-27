@@ -17,6 +17,10 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async({ context }) => {
+  const userSession = await context.queryClient.ensureInfiniteQueryData
+  },
+
   head: () => ({
     meta: [
       {

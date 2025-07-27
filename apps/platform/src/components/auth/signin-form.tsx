@@ -1,47 +1,70 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Eye, EyeOff } from "lucide-react"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import AppleLoginIcon from "../common/apple-login-icon"
 import FacebookLoginIcon from "../common/facebook-login-icon"
 import GoogleLoginIcon from "../common/google-login-icon"
 import { BrandLogoDark } from "../common/brand-logo-dark"
 import { Checkbox } from "../ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
+import type { CheckedState } from "@radix-ui/react-checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth-client"
 
 export const loginSchema = z.object({
     email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
-    password: z.string().min(1, "Password is required").min(6, "Password must be at least 6 characters"),
-    rememberMe: z.boolean().default(false),
+    password: z.string().min(1, "Password is required").min(6, "Password must be at least 6 characters")
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>
 
+const signIn = async (data: Omit<LoginFormData, "rememberMe">) => {
+    const { error, data: response } = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+    })
+
+    if (error) {
+        throw new Error(error.message)
+    }
+
+    return response
+}
+
 export default function SigninForm() {
+    const navigate = useNavigate()
+    const queryClient = useQueryClient()
+
     const [showPassword, setShowPassword] = useState(false)
+    const [rememberMe, setRememberMe] = useState<CheckedState>(false)
 
     const form = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
             email: "",
-            password: "",
-            rememberMe: true,
+            password: ""
         },
     })
 
-    const onSubmit = async (data: LoginFormData) => {
-        try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            console.log("Login data:", data)
-            // Handle successful login here
-        } catch (error) {
-            console.error("Login error:", error)
-        }
+    // Sign in mutation
+    const signInMutation = useMutation({
+        mutationFn: signIn,
+        onSuccess: (response) => {
+            toast.success(`Hey ${response.user.name}, welcome back!`)
+
+            queryClient.resetQueries()
+            navigate({ to: "/dashboard" })
+        },
+    })
+
+    const onSubmit = async (values: LoginFormData) => {
+        await signInMutation.mutateAsync(values)
     }
 
     const handleSocialLogin = (provider: string) => {
@@ -127,24 +150,14 @@ export default function SigninForm() {
                         </div>
 
                         {/* Remember Me Checkbox */}
-                        <FormField
-                            control={form.control}
-                            name="rememberMe"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-[10px] space-y-0">
-                                    <FormControl>
-                                        <Checkbox
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                            className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                                        />
-                                    </FormControl>
-                                    <div className="space-y-1 leading-none">
-                                        <FormLabel className="text-sm font-medium text-gray-700 cursor-pointer">Remember Me</FormLabel>
-                                    </div>
-                                </FormItem>
-                            )}
-                        />
+                        <div className="flex items-center gap-[10px]">
+                            <Checkbox
+                                checked={rememberMe}
+                                onCheckedChange={setRememberMe}
+                                className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                            />
+                            <p className="text-sm font-medium text-gray-700 cursor-pointer">Remember Me</p>
+                        </div>
 
                         {/* Submit Button */}
                         <Button
