@@ -31,7 +31,7 @@ const signIn = async (data: Omit<LoginFormData, "rememberMe">) => {
     })
 
     if (error) {
-        throw new Error(error.message)
+        toast.error(error.message ?? "Error while signing you in")
     }
 
     return response
@@ -56,7 +56,7 @@ export default function SigninForm() {
     const signInMutation = useMutation({
         mutationFn: signIn,
         onSuccess: (response) => {
-            toast.success(`Hey ${response.user.name}, welcome back!`)
+            toast.success(`Hey ${response?.user.name}, welcome back!`)
 
             queryClient.resetQueries()
             navigate({ to: "/dashboard" })
