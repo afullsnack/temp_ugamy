@@ -62,7 +62,7 @@ export default function SignupForm() {
 
     const form = useForm<SignupFormValues>({
         resolver: zodResolver(SignupSchema),
-        mode: "onChange", // Validate on blur/change
+        mode: "onChange",
         defaultValues: {
             fullname: "",
             username: "",
@@ -81,7 +81,7 @@ export default function SignupForm() {
             toast.success(`Proceed to sign in`)
 
             queryClient.resetQueries()
-            navigate({ to: "/signin" })
+            navigate({ to: "/pay" })
         },
     })
 
