@@ -59,7 +59,7 @@ export default function SigninForm() {
             toast.success(`Hey ${response?.user.name}, welcome back!`)
 
             queryClient.resetQueries()
-            navigate({ to: "/dashboard" })
+            navigate({ to: "/pay" })
         },
     })
 
@@ -162,7 +162,7 @@ export default function SigninForm() {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            disabled={form.formState.isSubmitting}
+                            // disabled={form.formState.isSubmitting}
                             className="w-full bg-[hsla(160,84%,39%,1)] hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
