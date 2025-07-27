@@ -165,9 +165,9 @@ export default function SignupForm() {
                                             variant="link"
                                             size="sm"
                                             onClick={handleVerifyEmail}
-                                            className="h-auto p-0 text-sm text-[hsla(160,84%,39%,1)] hover:text-cyan-700"
+                                            className="h-auto p-0 text-sm text-[hsla(160,84%,39%,1)] hover:text-cyan-700 underlined"
                                         >
-                                            Verify Email:
+                                            Verify Email
                                         </Button>
                                     </div>
                                     <FormControl>
@@ -184,9 +184,9 @@ export default function SignupForm() {
                             name="verificationCode"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="sr-only">Verification Code</FormLabel> {/* Screen reader only label */}
+                                    <FormLabel>Verification Code</FormLabel>
                                     <FormControl>
-                                        <Input type="text" placeholder="000000" {...field} className="w-full text-center" maxLength={6} />
+                                        <Input type="text" placeholder="000000" {...field} className="w-full" maxLength={6} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
