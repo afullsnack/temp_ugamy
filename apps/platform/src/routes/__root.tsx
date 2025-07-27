@@ -6,8 +6,6 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import Header from '../components/Header'
-
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
@@ -19,6 +17,10 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async({ context }) => {
+  const userSession = await context.queryClient.ensureInfiniteQueryData
+  },
+
   head: () => ({
     meta: [
       {
@@ -42,8 +44,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
   component: () => (
     <RootDocument>
-      <Header />
-
       <Outlet />
       <TanStackRouterDevtools />
 

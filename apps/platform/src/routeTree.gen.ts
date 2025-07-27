@@ -11,7 +11,14 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as PayRouteRouteImport } from './routes/pay/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PaySuccessfulRouteImport } from './routes/pay/successful'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
@@ -21,10 +28,45 @@ import { ServerRoute as ApiDemoNamesServerRouteImport } from './routes/api.demo-
 
 const rootServerRouteImport = createServerRootRoute()
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayRouteRoute = PayRouteRouteImport.update({
+  id: '/pay',
+  path: '/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PaySuccessfulRoute = PaySuccessfulRouteImport.update({
+  id: '/successful',
+  path: '/successful',
+  getParentRoute: () => PayRouteRoute,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
@@ -59,16 +101,30 @@ const ApiDemoNamesServerRoute = ApiDemoNamesServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/pay': typeof PayRouteRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
   '/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/pay/successful': typeof PaySuccessfulRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/pay': typeof PayRouteRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
   '/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/pay/successful': typeof PaySuccessfulRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -76,8 +132,15 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/pay': typeof PayRouteRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/pay/successful': typeof PaySuccessfulRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -86,24 +149,45 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/pay'
+    | '/dashboard'
+    | '/privacy'
+    | '/register'
+    | '/signin'
+    | '/terms'
     | '/signup'
     | '/demo/tanstack-query'
+    | '/pay/successful'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/pay'
+    | '/dashboard'
+    | '/privacy'
+    | '/register'
+    | '/signin'
+    | '/terms'
     | '/signup'
     | '/demo/tanstack-query'
+    | '/pay/successful'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
   id:
     | '__root__'
     | '/'
+    | '/pay'
+    | '/dashboard'
+    | '/privacy'
+    | '/register'
+    | '/signin'
+    | '/terms'
     | '/_auth/signup'
     | '/demo/tanstack-query'
+    | '/pay/successful'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -111,6 +195,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PayRouteRoute: typeof PayRouteRouteWithChildren
+  DashboardRoute: typeof DashboardRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RegisterRoute: typeof RegisterRoute
+  SigninRoute: typeof SigninRoute
+  TermsRoute: typeof TermsRoute
   AuthSignupRoute: typeof AuthSignupRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
@@ -141,12 +231,61 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay': {
+      id: '/pay'
+      path: '/pay'
+      fullPath: '/pay'
+      preLoaderRoute: typeof PayRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/pay/successful': {
+      id: '/pay/successful'
+      path: '/successful'
+      fullPath: '/pay/successful'
+      preLoaderRoute: typeof PaySuccessfulRouteImport
+      parentRoute: typeof PayRouteRoute
     }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
@@ -197,8 +336,26 @@ declare module '@tanstack/react-start/server' {
   }
 }
 
+interface PayRouteRouteChildren {
+  PaySuccessfulRoute: typeof PaySuccessfulRoute
+}
+
+const PayRouteRouteChildren: PayRouteRouteChildren = {
+  PaySuccessfulRoute: PaySuccessfulRoute,
+}
+
+const PayRouteRouteWithChildren = PayRouteRoute._addFileChildren(
+  PayRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PayRouteRoute: PayRouteRouteWithChildren,
+  DashboardRoute: DashboardRoute,
+  PrivacyRoute: PrivacyRoute,
+  RegisterRoute: RegisterRoute,
+  SigninRoute: SigninRoute,
+  TermsRoute: TermsRoute,
   AuthSignupRoute: AuthSignupRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,
