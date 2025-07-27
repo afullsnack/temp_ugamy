@@ -81,7 +81,7 @@ export default function SignupForm() {
             toast.success(`Proceed to sign in`)
 
             queryClient.resetQueries()
-            navigate({ to: "/pay" })
+            navigate({ to: "/signin" })
         },
     })
 
