@@ -1,7 +1,7 @@
 "use client"
 
 import BrandLogo from "../common/brand-logo"
-import WelcomeImage from "@/public/ugamy-welcome-image.png"
+// import WelcomeImage from "@/public/ugamy-welcome-image.png"
 
 export default function WelcomeScreen() {
     return (
@@ -31,7 +31,7 @@ export default function WelcomeScreen() {
                 </div>
             </div>
             {/* Background Image */}
-            <img src={WelcomeImage} alt="welcome image" className="absolute inset-0 w-full h-full" />
+            <img src="/ugamy-welcome-image.png?url." alt="welcome image" className="absolute inset-0 w-full h-full" />
         </div>
     )
 }
