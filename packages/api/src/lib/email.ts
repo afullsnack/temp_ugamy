@@ -14,12 +14,12 @@ export async function sendEmail({ to, subject, body, name }: IEmailProps) {
     emails: Array<Record<string, any>>;
     timestamp: string;
   }>(`${env.PLUNK_API_URL}/v1/send`, {
-    body: {
+    body: JSON.stringify({
       to,
       subject,
       body,
       name,
-    },
+    }),
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${env.PLUNK_API_KEY}`,
