@@ -34,13 +34,17 @@ COPY --from=builder /app/packages/api/src/db/migrations ./packages/api/dist/src/
 COPY --from=builder /app/packages/api/package.json ./packages/api/package.json
 
 ARG DATABASE_AUTH_TOKEN
+ARG DATABASE_URL
 # Set production environment
 ENV NODE_ENV="staging"
 ENV DATABASE_AUTH_TOKEN=$DATABASE_AUTH_TOKEN
+ENV DATABASE_URL=$DATABASE_URL
 
 RUN npm install -g pnpm
 
 RUN pnpm install --prod=false
+
+RUN pnpm run db
 
 # Expose the port your Hono.js application listens on
 EXPOSE 9999

@@ -8,8 +8,8 @@ primary_region = 'lhr'
 
 [build]
 
-[deploy]
-  release_command = 'pnpm run db'
+# [deploy]
+#   release_command = 'pnpm run db'
 
 [http_service]
   internal_port = 9999

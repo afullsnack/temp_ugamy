@@ -11,7 +11,7 @@ variables:
 
 deploy:
   script:
-    - flyctl deploy --config ./packages/api/fly.toml --dockerfile ./Dockerfile --remote-only --build-arg DATABASE_AUTH_TOKEN=$DATABASE_AUTH_TOKEN
+    - flyctl deploy --config ./packages/api/fly.toml --dockerfile ./Dockerfile --remote-only --build-arg DATABASE_AUTH_TOKEN=$DATABASE_AUTH_TOKEN --build-arg DATABASE_URL=$DATABASE_URL
     - echo "Deployment initiated"
   only:
     - main
