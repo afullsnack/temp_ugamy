@@ -18,14 +18,14 @@ const EnvSchema = z.object({
   DATABASE_URL: z.string().url(),
   DATABASE_AUTH_TOKEN: z.string().optional(),
   // Better auth
-  BETTER_AUTH_SERCRET: z.string().min(1),
-  BETTER_AUTH_URL: z.string().url(),
+  BETTER_AUTH_SERCRET: z.string().min(1).optional(),
+  BETTER_AUTH_URL: z.string().url().optional(),
 
   // Mailing provider
-  PLUNK_API_KEY: z.string().min(1),
-  PLUNK_API_URL: z.string().url(),
+  PLUNK_API_KEY: z.string().min(1).optional(),
+  PLUNK_API_URL: z.string().url().optional(),
 }).superRefine((input, ctx) => {
-  if (input.NODE_ENV === "production" && !input.DATABASE_AUTH_TOKEN) {
+  if (input.NODE_ENV === "production" || input.NODE_ENV === "staging" && !input.DATABASE_AUTH_TOKEN) {
     ctx.addIssue({
       code: z.ZodIssueCode.invalid_type,
       expected: "string",

@@ -9,8 +9,11 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "npm run lint --fix",
+    "db:generate": "pnpm with-env npx drizzle-kit generate --config=./dist/drizzle.config.js",
+    "db:migrate": "pnpm with-env npx drizzle-kit migrate --config=./dist/drizzle.config.js",
     "test": "cross-env NODE_ENV=test vitest",
-    "build": "tsc && tsc-alias"
+    "build": "tsc && tsc-alias",
+    "with-env": "dotenv -e .env.local -e .env --"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.3",
@@ -30,9 +33,10 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.13.3",
+    "@flydotio/dockerfile": "^0.7.10",
     "@types/node": "^24.0.10",
     "cross-env": "^7.0.3",
-    "drizzle-kit": "^0.24.2",
+    "drizzle-kit": "0.24.2",
     "eslint": "^9.28.0",
     "eslint-plugin-format": "^1.0.1",
     "tsc-alias": "^1.8.16",
