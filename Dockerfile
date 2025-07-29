@@ -34,7 +34,7 @@ COPY --from=builder /app/packages/api/src/db/migrations ./packages/api/dist/src/
 COPY --from=builder /app/packages/api/package.json ./packages/api/package.json
 
 # Set production environment
-ENV NODE_ENV="production"
+ENV NODE_ENV="staging"
 
 RUN npm install -g pnpm
 

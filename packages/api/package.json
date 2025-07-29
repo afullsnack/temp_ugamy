@@ -11,6 +11,8 @@
     "lint:fix": "npm run lint --fix",
     "db:generate": "pnpm with-env npx drizzle-kit generate --config=./dist/drizzle.config.js",
     "db:migrate": "pnpm with-env npx drizzle-kit migrate --config=./dist/drizzle.config.js",
+    "db:generate:dev": "pnpm with-env npx drizzle-kit generate --config=./drizzle.config.ts",
+    "db:migrate:dev": "pnpm with-env npx drizzle-kit migrate --config=./drizzle.config.ts",
     "test": "cross-env NODE_ENV=test vitest",
     "build": "tsc && tsc-alias",
     "with-env": "dotenv -e .env.local -e .env --"
