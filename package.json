@@ -8,8 +8,8 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "dev:package:api": "turbo dev --filter=@ugamy/api",
-    "build:package:api": "turbo build --filter=@ugamy/api",
-    "start:package:api": "turbo start --filter=@ugamy/api --env-mode=loose",
+    "build:package:api": "pnpm run --filter @ugamy/api build",
+    "start:package:api": "pnpm run --filter @ugamy/api start",
     "dev:app:dashboard": "turbo dev --filter=@ugamy/api",
     "db": "pnpm run --filter @ugamy/api db:generate && pnpm run --filter @ugamy/api db:migrate",
     "deploy": "flyctl deploy --config ./packages/api/fly.toml --dockerfile ./Dockerfile"
