@@ -38,7 +38,7 @@ ENV NODE_ENV="production"
 
 RUN npm install -g pnpm
 
-RUN pnpm install
+RUN pnpm install --prod=false
 
 # Expose the port your Hono.js application listens on
 EXPOSE 9999
