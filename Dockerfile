@@ -29,7 +29,7 @@ WORKDIR /app
 
 COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY --from=builder /app/package.json ./package.json
-COPY --from=bulder /app/turbo.json ./turbo.json
+COPY --from=builder /app/turbo.json ./turbo.json
 COPY --from=builder /app/packages/api/dist ./packages/api/dist
 COPY --from=builder /app/packages/api/src/db/migrations ./packages/api/dist/src/db/migrations
 COPY --from=builder /app/packages/api/package.json ./packages/api/package.json
