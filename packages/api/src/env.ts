@@ -14,8 +14,8 @@ expand(config({
 const EnvSchema = z.object({
   NODE_ENV: z.string().default("development"),
   PORT: z.coerce.number().default(9999),
-  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]),
-  DATABASE_URL: z.string().url(),
+  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("debug"),
+  DATABASE_URL: z.string().min(1),
   DATABASE_AUTH_TOKEN: z.string().optional(),
   // Better auth
   BETTER_AUTH_SERCRET: z.string().min(1).optional(),
