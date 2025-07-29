@@ -33,8 +33,10 @@ COPY --from=builder /app/packages/api/dist ./packages/api/dist
 COPY --from=builder /app/packages/api/src/db/migrations ./packages/api/dist/src/db/migrations
 COPY --from=builder /app/packages/api/package.json ./packages/api/package.json
 
+ARG DATABASE_AUTH_TOKEN
 # Set production environment
 ENV NODE_ENV="staging"
+ENV DATABASE_AUTH_TOKEN=$DATABASE_AUTH_TOKEN
 
 RUN npm install -g pnpm
 
