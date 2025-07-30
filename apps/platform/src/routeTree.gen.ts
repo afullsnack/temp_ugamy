@@ -13,6 +13,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SigninRouteImport } from './routes/signin'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -36,6 +37,11 @@ const TermsRoute = TermsRouteImport.update({
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
   '/signup': typeof AuthSignupRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
   '/signup': typeof AuthSignupRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
   '/_auth/signup': typeof AuthSignupRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/privacy'
     | '/register'
+    | '/reset-password'
     | '/signin'
     | '/terms'
     | '/signup'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/privacy'
     | '/register'
+    | '/reset-password'
     | '/signin'
     | '/terms'
     | '/signup'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/privacy'
     | '/register'
+    | '/reset-password'
     | '/signin'
     | '/terms'
     | '/_auth/signup'
@@ -199,6 +211,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SigninRoute: typeof SigninRoute
   TermsRoute: typeof TermsRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin'
       preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -354,6 +374,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SigninRoute: SigninRoute,
   TermsRoute: TermsRoute,
   AuthSignupRoute: AuthSignupRoute,
