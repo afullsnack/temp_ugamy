@@ -101,5 +101,5 @@ export const auth = betterAuth({
       },
     }),
   ],
-  trustedOrigins: ["*", "http://localhost:3000"],
+  trustedOrigins: ["*", "http://localhost:3000", "https://ugamy-backend-platform.vercel.app", "https://ugamy.io"],
 });
