@@ -8,7 +8,11 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "dev:package:api": "turbo dev --filter=@ugamy/api",
-    "dev:app:dashboard": "turbo dev --filter=@ugamy/api"
+    "build:package:api": "pnpm run --filter @ugamy/api build",
+    "start:package:api": "pnpm run --filter @ugamy/api start",
+    "dev:app:dashboard": "turbo dev --filter=@ugamy/api",
+    "db": "pnpm run --filter @ugamy/api db:generate && pnpm run --filter @ugamy/api db:migrate",
+    "deploy": "flyctl deploy --config ./packages/api/fly.toml --dockerfile ./Dockerfile"
   },
   "keywords": [
     "Video",
@@ -19,7 +23,8 @@
   "license": "ISC",
   "dependencies": {
     "@better-fetch/fetch": "^1.1.18",
-    "better-auth": "^1.2.12"
+    "better-auth": "^1.2.12",
+    "dotenv-cli": "^9.0.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.2",

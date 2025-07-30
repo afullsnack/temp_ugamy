@@ -1,0 +1,19 @@
+# default:
+#   image: flyio/flyctl:latest
+
+before_script:
+  - apt-get update -qq && apt-get install -y curl
+  - curl -L https://fly.io/install.sh | sh
+  - export PATH="/root/.fly/bin:$PATH"
+
+variables:
+  FLY_APP_NAME: ugamy-api # Replace with your Fly.io app name
+
+deploy:
+  script:
+    - echo "DB TOKEN= $DATABASE_AUTH_TOKEN"
+    - flyctl deploy --config ./packages/api/fly.toml --dockerfile ./Dockerfile --remote-only --build-arg DATABASE_AUTH_TOKEN=$DATABASE_AUTH_TOKEN --build-arg DATABASE_URL=$DATABASE_URL
+    - echo "Deployment initiated"
+  only:
+    - main
+    - staging
