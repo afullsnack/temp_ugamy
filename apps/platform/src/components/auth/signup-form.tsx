@@ -118,7 +118,7 @@ export default function SignupForm() {
     const onSubmit = async (values: SignupFormValues) => {
         const { data, error } = await authClient.emailOtp.verifyEmail({
             email: `${values.email}`,
-            otp: `${values.email}`,
+            otp: `${values.verificationCode}`,
         });
         if (data?.token) {
             signUpMutation.mutateAsync(values)
