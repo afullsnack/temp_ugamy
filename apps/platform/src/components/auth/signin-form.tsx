@@ -56,11 +56,16 @@ export default function SigninForm() {
     const signInMutation = useMutation({
         mutationFn: signIn,
         onSuccess: (response) => {
-            toast.success(`Hey ${response?.user.name}, welcome back!`)
+            if (response?.user) {
+                toast.success(`Hey ${response.user.name}, welcome back!`)
+            }
 
-            queryClient.resetQueries()
             navigate({ to: "/dashboard" })
+            queryClient.resetQueries()
         },
+        onError: (error) => {
+            toast.error(error.message || "Error signing you in. Try again")
+        }
     })
 
     const onSubmit = async (values: LoginFormData) => {
@@ -139,10 +144,9 @@ export default function SigninForm() {
                             <span className="text-gray-600">Forgot your password? </span>
                             <button
                                 type="button"
-                                className="text-[hsla(160,84%,39%,1)] hover:text-teal-700 font-medium"
+                                className="text-[hsla(160,84%,39%,1)] hover:text-teal-700 font-medium cursor-pointer"
                                 onClick={() => {
-                                    // Handle forgot password
-                                    console.log("Forgot password clicked")
+                                    navigate({ to: "/reset-password" })
                                 }}
                             >
                                 Reset here
@@ -162,8 +166,8 @@ export default function SigninForm() {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            // disabled={form.formState.isSubmitting}
-                            className="w-full bg-[hsla(160,84%,39%,1)] hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={!form.formState.isValid || form.formState.isSubmitting}
+                            className="w-full h-[50px] text-bold text-base text-white py-4 px-8 mt-6"
                         >
                             {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
                         </Button>

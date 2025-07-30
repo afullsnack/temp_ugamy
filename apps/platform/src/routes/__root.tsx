@@ -11,15 +11,13 @@ import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { Toaster } from '@/components/ui/sonner'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  beforeLoad: async({ context }) => {
-  const userSession = await context.queryClient.ensureInfiniteQueryData
-  },
 
   head: () => ({
     meta: [
@@ -65,6 +63,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <Toaster position='top-center' richColors />
         {children}
         <Scripts />
       </body>
