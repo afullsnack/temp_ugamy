@@ -4,12 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Link } from "@tanstack/react-router"
+import { toast } from "sonner"
 import { BrandLogoDark } from "../common/brand-logo-dark"
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { authClient } from "@/lib/auth-client"
-import { toast } from "sonner"
 
 const formSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
