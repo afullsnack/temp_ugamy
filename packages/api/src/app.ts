@@ -3,6 +3,7 @@ import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import index from "@/routes/index.route";
 import payments from "@/routes/payments/payments.index"
+import webhooks from "@/routes/webhooks/webhooks.index"
 
 const app = createApp();
 
@@ -10,7 +11,8 @@ configureOpenAPI(app);
 
 const routes = [
   index,
-  payments
+  payments,
+  webhooks
   // tasks,
 ] as const;
 
