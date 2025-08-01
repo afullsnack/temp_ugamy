@@ -12,5 +12,6 @@ export const plan: AppRouteHandler<PlanRoute> = (c) => {
 export const subscribe: AppRouteHandler<SubscribeRoute> = (c) => c.json({
   title: "Entry plan",
   amount: 40000,
-  interval: "30d"
+  interval: "30d",
+  link: "https://paystack.link/sdonoabdvabfaasdvnsoadvb"
 })

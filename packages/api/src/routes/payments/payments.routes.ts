@@ -46,7 +46,8 @@ export const subscribe = createRoute({
       z.object({
         title: z.string().optional(),
         amount: z.number(),
-        interval: z.string()
+        interval: z.string(),
+        link: z.string()
       }),
       "User subscribed successul"
     )
