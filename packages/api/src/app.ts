@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import index from "@/routes/index.route";
+import payments from "@/routes/payments/payments.index"
 
 const app = createApp();
 
@@ -9,6 +10,7 @@ configureOpenAPI(app);
 
 const routes = [
   index,
+  payments
   // tasks,
 ] as const;
 
