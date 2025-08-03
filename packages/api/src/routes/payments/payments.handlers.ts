@@ -4,6 +4,8 @@ import type { CreatePlanRoute, GetPlans, SubscribeRoute } from "./payments.route
 import type { AppRouteHandler } from "@/lib/types"
 import { plans } from "@/db/schema/schema"
 import * as HttpStatusCodes from "stoker/http-status-codes"
+import { user } from "@/db/schema/auth-schema"
+import { eq } from "drizzle-orm"
 
 
 export const plan: AppRouteHandler<CreatePlanRoute> = async (c) => {
@@ -66,6 +68,11 @@ export const subscribe: AppRouteHandler<SubscribeRoute> = async (c) => {
       message: error.message || "Failed to create transaction"
     }, HttpStatusCodes.BAD_REQUEST)
   }
+
+  await db.update(user)
+    .set({paymentReference: reference})
+    .where(eq(user.email, body.email))
+    .returning()
 
   return c.json(subscribeData, HttpStatusCodes.OK)
 }

@@ -24,6 +24,13 @@ export const paystack = createRoute({
         success: z.boolean()
       }),
       "Webhook respose"
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      z.object({
+        event: z.string(),
+        success: z.boolean()
+      }),
+      "Webhook bad request"
     )
   }
 })

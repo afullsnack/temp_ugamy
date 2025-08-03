@@ -12,6 +12,8 @@ export const user = sqliteTable("user", {
   emailVerified: integer("email_verified", { mode: "boolean" }).$defaultFn(() => false).notNull(),
   image: text("image"),
   planId: text("plan_id").references(() => plans.id, {onDelete: "no action"}),
+  isSubscribed: integer("is_subscribed", {mode: "boolean"}).$defaultFn(() => false),
+  paymentReference: text("payment_reference"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 });
