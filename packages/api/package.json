@@ -15,7 +15,7 @@
     "db:migrate:dev": "pnpm with-env npx drizzle-kit migrate --config=./drizzle.config.ts",
     "test": "cross-env NODE_ENV=test vitest",
     "build": "tsc && tsc-alias",
-    "with-env": "dotenv -e .env.local -e .env --"
+    "with-env": "dotenv -e .env --"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.3",

@@ -24,6 +24,10 @@ const EnvSchema = z.object({
   // Mailing provider
   PLUNK_API_KEY: z.string().min(1).optional(),
   PLUNK_API_URL: z.string().url().optional(),
+
+  // Paystack
+  PAYSTACK_SK: z.string().min(1).optional(),
+  PAYSTACK_PK: z.string().min(3).optional()
 }).superRefine((input, ctx) => {
   if (input.NODE_ENV === "production" || input.NODE_ENV === "staging" && !input.DATABASE_AUTH_TOKEN) {
     ctx.addIssue({

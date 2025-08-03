@@ -1,4 +1,5 @@
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { plans } from "./schema";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -10,6 +11,7 @@ export const user = sqliteTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: integer("email_verified", { mode: "boolean" }).$defaultFn(() => false).notNull(),
   image: text("image"),
+  planId: text("plan_id").references(() => plans.id, {onDelete: "no action"}),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 });

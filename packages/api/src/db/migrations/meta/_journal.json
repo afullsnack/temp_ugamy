@@ -36,6 +36,13 @@
       "when": 1753269814094,
       "tag": "0004_breezy_vindicator",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1754220387604,
+      "tag": "0005_massive_blindfold",
+      "breakpoints": false
     }
   ]
 }

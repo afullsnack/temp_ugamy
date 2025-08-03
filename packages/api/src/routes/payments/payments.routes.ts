@@ -1,29 +1,40 @@
+import { selectPlanSchema } from "@/db/schema/schema"
 import { createRoute, z } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
+import { createErrorSchema } from "stoker/openapi/schemas"
 
 
 const tags = ["Payments"]
 export const plan = createRoute({
   tags,
   method: "post",
-  path: "/payments/plan",
+  path: "/payments/plans",
   request: {
     body: jsonContentRequired(
       z.object({
         amount: z.number(),
-        title: z.string().optional()
+        name: z.string().optional().default("Monthly subscription")
       }),
       "Body request"
     )
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.object({
-        amount: z.number(),
-        title: z.string().optional()
-      }),
+      selectPlanSchema,
       "Response of plan creation"
+    )
+  }
+})
+
+export const getPlans = createRoute({
+  tags,
+  method: "get",
+  path: "/payments/plans",
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(selectPlanSchema),
+      "get all plans"
     )
   }
 })
@@ -35,25 +46,30 @@ export const subscribe = createRoute({
   request: {
     body: jsonContentRequired(
       z.object({
-        planId: z.number(),
-        email: z.string().email()
+        email: z.string().email(),
+        amount: z.coerce.number(),
+        planCode: z.string().optional(),
+        callbackUrl: z.string().optional()
       }),
       "Body request"
     )
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
+      z.record(z.string(), z.any()),
+      "Transaction init value"
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
       z.object({
-        title: z.string().optional(),
-        amount: z.number(),
-        interval: z.string(),
-        link: z.string()
+        status: z.boolean(),
+        message: z.string(),
       }),
-      "User subscribed successul"
+      "Bad request return"
     )
   }
 })
 
 
-export type PlanRoute = typeof plan
+export type CreatePlanRoute = typeof plan
+export type GetPlans = typeof getPlans
 export type SubscribeRoute = typeof subscribe
