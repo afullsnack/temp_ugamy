@@ -11,6 +11,7 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -29,6 +30,11 @@ import { ServerRoute as ApiDemoNamesServerRouteImport } from './routes/api.demo-
 
 const rootServerRouteImport = createServerRootRoute()
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/pay/successful': typeof PaySuccessfulRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/pay/successful': typeof PaySuccessfulRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/pay/successful': typeof PaySuccessfulRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/terms'
+    | '/verify-email'
     | '/signup'
     | '/demo/tanstack-query'
     | '/pay/successful'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/terms'
+    | '/verify-email'
     | '/signup'
     | '/demo/tanstack-query'
     | '/pay/successful'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/terms'
+    | '/verify-email'
     | '/_auth/signup'
     | '/demo/tanstack-query'
     | '/pay/successful'
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SigninRoute: typeof SigninRoute
   TermsRoute: typeof TermsRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   AuthSignupRoute: typeof AuthSignupRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
@@ -244,6 +257,13 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -377,6 +397,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SigninRoute: SigninRoute,
   TermsRoute: TermsRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   AuthSignupRoute: AuthSignupRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,

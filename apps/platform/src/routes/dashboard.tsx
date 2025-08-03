@@ -3,15 +3,18 @@ import CourseDashboard from '@/components/dashboard/course-dashboard'
 import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/dashboard')({
-  component: RouteComponent,
-  beforeLoad: async () => {
-    const { data: session } = await authClient.getSession()
-    // if (!session) {
-    //   throw redirect({ to: "/signin" })
-    // }
-  },
+  component: RouteComponent
+  // loader: async () => {
+  //   const { data: session } = await authClient.useSession()
+  //   if (!session) {
+  //     throw redirect({
+  //       to: '/signin'
+  //     })
+  //   }
+  //   return { session }
+  // },
 })
 
 function RouteComponent() {
-    return <CourseDashboard />
+  return <CourseDashboard />
 }
