@@ -51,7 +51,7 @@ export default function PaymentSelectionScreen() {
     const handleContinuePayment = () => {
         SubscribeMutation.mutate({
             email: "adiejoel14@gmail.com",
-            amount: "1000",
+            amount: "100000",
             callbackUrl: 'https://ugamy-backend-platform.vercel.app/pay/successful'
         })
     }
