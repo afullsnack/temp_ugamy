@@ -1,21 +1,59 @@
 "use client"
 
 import { useState } from "react"
+import axios from 'axios'
 import { Check, Shield } from "lucide-react"
+import { useMutation } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { BrandLogoDark } from "../common/brand-logo-dark"
 import { Button } from "@/components/ui/button"
 
+
+// TODO: Improve API integration implementation
+interface ISubscribeResponse {
+    status: boolean,
+    message: string,
+    data: {
+        authorization_url: string,
+        access_code: string,
+        reference: string
+    }
+}
+interface ISubscribePayload {
+    email: string,
+    amount: string,
+    planCode?: string,
+    callbackUrl: string
+}
+
+export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeResponse> => {
+    const response = await axios.post('https://ugamy-api.fly.dev/payments/subscribe', payload)
+    return response.data
+}
+
+
 export default function PaymentSelectionScreen() {
     const [selectedPayment, setSelectedPayment] = useState("paystack")
 
-    const handlePaymentSelect = (method: string) => {
-        setSelectedPayment(method)
-    }
+    // Subscribe API mutation
+    const SubscribeMutation = useMutation({
+        mutationFn: subscribe,
+        onSuccess: (data) => {
+            toast.success("Redirecting to Paystack checkout")
+            window.location.href = data.data.authorization_url
+        },
+        onError: (error) => {
+            toast.error(error.message || "Error subscribing. Please try again")
+        },
+    })
 
     const handleContinuePayment = () => {
-        console.log("Continuing with payment method:", selectedPayment)
-    // Handle payment continuation logic here
+        SubscribeMutation.mutate({
+            email: "adiejoel14@gmail.com",
+            amount: "1000",
+            callbackUrl: 'https://ugamy-backend-platform.vercel.app/pay/successful'
+        })
     }
 
     return (
@@ -75,7 +113,7 @@ export default function PaymentSelectionScreen() {
                     </AccordionItem>
 
                     {/* Stripe Option */}
-                    <AccordionItem value="stripe" className="p-[1px] border rounded-[8px] shadow-sm">
+                    <AccordionItem value="stripe" disabled className="p-[1px] border rounded-[8px] shadow-sm">
                         <AccordionTrigger className="bg-[hsla(210,20%,98%,1)] h-[44px] px-4 py-3 hover:no-underline rounded-none rounded-t-[8px] cursor-pointer">
                             <div className="flex items-center gap-3 w-full">
                                 <div className="flex items-center justify-center">
@@ -118,10 +156,11 @@ export default function PaymentSelectionScreen() {
                 {/* Continue Button */}
                 <Button
                     onClick={handleContinuePayment}
+                    disabled={SubscribeMutation.isPending}
                     className="w-full h-[50px] bg-[hsla(160,84%,39%,1)] hover:bg-[hsla(160,84%,39%,1)] text-white py-3 text-base font-medium rounded-[8px]"
                     size="lg"
                 >
-                    Continue to Payment
+                    {SubscribeMutation.isPending ? "Processing..." : "Continue to Payment"}
                 </Button>
             </div>
         </div>

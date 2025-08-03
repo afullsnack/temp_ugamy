@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "sonner"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import AppleLoginIcon from "../common/apple-login-icon"
 import FacebookLoginIcon from "../common/facebook-login-icon"
 import GoogleLoginIcon from "../common/google-login-icon"
@@ -22,11 +22,6 @@ const SignupSchema = z
         fullname: z.string().min(1, "Fullname is required"),
         username: z.string().min(1, "Username is required"),
         email: z.string().min(1, "Email is required").email("Invalid email address"),
-        verificationCode: z
-            .string()
-            .min(1, "Verification code is required")
-            .length(6, "Verification code must be 6 digits")
-            .regex(/^\d{6}$/, "Verification code must be numeric"),
         phone: z.string().min(1, "Phone number is required"),
         password: z.string().min(8, "Password must be at least 8 characters long"),
         confirmPassword: z.string().min(1, "Confirm password is required"),
@@ -57,11 +52,9 @@ const signUp = async (data: SignupFormValues) => {
 
 export default function SignupForm() {
     const navigate = useNavigate()
-    const queryClient = useQueryClient()
 
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [sendOTP, setSendOTP] = useState(false)
 
     const form = useForm<SignupFormValues>({
         resolver: zodResolver(SignupSchema),
@@ -70,12 +63,36 @@ export default function SignupForm() {
             fullname: "",
             username: "",
             email: "",
-            verificationCode: "",
             phone: "",
             password: "",
             confirmPassword: "",
         },
     })
+
+    const emailToSendOTP = form.watch("email");
+
+    // Handle verify Email
+    const handleSendEmailVerification = async () => {
+        if (!emailToSendOTP) {
+            toast.error("Enter email address")
+            form.setError("email", { message: "Email cannot be empty" })
+            return
+        }
+
+        // Send Email verification API mutation
+        const { data, error } = await authClient.emailOtp.sendVerificationOtp({
+            email: `${emailToSendOTP}`,
+            type: "email-verification",
+        })
+
+        if (data?.success) {
+            toast.success(`OTP has been sent to: ${emailToSendOTP}`)
+        }
+
+        if (error) {
+            toast.error(error.message ?? "Error sending OTP")
+        }
+    }
 
     // Sign up mutation
     const signUpMutation = useMutation({
@@ -83,49 +100,19 @@ export default function SignupForm() {
         onSuccess: () => {
             toast.success(`Proceed to sign in`)
 
-            queryClient.resetQueries()
-            navigate({ to: "/signin" })
+            handleSendEmailVerification()
+            navigate({ 
+                to: "/verify-email",
+                search: (prev) => ({ ...prev, email: emailToSendOTP }),
+             })
         },
         onError: (error) => {
             toast.error(error.message || "An unexpected error occured, kindly try again")
         }
     })
 
-    // Handle verify Email
-    const handleVerifyEmail = async () => {
-        const emailToSendOTP = form.watch("email");
-
-        if (!emailToSendOTP) {
-            toast.error("Enter email address")
-            form.setError("email", { message: "Email cannot be empty" })
-            return
-        }
-
-        const { data, error } = await authClient.emailOtp.sendVerificationOtp({
-            email: `${emailToSendOTP}`,
-            type: "email-verification",
-        })
-        if (data?.success) {
-            toast.success(`OTP has been sent to: ${emailToSendOTP}`)
-            setSendOTP(true)
-        }
-        if (error) {
-            toast.error(error.message ?? "Error sending OTP")
-            setSendOTP(false)
-        }
-    }
-
     const onSubmit = async (values: SignupFormValues) => {
-        const { data, error } = await authClient.emailOtp.verifyEmail({
-            email: `${values.email}`,
-            otp: `${values.verificationCode}`,
-        });
-        if (data?.token) {
-            signUpMutation.mutateAsync(values)
-        }
-        if (error) {
-            toast.error(error.message ?? "OTP not valid")
-        }
+        await signUpMutation.mutateAsync(values)
     }
 
     const handleSocialLogin = (provider: string) => {
@@ -187,18 +174,7 @@ export default function SignupForm() {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <div className="mb-1 flex items-center justify-between">
-                                        <FormLabel className="text-sm text-gray-700">Email:</FormLabel>
-                                        <Button
-                                            type="button"
-                                            variant="link"
-                                            size="sm"
-                                            onClick={handleVerifyEmail}
-                                            className="h-auto p-0 text-sm text-[hsla(160,84%,39%,1)] hover:text-cyan-700 underline"
-                                        >
-                                            Verify Email
-                                        </Button>
-                                    </div>
+                                    <FormLabel className="text-sm text-gray-700">Email:</FormLabel>
                                     <FormControl>
                                         <Input type="email" placeholder="Enter info" {...field} className="flex-1" />
                                     </FormControl>
@@ -206,26 +182,6 @@ export default function SignupForm() {
                                 </FormItem>
                             )}
                         />
-
-                        {/* Verification Code */}
-                        <FormField
-                            control={form.control}
-                            name="verificationCode"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Verification Code</FormLabel>
-                                    <FormControl>
-                                        <Input type="text" placeholder="000000" {...field} className="w-full" maxLength={6} disabled={!sendOTP} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        {sendOTP && (
-                            <p className="mt-1 text-xs text-[hsla(160,84%,39%,1)]">
-                                (Confirm the verification code that was sent to you email.)
-                            </p>
-                        )}
 
                         {/* Phone */}
                         <FormField
