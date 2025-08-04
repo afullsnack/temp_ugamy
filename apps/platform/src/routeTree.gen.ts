@@ -17,10 +17,10 @@ import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PaymentSuccessfulRouteImport } from './routes/payment-successful'
+import { Route as PayRouteImport } from './routes/pay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as PayRouteRouteImport } from './routes/pay/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PaySuccessfulRouteImport } from './routes/pay/successful'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
@@ -60,25 +60,25 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentSuccessfulRoute = PaymentSuccessfulRouteImport.update({
+  id: '/payment-successful',
+  path: '/payment-successful',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayRoute = PayRouteImport.update({
+  id: '/pay',
+  path: '/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayRouteRoute = PayRouteRouteImport.update({
-  id: '/pay',
-  path: '/pay',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const PaySuccessfulRoute = PaySuccessfulRouteImport.update({
-  id: '/successful',
-  path: '/successful',
-  getParentRoute: () => PayRouteRoute,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
@@ -113,8 +113,9 @@ const ApiDemoNamesServerRoute = ApiDemoNamesServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/pay': typeof PayRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/pay': typeof PayRoute
+  '/payment-successful': typeof PaymentSuccessfulRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -123,15 +124,15 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/pay/successful': typeof PaySuccessfulRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/pay': typeof PayRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/pay': typeof PayRoute
+  '/payment-successful': typeof PaymentSuccessfulRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -140,7 +141,6 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/pay/successful': typeof PaySuccessfulRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -148,8 +148,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/pay': typeof PayRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/pay': typeof PayRoute
+  '/payment-successful': typeof PaymentSuccessfulRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -158,7 +159,6 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/pay/successful': typeof PaySuccessfulRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -167,8 +167,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/pay'
     | '/dashboard'
+    | '/pay'
+    | '/payment-successful'
     | '/privacy'
     | '/register'
     | '/reset-password'
@@ -177,15 +178,15 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/signup'
     | '/demo/tanstack-query'
-    | '/pay/successful'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/pay'
     | '/dashboard'
+    | '/pay'
+    | '/payment-successful'
     | '/privacy'
     | '/register'
     | '/reset-password'
@@ -194,15 +195,15 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/signup'
     | '/demo/tanstack-query'
-    | '/pay/successful'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
   id:
     | '__root__'
     | '/'
-    | '/pay'
     | '/dashboard'
+    | '/pay'
+    | '/payment-successful'
     | '/privacy'
     | '/register'
     | '/reset-password'
@@ -211,7 +212,6 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/_auth/signup'
     | '/demo/tanstack-query'
-    | '/pay/successful'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -219,8 +219,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PayRouteRoute: typeof PayRouteRouteWithChildren
   DashboardRoute: typeof DashboardRoute
+  PayRoute: typeof PayRoute
+  PaymentSuccessfulRoute: typeof PaymentSuccessfulRoute
   PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -299,18 +300,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/payment-successful': {
+      id: '/payment-successful'
+      path: '/payment-successful'
+      fullPath: '/payment-successful'
+      preLoaderRoute: typeof PaymentSuccessfulRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pay': {
       id: '/pay'
       path: '/pay'
       fullPath: '/pay'
-      preLoaderRoute: typeof PayRouteRouteImport
+      preLoaderRoute: typeof PayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -319,13 +327,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/pay/successful': {
-      id: '/pay/successful'
-      path: '/successful'
-      fullPath: '/pay/successful'
-      preLoaderRoute: typeof PaySuccessfulRouteImport
-      parentRoute: typeof PayRouteRoute
     }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
@@ -376,22 +377,11 @@ declare module '@tanstack/react-start/server' {
   }
 }
 
-interface PayRouteRouteChildren {
-  PaySuccessfulRoute: typeof PaySuccessfulRoute
-}
-
-const PayRouteRouteChildren: PayRouteRouteChildren = {
-  PaySuccessfulRoute: PaySuccessfulRoute,
-}
-
-const PayRouteRouteWithChildren = PayRouteRoute._addFileChildren(
-  PayRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PayRouteRoute: PayRouteRouteWithChildren,
   DashboardRoute: DashboardRoute,
+  PayRoute: PayRoute,
+  PaymentSuccessfulRoute: PaymentSuccessfulRoute,
   PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,

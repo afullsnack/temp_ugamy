@@ -8,9 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "sonner"
 import { useMutation } from "@tanstack/react-query"
-import AppleLoginIcon from "../common/apple-login-icon"
-import FacebookLoginIcon from "../common/facebook-login-icon"
-import GoogleLoginIcon from "../common/google-login-icon"
+// import AppleLoginIcon from "../common/apple-login-icon"
+// import FacebookLoginIcon from "../common/facebook-login-icon"
+// import GoogleLoginIcon from "../common/google-login-icon"
 import { BrandLogoDark } from "../common/brand-logo-dark"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Button } from "@/components/ui/button"
@@ -69,27 +69,19 @@ export default function SignupForm() {
         },
     })
 
-    const emailToSendOTP = form.watch("email");
-
     // Handle verify Email
-    const handleSendEmailVerification = async () => {
-        if (!emailToSendOTP) {
-            toast.error("Enter email address")
-            form.setError("email", { message: "Email cannot be empty" })
-            return
-        }
-
+    const handleSendEmailVerification = async (payload: { email: string }) => {
         // Send Email verification API mutation
         const { data, error } = await authClient.emailOtp.sendVerificationOtp({
-            email: `${emailToSendOTP}`,
+            email: payload.email,
             type: "email-verification",
         })
 
         if (data?.success) {
-            toast.success(`OTP has been sent to: ${emailToSendOTP}`)
+            toast.success(`OTP has been sent to: ${payload.email}`)
             navigate({
                 to: "/verify-email",
-                search: (prev) => ({ ...prev, email: emailToSendOTP }),
+                search: (prev) => ({ ...prev, email: `${payload.email}` }),
             })
         }
 
@@ -101,16 +93,6 @@ export default function SignupForm() {
     // Reset Password mutation
     const { isPending, mutateAsync } = useMutation({
         mutationFn: signUp,
-        onSuccess: (data) => {
-            if (data.user.emailVerified) {
-                toast.success("Proceed to sign in")
-                navigate({
-                    to: "/signin"
-                })
-            } else {
-                handleSendEmailVerification()
-            }
-        },
         onError: (error) => {
             toast.error(error.message || "An unexpected error occured, kindly try again")
         }
@@ -118,10 +100,18 @@ export default function SignupForm() {
 
     const onSubmit = async (values: SignupFormValues) => {
         await mutateAsync(values)
-    }
-
-    const handleSocialLogin = (provider: string) => {
-        console.log(`Login with ${provider}`)
+            .then((data) => {
+                if (data.user.emailVerified) {
+                    toast.success("Proceed to sign in")
+                    navigate({
+                        to: "/signin"
+                    })
+                } else {
+                    handleSendEmailVerification({
+                        email: values.email
+                    })
+                }
+            })
     }
 
     return (
@@ -273,36 +263,36 @@ export default function SignupForm() {
                 </Form>
 
                 {/* Divider */}
-                <div className="my-6 flex items-center">
+                {/* <div className="my-6 flex items-center">
                     <div className="flex-1 border-t border-gray-300"></div>
                     <span className="px-4 text-sm text-gray-500">OR</span>
                     <div className="flex-1 border-t border-gray-300"></div>
-                </div>
+                </div> */}
 
                 {/* Social Login */}
-                <div className="mb-6 flex justify-center gap-4">
-                    {/* Google login */}
-                    <button
+                {/* <div className="mb-6 flex justify-center gap-4"> */}
+                {/* Google login */}
+                {/* <button
                         onClick={() => handleSocialLogin("Google")}
                         className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white transition-colors hover:bg-gray-50"
                     >
                         <GoogleLoginIcon />
-                    </button>
-                    {/* Facebook login */}
-                    <button
+                    </button> */}
+                {/* Facebook login */}
+                {/* <button
                         onClick={() => handleSocialLogin("Facebook")}
                         className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white transition-colors hover:bg-gray-50"
                     >
                         <FacebookLoginIcon />
-                    </button>
-                    {/* Apple login */}
-                    <button
+                    </button> */}
+                {/* Apple login */}
+                {/* <button
                         onClick={() => handleSocialLogin("Apple")}
                         className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white transition-colors hover:bg-gray-50"
                     >
                         <AppleLoginIcon />
-                    </button>
-                </div>
+                    </button> */}
+                {/* </div> */}
 
                 {/* Sign In Link */}
                 <div className="mb-4 text-center">
