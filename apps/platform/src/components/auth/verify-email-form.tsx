@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Link, useNavigate, useSearch } from "@tanstack/react-router"
 import { toast } from "sonner"
+import { useMutation } from "@tanstack/react-query"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Button } from "../ui/button"
@@ -24,6 +25,19 @@ const formSchema = z.object({
             message: "Verification code must be 6 digits.",
         }),
 })
+
+const VerifyEmail = async (payload: { code: string, email: string }) => {
+    const { data, error } = await authClient.emailOtp.verifyEmail({
+        email: payload.email,
+        otp: payload.code,
+    });
+
+    if (error) {
+        throw error
+    }
+
+    return data
+}
 
 export default function VerifyEmailForm() {
     const navigate = useNavigate()
@@ -61,18 +75,25 @@ export default function VerifyEmailForm() {
         }
     }
 
+    // Verify Email
+    const { isPending, mutateAsync } = useMutation({
+        mutationFn: VerifyEmail,
+        onSuccess: () => {
+            toast.success("Proceed to sign in")
+            navigate({
+                to: "/dashboard"
+            })
+        },
+        onError: (error) => {
+            toast.error(error.message || "An unexpected error occured, kindly try again")
+        }
+    })
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const { data, error } = await authClient.emailOtp.verifyEmail({
-            email: `${search.email ?? ""}`,
-            otp: `${values.code}`,
-        });
-        if (data?.token) {
-            toast.success("Email verification successful proceed to sign in")
-            navigate({ to: "/signin" })
-        }
-        if (error) {
-            toast.error(error.message ?? "OTP not valid")
-        }
+        await mutateAsync({
+            code: values.code,
+            email: search.email ?? ""
+        })
     }
 
     return (
@@ -99,8 +120,8 @@ export default function VerifyEmailForm() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full h-[50px]">
-                            Verify Account
+                        <Button type="submit" disabled={isPending} className="w-full h-[50px]">
+                            {isPending ? "Verifying Account..." : " Verify Account"}
                         </Button>
                     </form>
                 </Form>

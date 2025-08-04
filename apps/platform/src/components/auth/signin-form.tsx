@@ -24,17 +24,17 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>
 
-const signIn = async (data: Omit<LoginFormData, "rememberMe">) => {
-    const { error, data: response } = await authClient.signIn.email({
-        email: data.email,
-        password: data.password,
+const signIn = async (payload: Omit<LoginFormData, "rememberMe">) => {
+    const { error, data } = await authClient.signIn.email({
+        email: payload.email,
+        password: payload.password,
     })
 
     if (error) {
-        toast.error(error.message ?? "Error while signing you in")
+        throw error
     }
 
-    return response
+    return data
 }
 
 export default function SigninForm() {
@@ -53,15 +53,12 @@ export default function SigninForm() {
     })
 
     // Sign in mutation
-    const signInMutation = useMutation({
+    const { mutateAsync, isPending } = useMutation({
         mutationFn: signIn,
         onSuccess: (response) => {
-            if (response?.user) {
-                toast.success(`Hey ${response.user.name}, welcome back!`)
-            }
-
-            navigate({ to: "/dashboard" })
             queryClient.resetQueries()
+            navigate({ to: "/dashboard" })
+            toast.success(`Hey ${response.user.name}, welcome back!`)
         },
         onError: (error) => {
             toast.error(error.message || "Error signing you in. Try again")
@@ -69,7 +66,7 @@ export default function SigninForm() {
     })
 
     const onSubmit = async (values: LoginFormData) => {
-        await signInMutation.mutateAsync(values)
+        await mutateAsync(values)
     }
 
     const handleSocialLogin = (provider: string) => {
@@ -166,10 +163,10 @@ export default function SigninForm() {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            disabled={!form.formState.isValid || form.formState.isSubmitting}
+                            disabled={isPending}
                             className="w-full h-[50px] text-bold text-base text-white py-4 px-8 mt-6"
                         >
-                            {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
+                            {isPending ? "Signing In..." : "Sign In"}
                         </Button>
                     </form>
                 </Form>

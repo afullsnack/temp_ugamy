@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import CourseDashboard from '@/components/dashboard/course-dashboard'
+import CourseDashboard from '@/components/dashboard/dashboard-temp'
 import { authClient } from '@/lib/auth-client'
 import DashboardFallback from '@/components/dashboard/dashboard-fallback'
 
@@ -17,6 +17,5 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function RouteComponent() {
-  return <DashboardFallback />
-  // return <CourseDashboard />
+  return <CourseDashboard />
 }

@@ -3,8 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { BrandLogoDark } from "../common/brand-logo-dark"
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Input } from "../ui/input"
@@ -15,7 +16,22 @@ const formSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
 })
 
+const ResetPassword = async (payload: { email: string }) => {
+    const { data, error } = await authClient.forgetPassword.emailOtp({
+        email: payload.email,
+    });
+
+    if (error) {
+        throw error
+    }
+
+    return data
+}
+
 const ResetPasswordForm = () => {
+    const navigate = useNavigate()
+    const queryClient = useQueryClient()
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -23,18 +39,21 @@ const ResetPasswordForm = () => {
         },
     })
 
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const emailToSendLink = form.watch("email");
+    // Reset password mutation
+    const { mutateAsync, isPending } = useMutation({
+        mutationFn: ResetPassword,
+        onSuccess: () => {
+            queryClient.resetQueries()
+            toast.success("proceed to sign in")
+            navigate({ to: "/signin" })
+        },
+        onError: (error) => {
+            toast.error(error.message || "Error resetting your password. Try again")
+        }
+    })
 
-        const { data, error } = await authClient.forgetPassword.emailOtp({
-            email: `${values}`,
-        });
-        if (data?.success) {
-            toast.success(`Check you email: ${emailToSendLink}`)
-        }
-        if (error) {
-            toast.error(error.message ?? "Error sending reset link")
-        }
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        await mutateAsync(values)
     }
 
     return (
@@ -71,10 +90,10 @@ const ResetPasswordForm = () => {
                         <div>
                             <Button
                                 type="submit"
-                                disabled={!form.formState.isValid || form.formState.isSubmitting}
+                                disabled={isPending}
                                 className="flex w-full h-[50px] justify-center font-bold rounded-md border border-transparent bg-primary px-4 py-2 text-sm text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             >
-                                {form.formState.isSubmitting ? "Sending..." : "Send Reset Link"}
+                                {isPending ? "Sending..." : "Send Reset Link"}
                             </Button>
                         </div>
                     </form>

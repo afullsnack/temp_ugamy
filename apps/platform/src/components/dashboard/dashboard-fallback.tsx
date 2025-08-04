@@ -1,13 +1,14 @@
 import { useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
+import FallbackIllust from "@/public/dashboard-fallback-illust.png"
 
 const DashboardFallback = () => {
     const navigate = useNavigate()
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4 py-12 text-center">
-            <div className="space-y-6">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-white mt-8 text-center">
+            <div className="max-w-[370px] space-y-6 px-4 py-12">
                 <img
-                    src="/dashboard-fallback-illust.png?url"
+                    src={FallbackIllust}
                     alt="fallback url"
                     width={200}
                     height={150}

@@ -34,17 +34,17 @@ const SignupSchema = z
 type SignupFormValues = z.infer<typeof SignupSchema>
 
 // Handle Signup
-const signUp = async (data: SignupFormValues) => {
-    const { error } = await authClient.signUp.email({
-        email: data.email,
-        password: data.password,
-        name: data.fullname,
-        username: data.username,
-        phoneNumber: data.phone,
+const signUp = async (payload: SignupFormValues) => {
+    const { error, data } = await authClient.signUp.email({
+        email: payload.email,
+        password: payload.password,
+        name: payload.fullname,
+        username: payload.username,
+        phoneNumber: payload.phone,
     })
 
     if (error) {
-        toast.error(error.message ?? "")
+        throw error
     }
 
     return data
@@ -87,6 +87,10 @@ export default function SignupForm() {
 
         if (data?.success) {
             toast.success(`OTP has been sent to: ${emailToSendOTP}`)
+            navigate({
+                to: "/verify-email",
+                search: (prev) => ({ ...prev, email: emailToSendOTP }),
+            })
         }
 
         if (error) {
@@ -94,17 +98,18 @@ export default function SignupForm() {
         }
     }
 
-    // Sign up mutation
-    const signUpMutation = useMutation({
+    // Reset Password mutation
+    const { isPending, mutateAsync } = useMutation({
         mutationFn: signUp,
-        onSuccess: () => {
-            toast.success(`Proceed to sign in`)
-
-            handleSendEmailVerification()
-            navigate({ 
-                to: "/verify-email",
-                search: (prev) => ({ ...prev, email: emailToSendOTP }),
-             })
+        onSuccess: (data) => {
+            if (data.user.emailVerified) {
+                toast.success("Proceed to sign in")
+                navigate({
+                    to: "/signin"
+                })
+            } else {
+                handleSendEmailVerification()
+            }
         },
         onError: (error) => {
             toast.error(error.message || "An unexpected error occured, kindly try again")
@@ -112,7 +117,7 @@ export default function SignupForm() {
     })
 
     const onSubmit = async (values: SignupFormValues) => {
-        await signUpMutation.mutateAsync(values)
+        await mutateAsync(values)
     }
 
     const handleSocialLogin = (provider: string) => {
@@ -259,10 +264,10 @@ export default function SignupForm() {
                         {/* Next Button */}
                         <Button
                             type="submit"
-                            disabled={!form.formState.isValid || form.formState.isSubmitting}
+                            disabled={isPending}
                             className="w-full h-[50px] text-bold text-base text-white py-4 px-8 mt-6"
                         >
-                            Create Account
+                            {isPending ? "Creating Account..." : "Create Account"}
                         </Button>
                     </form>
                 </Form>
