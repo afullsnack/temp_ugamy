@@ -34,25 +34,6 @@ export const auth = betterAuth({
       }
     },
   },
-  emailVerification: {
-    sendVerificationEmail: async (ctx, _) => {
-      try {
-        await sendEmail({
-          to: ctx.user.email,
-          subject: "Verify your email",
-          body: `Your verification code is ${ctx.token}`,
-          name: "Ugamy",
-        });
-      }
-      catch (error: any) {
-        console.error("Fail to send email verificaiton otp", error);
-        throw new APIError("INTERNAL_SERVER_ERROR", { message: "Failed to send email verification otp", code: error?.code || 500 });
-      }
-    },
-    onEmailVerification: async (user, _) => {
-      console.log(`${user.name} with email ${user.email} has been verified`);
-    },
-  },
   plugins: [
     username({
       usernameValidator: (username) => {
