@@ -49,7 +49,7 @@ export const auth = betterAuth({
       otpLength: 6,
       expiresIn: 60 * 5, // 5 minutes
       allowedAttempts: 5,
-      sendVerificationOnSignUp: true,
+      sendVerificationOnSignUp: false,
       sendVerificationOTP: async ({ email, otp, type }) => {
         if (type === "email-verification") {
           try {
