@@ -7,6 +7,7 @@ import db from "@/db";
 import * as authSchema from "@/db/schema/auth-schema";
 
 import { sendEmail } from "./email";
+import env from "@/env";
 
 export const auth = betterAuth({
   basePath: "/api/auth",
@@ -83,4 +84,17 @@ export const auth = betterAuth({
     }),
   ],
   trustedOrigins: ["*", "http://localhost:3000", "https://ugamy-backend-platform.vercel.app", "https://ugamy.io"],
+  advanced: {
+    cookies: {
+      session_token: {
+        attributes: {
+          sameSite: env.NODE_ENV === "development" ? "Lax" : "None",
+          secure: env.NODE_ENV !== "development",
+          // domain: env.NODE_ENV === "development"? 'localhost' : 'passry.com',
+          // path: "/",
+          partitioned: env.NODE_ENV !== "development"
+        },
+      },
+    },
+  },
 });
