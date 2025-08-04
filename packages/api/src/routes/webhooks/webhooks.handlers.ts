@@ -13,7 +13,6 @@ import type { PaystackWebhookRoute } from "./webhooks.routes";
 export const paystack: AppRouteHandler<PaystackWebhookRoute> = async (c) => {
   try {
     const body = await c.req.valid("json");
-    console.log("Webhook event", body);
 
     const hash = crypto.createHmac("sha512", env.PAYSTACK_SK!)
       .update(JSON.stringify(body))
@@ -32,11 +31,9 @@ export const paystack: AppRouteHandler<PaystackWebhookRoute> = async (c) => {
 
         if (userExists && userExists.paymentReference === reference) {
         // User is subscribed
-          const [userUpdate] = await db.update(user)
+          await db.update(user)
             .set({ isSubscribed: true })
-            .where(eq(user.email, email))
-            .returning();
-          console.log("User subscription recorded", userUpdate);
+            .where(eq(user.email, email));
         }
       }
 
@@ -51,7 +48,7 @@ export const paystack: AppRouteHandler<PaystackWebhookRoute> = async (c) => {
     }, HttpStatusCodes.BAD_REQUEST);
   }
   catch (error: any) {
-    console.log("Error in paystack webhook", error);
+    console.error("Error in paystack webhook", error);
     return c.json({
       success: false,
       event: "charge.failed",
