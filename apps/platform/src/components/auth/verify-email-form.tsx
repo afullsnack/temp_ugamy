@@ -81,7 +81,7 @@ export default function VerifyEmailForm() {
         onSuccess: () => {
             toast.success("Proceed to sign in")
             navigate({
-                to: "/dashboard"
+                to: "/signin"
             })
         },
         onError: (error) => {
@@ -129,7 +129,7 @@ export default function VerifyEmailForm() {
             <CardFooter className="flex flex-col gap-2 text-sm">
                 <p className="text-muted-foreground">
                     Didn't receive the code?{" "}
-                    <Button variant="link" onClick={handleSendEmailVerification} className="font-medium text-primary hover:underline p-0">
+                    <Button type="button" variant="link" onClick={handleSendEmailVerification} className="font-medium text-primary hover:underline p-0">
                         Resend Code
                     </Button>
                 </p>
