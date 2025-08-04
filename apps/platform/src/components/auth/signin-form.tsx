@@ -6,9 +6,9 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import AppleLoginIcon from "../common/apple-login-icon"
-import FacebookLoginIcon from "../common/facebook-login-icon"
-import GoogleLoginIcon from "../common/google-login-icon"
+// import AppleLoginIcon from "../common/apple-login-icon"
+// import FacebookLoginIcon from "../common/facebook-login-icon"
+// import GoogleLoginIcon from "../common/google-login-icon"
 import { BrandLogoDark } from "../common/brand-logo-dark"
 import { Checkbox } from "../ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
@@ -67,10 +67,6 @@ export default function SigninForm() {
 
     const onSubmit = async (values: LoginFormData) => {
         await mutateAsync(values)
-    }
-
-    const handleSocialLogin = (provider: string) => {
-        console.log(`Login with ${provider}`)
     }
 
     return (
@@ -172,38 +168,38 @@ export default function SigninForm() {
                 </Form>
 
                 {/* Divider */}
-                <div className="flex items-center my-6">
+                {/* <div className="flex items-center my-6">
                     <div className="flex-1 border-t border-gray-300"></div>
                     <span className="px-4 text-gray-500 text-sm">OR</span>
                     <div className="flex-1 border-t border-gray-300"></div>
-                </div>
+                </div> */}
 
                 {/* Social Login */}
-                <div className="flex justify-center gap-4 mb-6">
+                {/* <div className="flex justify-center gap-4 mb-6"> */}
                     {/* Google login */}
-                    <button
+                    {/* <button
                         onClick={() => handleSocialLogin("Google")}
                         className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <GoogleLoginIcon />
-                    </button>
+                    </button> */}
 
                     {/* Facebook login */}
-                    <button
+                    {/* <button
                         onClick={() => handleSocialLogin("Facebook")}
                         className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <FacebookLoginIcon />
-                    </button>
+                    </button> */}
 
                     {/* Apple login */}
-                    <button
+                    {/* <button
                         onClick={() => handleSocialLogin("Apple")}
                         className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <AppleLoginIcon />
-                    </button>
-                </div>
+                    </button> */}
+                {/* </div> */}
 
                 {/* Sign In Link */}
                 <div className="text-center mb-4">

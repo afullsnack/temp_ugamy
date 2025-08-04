@@ -6,7 +6,7 @@ import { Check, Shield } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
-import { BrandLogoDark } from "../common/brand-logo-dark"
+import { BrandLogoDark } from "./brand-logo-dark"
 import { Button } from "@/components/ui/button"
 
 
@@ -51,8 +51,9 @@ export default function PaymentSelectionScreen() {
     const handleContinuePayment = () => {
         SubscribeMutation.mutate({
             email: "adiejoel14@gmail.com",
-            amount: "100000",
-            callbackUrl: 'https://ugamy-backend-platform.vercel.app/pay/successful'
+            amount: "1000000",
+            // Create a constant for this
+            callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'
         })
     }
 
