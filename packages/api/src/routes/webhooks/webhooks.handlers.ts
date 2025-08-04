@@ -11,42 +11,50 @@ import env from "@/env";
 import type { PaystackWebhookRoute } from "./webhooks.routes";
 
 export const paystack: AppRouteHandler<PaystackWebhookRoute> = async (c) => {
-  const body = await c.req.raw.json();
-  console.log("Webhook event", body);
+  try {
+    const body = await c.req.valid("json");
+    console.log("Webhook event", body);
 
-  const hash = crypto.createHmac("sha512", env.PAYSTACK_SK!)
-    .update(JSON.stringify(body))
-    .digest("hex");
+    const hash = crypto.createHmac("sha512", env.PAYSTACK_SK!)
+      .update(JSON.stringify(body))
+      .digest("hex");
 
-  if (hash === c.req.raw.headers.get("x-paystack-signature")) {
+    if (hash === c.req.raw.headers.get("x-paystack-signature")) {
     // TODO: handle event
 
-    if (body.event === "charge.success") {
-      const reference = body.data.reference;
-      const email = body.data.customer.email;
+      if (body.event === "charge.success") {
+        const reference = body.data.reference;
+        const email = body.data.customer.email;
 
-      const userExists = await db.query.user.findFirst({
-        where: (fields, ops) => ops.eq(fields.email, email),
-      });
+        const userExists = await db.query.user.findFirst({
+          where: (fields, ops) => ops.eq(fields.email, email),
+        });
 
-      if (userExists && userExists.paymentReference === reference) {
+        if (userExists && userExists.paymentReference === reference) {
         // User is subscribed
-        const [userUpdate] = await db.update(user)
-          .set({ isSubscribed: true })
-          .where(eq(user.email, email))
-          .returning();
-        console.log("User subscription recorded", userUpdate);
+          const [userUpdate] = await db.update(user)
+            .set({ isSubscribed: true })
+            .where(eq(user.email, email))
+            .returning();
+          console.log("User subscription recorded", userUpdate);
+        }
       }
+
+      return c.json({
+        success: true,
+        event: "charge.success",
+      }, HttpStatusCodes.OK);
     }
-
     return c.json({
-      success: true,
+      success: false,
       event: "charge.success",
-    }, HttpStatusCodes.OK);
+    }, HttpStatusCodes.BAD_REQUEST);
   }
-
-  return c.json({
-    success: false,
-    event: "charge.success",
-  }, HttpStatusCodes.BAD_REQUEST);
+  catch (error: any) {
+    console.log("Error in paystack webhook", error);
+    return c.json({
+      success: false,
+      event: "charge.failed",
+    }, HttpStatusCodes.BAD_REQUEST);
+  }
 };
