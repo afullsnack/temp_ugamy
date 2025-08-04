@@ -29,12 +29,7 @@ export default function createApp() {
 
   app.notFound(notFound);
   app.onError(onError);
-  app.use(async (c, next) => {
-    await next();
-    if(c.res.status >= 400) {
-      console.log("Catch all 4xx error", JSON.stringify(c.res, null, 4));
-    }
-  })
+
   return app;
 }
 
