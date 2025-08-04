@@ -7,7 +7,7 @@ import { z } from "zod";
 expand(config({
   path: path.resolve(
     process.cwd(),
-    process.env.NODE_ENV === "test" ? ".env.test" : process.env.NODE_ENV === "development"? ".env.local" : ".env",
+    process.env.NODE_ENV === "test" ? ".env.test" : process.env.NODE_ENV === "development" ? ".env.local" : ".env",
   ),
 }));
 
@@ -27,7 +27,14 @@ const EnvSchema = z.object({
 
   // Paystack
   PAYSTACK_SK: z.string().min(1).optional(),
-  PAYSTACK_PK: z.string().min(3).optional()
+  PAYSTACK_PK: z.string().min(3).optional(),
+
+  // AWS
+  AWS_ACCESS_KEY_ID: z.string().min(1).optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  AWS_ENDPOINT_URL_S3: z.string().url().optional(),
+  AWS_REGION: z.string().optional(),
+  BUCKET_NAME: z.string().optional(),
 }).superRefine((input, ctx) => {
   if (input.NODE_ENV === "production" || input.NODE_ENV === "staging" && !input.DATABASE_AUTH_TOKEN) {
     ctx.addIssue({
