@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import { emailOTPClient, phoneNumberClient, usernameClient } from "better-auth/client/plugins"
+import { emailOTPClient, phoneNumberClient, usernameClient, customSessionClient } from "better-auth/client/plugins"
 import { env } from "@/env";
 
 export const authClient = createAuthClient({
@@ -7,7 +7,8 @@ export const authClient = createAuthClient({
   plugins: [
     usernameClient(),
     phoneNumberClient(),
-    emailOTPClient()
+    emailOTPClient(),
+    customSessionClient()
   ]
 })
 
