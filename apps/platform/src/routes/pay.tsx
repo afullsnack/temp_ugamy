@@ -1,12 +1,24 @@
+import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import PaymentSelectionScreen from '@/components/common/payment-selection-screen'
 import WelcomeScreen from '@/components/auth/welcome-screen'
+import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/pay')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
+    const { data: session } = authClient.useSession()
+    const isVerified = session?.user.emailVerified
+
+    // Redirect users to email verification page if their email is not verified
+    useEffect(() => {
+        if (!isVerified) {
+           window.location.href = '/verify-email'
+        }
+    }, [])
+
     return (
         <div className='relative bg-white w-full min-h-screen flex items-center justify-center overflow-hidden'>
             {/* Background Gaming Elements */}

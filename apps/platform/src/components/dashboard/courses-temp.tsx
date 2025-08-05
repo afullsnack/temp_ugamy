@@ -73,8 +73,8 @@ const CoursesTemp: FC<IProps> = ({ viewMode }) => {
     ]
 
     return (
-        <div className='w-full'>
-            <div className="flex-1 overflow-y-auto pt-40 lg:pt-40">
+        <>
+            <div className="w-full h-full flex-1 overflow-y-auto pt-40 lg:pt-40">
                 <div className="p-4 lg:p-6">
                     {/* Episodes Grid */}
                     <div
@@ -136,8 +136,9 @@ const CoursesTemp: FC<IProps> = ({ viewMode }) => {
             </div>
 
             {/* Video Modal */}
+            {/* TODO: Use EBAY-MODAL TO RENDER MODALS */}
             <VideoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        </div>
+        </>
     )
 }
 
