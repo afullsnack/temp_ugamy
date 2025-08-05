@@ -102,7 +102,7 @@ export default function PaymentSelectionScreen() {
 
                             <div className="mb-3">
                                 <span className="text-sm text-gray-700">
-                                    Amount: <span className="font-semibold text-green-600">₦1,000 NGN</span>
+                                    Amount: <span className="font-semibold text-green-600">₦10,000 NGN</span>
                                 </span>
                             </div>
 
