@@ -39,7 +39,7 @@ const VerifyEmail = async (payload: { code: string, email: string }) => {
     return data
 }
 
-export default function VerifyEmailForm() {
+export default function VerifyEmailForm() {    
     const navigate = useNavigate()
 
     const search = useSearch({

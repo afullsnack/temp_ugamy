@@ -1,19 +1,51 @@
 import { Play, X } from 'lucide-react'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { useNavigate } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import BrandLogo from './brand-logo'
 import type { Dispatch, FC, SetStateAction } from 'react'
 import ProfileImage from "@/public/profile-image.png"
+import { authClient } from '@/lib/auth-client'
+import { formatDate } from '@/lib/utils'
 
 interface IProps {
     sidebarOpen: boolean
     setSidebarOpen: Dispatch<SetStateAction<boolean>>
 }
 
+const signOut = async () => {
+    const { error, data } = await authClient.signOut()
+
+    if (error) {
+        throw error
+    }
+
+    return data
+}
+
 const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
+    const navigate = useNavigate()
+    const { data: session } = authClient.useSession()
+
+    // Sign in mutation
+    const { mutateAsync, isPending } = useMutation({
+        mutationFn: signOut,
+        onSuccess: () => {
+            window.location.reload()
+        },
+        onError: (error) => {
+            toast.error(error.message || "Error signing you out")
+        }
+    })
+
+    const handleSignout = async () => {
+        await mutateAsync()
+    }
+
     return (
         <div
-            className={`
-    fixed left-0 top-0 h-full w-80 bg-[hsla(221,39%,11%,1)] flex flex-col items-center z-50 text-white p-6 transform transition-transform duration-300 ease-in-out
+            className={`fixed left-0 top-0 h-full w-80 bg-[hsla(221,39%,11%,1)] flex flex-col items-center z-50 text-white p-6 transform transition-transform duration-300 ease-in-out
     lg:translate-x-0 lg:static lg:z-auto overflow-y-auto
     ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
 `}
@@ -36,34 +68,34 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
             {/* Profile Section */}
             <div className="flex-1">
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-[233px] h-[233px] rounded-full overflow-hidden mb-4 bg-gray-600">
+                    {/* <div className="w-[233px] h-[233px] rounded-full overflow-hidden mb-4 bg-gray-600">
                         <img
-                            src={ProfileImage}
+                            src={session?.user.image ?? ProfileImage}
                             alt="Profile"
                             width={128}
                             height={128}
                             className="w-full h-full object-cover"
                         />
-                    </div>
-                    <h2 className="text-xl font-semibold mb-4">Dominic Emeka</h2>
+                    </div> */}
+                    <h2 className="text-xl md:text-2xl font-semibold mb-4">{session?.user.name ?? "N/A"}</h2>
                 </div>
 
                 <div className="space-y-3 text-sm text-center mb-8">
                     <div>
                         <span className="text-gray-400">Username: </span>
-                        <span className="text-teal-400">@gamer_don</span>
+                        <span className="text-teal-400">{session?.user.displayUsername ?? "N/A"}</span>
                     </div>
                     <div>
                         <span className="text-gray-400">Email: </span>
-                        <span className="text-teal-400">dom@ugamy.com</span>
+                        <span className="text-teal-400">{session?.user.email ?? "N/A"}</span>
                     </div>
                     <div>
                         <span className="text-gray-400">Phone: </span>
-                        <span className="text-teal-400">1234567890</span>
+                        <span className="text-teal-400">{session?.user.phoneNumber ?? "N/A"}</span>
                     </div>
                     <div>
                         <span className="text-gray-400">Join Date: </span>
-                        <span className="text-teal-400">July 2025</span>
+                        <span className="text-teal-400">{formatDate(session?.user.createdAt as Date) || "N/A"}</span>
                     </div>
                 </div>
 
@@ -84,13 +116,14 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
                     </Button>
                     <Button
                         variant="outline"
+                        onClick={() => navigate({ to: "/reset-password" })}
                         className="flex-1 border-[hsla(160,84%,39%,1)] text-teal-400 hover:bg-[hsla(160,84%,39%,1)] hover:text-white bg-transparent"
                     >
                         Password Reset
                     </Button>
                 </div>
-                <Button variant="link" className="w-full text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)]">
-                    Logout
+                <Button variant="link" onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
+                    {isPending ? "Logging you out" : "Logout"}
                 </Button>
             </div>
         </div>
