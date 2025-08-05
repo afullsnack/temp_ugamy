@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
-import { emailOTP, phoneNumber, username } from "better-auth/plugins";
+import { emailOTP, phoneNumber, username, customSession } from "better-auth/plugins";
 
 import db from "@/db";
 import * as authSchema from "@/db/schema/auth-schema";
@@ -36,6 +36,28 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    customSession(async ({user, session}) => {
+      const findUser = await db.query.user.findFirst({
+        where(fields, ops) {
+          return ops.eq(fields.id, user.id)
+        }
+      })
+
+      if(!findUser) {
+        return {
+          session,
+          user,
+        }
+      }
+
+      return {
+        session,
+        user: {
+          ...user,
+          isSubscribed: findUser?.isSubscribed,
+        }
+      }
+    }),
     username({
       usernameValidator: (username) => {
         console.log("Username", username);
