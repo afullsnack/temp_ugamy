@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { emailOTP, phoneNumber, username, customSession } from "better-auth/plugins";
@@ -9,7 +9,7 @@ import * as authSchema from "@/db/schema/auth-schema";
 import { sendEmail } from "./email";
 import env from "@/env";
 
-export const auth = betterAuth({
+const options = {
   basePath: "/api/auth",
   database: drizzleAdapter(db, {
     provider: "sqlite",
@@ -35,29 +35,21 @@ export const auth = betterAuth({
       }
     },
   },
+  trustedOrigins: ["*", "http://localhost:3000", "https://ugamy-backend-platform.vercel.app", "https://ugamy.io"],
+  advanced: {
+    cookies: {
+      session_token: {
+        attributes: {
+          sameSite: env.NODE_ENV === "development" ? "Lax" : "None",
+          secure: env.NODE_ENV !== "development",
+          // domain: env.NODE_ENV === "development"? 'localhost' : 'passry.com',
+          // path: "/",
+          partitioned: env.NODE_ENV !== "development"
+        },
+      },
+    },
+  },
   plugins: [
-    customSession(async ({user, session}) => {
-      const findUser = await db.query.user.findFirst({
-        where(fields, ops) {
-          return ops.eq(fields.id, user.id)
-        }
-      })
-
-      if(!findUser) {
-        return {
-          session,
-          user,
-        }
-      }
-
-      return {
-        session,
-        user: {
-          ...user,
-          isSubscribed: findUser?.isSubscribed,
-        }
-      }
-    }),
     username({
       usernameValidator: (username) => {
         console.log("Username", username);
@@ -104,19 +96,37 @@ export const auth = betterAuth({
         }
       },
     }),
-  ],
-  trustedOrigins: ["*", "http://localhost:3000", "https://ugamy-backend-platform.vercel.app", "https://ugamy.io"],
-  advanced: {
-    cookies: {
-      session_token: {
-        attributes: {
-          sameSite: env.NODE_ENV === "development" ? "Lax" : "None",
-          secure: env.NODE_ENV !== "development",
-          // domain: env.NODE_ENV === "development"? 'localhost' : 'passry.com',
-          // path: "/",
-          partitioned: env.NODE_ENV !== "development"
+  ]
+} satisfies BetterAuthOptions
+
+export const auth = betterAuth({
+  ...options,
+  plugins: [
+    ...(options.plugins ?? []),
+    customSession(async ({ user, session }) => {
+      const findUser = await db.query.user.findFirst({
+        where(fields, ops) {
+          return ops.eq(fields.id, user.id)
+        }
+      })
+
+      if (!findUser) {
+        return {
+          session,
+          user,
+        }
+      }
+
+      return {
+        session: {
+          ...session,
+          isSubscribed: findUser?.isSubscribed
         },
-      },
-    },
-  },
+        user: {
+          ...user,
+          isSubscribed: findUser?.isSubscribed,
+        }
+      }
+    }, options),
+  ],
 });

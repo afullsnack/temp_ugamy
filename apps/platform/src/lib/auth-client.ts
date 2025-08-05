@@ -1,6 +1,7 @@
 import { createAuthClient } from "better-auth/react";
 import { customSessionClient, emailOTPClient, phoneNumberClient, usernameClient } from "better-auth/client/plugins"
 import { env } from "@/env";
+import type {auth} from "@ugamy/api/auth-types"
 
 export const authClient = createAuthClient({
   baseURL: env.VITE_API_URL,
@@ -8,7 +9,7 @@ export const authClient = createAuthClient({
     usernameClient(),
     phoneNumberClient(),
     emailOTPClient(),
-    customSessionClient()
+    customSessionClient<typeof auth>()
   ]
 })
 

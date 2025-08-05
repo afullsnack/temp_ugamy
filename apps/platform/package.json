@@ -1,5 +1,5 @@
 {
-  "name": "platform",
+  "name": "@ugamy/platform",
   "private": true,
   "type": "module",
   "scripts": {
@@ -44,7 +44,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^5.1.4",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@ugamy/api": "workspace:^"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.1.0",

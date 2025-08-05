@@ -3,6 +3,12 @@
   "type": "module",
   "version": "1.0.0",
   "license": "MIT",
+  "exports": {
+    "./package.json": "./package.json",
+    "./auth-types": {
+      "types": "./dist/src/lib/auth.d.ts"
+    }
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node ./dist/src/index.js",
