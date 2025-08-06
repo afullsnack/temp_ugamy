@@ -45,7 +45,7 @@
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "^3.25.76",
-    "@ugamy/api": "workspace:^"
+    "@ugamy/api": "workspace:*"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.1.0",

@@ -295,7 +295,7 @@ export default function SignupForm() {
                 {/* </div> */}
 
                 {/* Sign In Link */}
-                <div className="mb-4 text-center">
+                <div className="mt-2 mb-4 text-center">
                     <span className="text-sm text-gray-600">Already have an account? </span>
                     <Link to="/signin" className="text-sm font-medium text-[hsla(160,84%,39%,1)] hover:text-cyan-700">
                         Sign In
