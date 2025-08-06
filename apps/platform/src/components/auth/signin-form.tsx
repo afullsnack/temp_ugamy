@@ -202,7 +202,7 @@ export default function SigninForm() {
                 {/* </div> */}
 
                 {/* Sign In Link */}
-                <div className="text-center mb-4">
+                <div className="text-center mt-2 mb-4">
                     <span className="text-gray-600 text-sm">Already have an account? </span>
                     <Link to="/register" className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700 text-sm font-medium">
                         Sign up
