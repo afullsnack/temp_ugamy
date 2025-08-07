@@ -5,7 +5,7 @@ import Sidebar from "../common/sidebar"
 import Topbar from "../common/topbar"
 import DashboardFallback from "./dashboard-fallback"
 import CoursesTemp from "./courses-temp"
-import { authClient } from "@/lib/auth-client"
+import { isSubscribed } from '@/lib/utils'
 
 // TODO: Refactor component
 
@@ -13,8 +13,6 @@ const DashboardTemp = () => {
     const [activeFilter, setActiveFilter] = useState("All")
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [sidebarOpen, setSidebarOpen] = useState(false)
-
-    const { data: session, isLoading } = authClient.useSession()
 
     const filters = ["All", "Watched", "Not Watched", "Favorite"]
 
@@ -33,7 +31,7 @@ const DashboardTemp = () => {
                 {/* Fixed Header */}
                 <Topbar viewMode={viewMode} setViewMode={setViewMode} setSidebarOpen={setSidebarOpen} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 
-                {!isLoading && session?.user && session?.user.isSubscribed ?
+                {isSubscribed ?
 
                     <CoursesTemp viewMode={viewMode} />
                     : <DashboardFallback />

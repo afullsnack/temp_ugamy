@@ -1,5 +1,6 @@
 import {  clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { authClient } from './auth-client';
 import type {ClassValue} from 'clsx';
 
 export function cn(...inputs: Array<ClassValue>) {
@@ -13,3 +14,60 @@ export function formatDate(date: Date | undefined): string {
 
   return `${day}/${month}/${year}`;
 }
+export interface ISession {
+  session: {
+    expiresAt: Date;
+    token: string;
+    createdAt: Date;
+    updatedAt: Date;
+    ipAddress: string;
+    userAgent: string;
+    userId: string;
+    id: string;
+    isSubscribed: boolean;
+  };
+  user: {
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    image: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    username: string;
+    displayUsername: string;
+    phoneNumber: string;
+    phoneNumberVerified: boolean;
+    id: string;
+    isSubscribed: boolean;
+  };
+}
+
+const getSession = async (): Promise<ISession | null> => {
+  const { data: session } = await authClient.getSession()
+
+  return session ?? null
+}
+export const session = await getSession()
+
+const getSubscription = async () => {
+  const session = await getSession()
+
+  return session?.user.isSubscribed
+}
+export const isSubscribed = await getSubscription()
+
+const EmailVerified = async () => {
+  const session = await getSession()
+
+  return session?.user.emailVerified
+}
+export const isEmailVerified = await EmailVerified()
+
+const Authenticated = async () => {
+  const session = await getSession()
+
+  return session !== null
+}
+
+export const isAuthenticated = await Authenticated()
+

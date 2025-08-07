@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { BrandLogoDark } from "./brand-logo-dark"
 import { Button } from "@/components/ui/button"
+import { session } from '@/lib/utils'
 
 
 // TODO: Improve API integration implementation
@@ -50,7 +51,7 @@ export default function PaymentSelectionScreen() {
 
     const handleContinuePayment = () => {
         SubscribeMutation.mutate({
-            email: "adiejoel14@gmail.com",
+            email: `${session?.user.email}`,
             amount: "1000000",
             // Create a constant for this
             callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'

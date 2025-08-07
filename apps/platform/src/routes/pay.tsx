@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import PaymentSelectionScreen from '@/components/common/payment-selection-screen'
 import WelcomeScreen from '@/components/auth/welcome-screen'
-import { authClient } from '@/lib/auth-client'
+import { isEmailVerified, isSubscribed } from "@/lib/utils"
 
 export const Route = createFileRoute('/pay')({
     component: RouteComponent,
@@ -11,23 +11,23 @@ export const Route = createFileRoute('/pay')({
 
 function RouteComponent() {
     const navigate = useNavigate()
-    const { data: session, isLoading } = authClient.useSession()
 
     // Redirect users to email verification page if their email is not verified
     useEffect(() => {
-        if (!isLoading && session?.user.emailVerified && session?.user.emailVerified === false) {
+        if (!isEmailVerified) {
             toast.error("Please verify your email to continue")
             navigate({ to: "/verify-email" })
         }
-    }, [session, isLoading, navigate])
+    }, [isEmailVerified, navigate])
 
     // Redirect users to dashboard if they are subscribed
     // TODO: Create a user redirect page and embed this logic there
     useEffect(() => {
-        if (!isLoading && session?.user && session?.user.emailVerified && session?.user.isSubscribed) {
+        if (isEmailVerified && isSubscribed) {
             navigate({ to: "/dashboard" })
         }
-    }, [session, isLoading, navigate])
+    }, [isEmailVerified, isSubscribed, navigate])
+
 
     return (
         <div className='relative bg-white w-full min-h-screen flex items-center justify-center overflow-hidden'>
