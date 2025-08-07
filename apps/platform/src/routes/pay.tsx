@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import PaymentSelectionScreen from '@/components/common/payment-selection-screen'
 import WelcomeScreen from '@/components/auth/welcome-screen'
 import { authClient } from '@/lib/auth-client'
@@ -9,15 +10,16 @@ export const Route = createFileRoute('/pay')({
 })
 
 function RouteComponent() {
-    const { data: session } = authClient.useSession()
-    const isVerified = session?.user.emailVerified
+    const navigate = useNavigate()
+    const { data: session, isLoading } = authClient.useSession()
 
     // Redirect users to email verification page if their email is not verified
     useEffect(() => {
-        if (session?.user.emailVerified && session?.user.emailVerified === false) {
-           window.location.href = '/verify-email'
+        if (!isLoading && session?.user.emailVerified && session?.user.emailVerified === false) {
+            toast.error("Please verify your email to continue")
+            navigate({ to: "/verify-email" })
         }
-    }, [session?.user.emailVerified])
+    }, [session, isLoading, navigate])
 
     return (
         <div className='relative bg-white w-full min-h-screen flex items-center justify-center overflow-hidden'>

@@ -4,7 +4,7 @@ import { Button } from '../ui/button'
 import VideoModal from "./video-modal"
 import type { FC } from 'react'
 import { Progress } from "@/components/ui/progress"
-import ProfileImagePlaceholder from "@/public/profile-image-placeholder.png"
+import ProfileImagePlaceholder from "/profile-image-placeholder.png"
 
 interface IProps {
     viewMode: "grid" | "list"
