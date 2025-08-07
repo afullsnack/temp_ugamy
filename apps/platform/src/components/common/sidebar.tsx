@@ -5,9 +5,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import BrandLogo from './brand-logo'
 import type { Dispatch, FC, SetStateAction } from 'react'
-import ProfileImage from "/profile-image.png"
 import { authClient } from '@/lib/auth-client'
-import { formatDate } from '@/lib/utils'
+import { formatDate, isEmailVerified, isSubscribed, session } from '@/lib/utils'
 
 interface IProps {
     sidebarOpen: boolean
@@ -25,8 +24,8 @@ const signOut = async () => {
 }
 
 const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
+ 
     const navigate = useNavigate()
-    const { data: session } = authClient.useSession()
 
     const queryClient = useQueryClient()
 

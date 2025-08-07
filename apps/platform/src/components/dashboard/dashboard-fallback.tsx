@@ -1,11 +1,9 @@
 import { useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
 import FallbackIllust from "/dashboard-fallback-illust.png"
-import { authClient } from "@/lib/auth-client"
+import { isEmailVerified, isSubscribed } from "@/lib/utils"
 
 const DashboardFallback = () => {
-    const { data: session } = authClient.useSession()
-    const isSubscribed = session?.user.isSubscribed
 
     const navigate = useNavigate()
     return (
@@ -25,7 +23,7 @@ const DashboardFallback = () => {
                     </p>
                 </div>
 
-                {isSubscribed ?
+                {isSubscribed && isEmailVerified ?
                     <Button
                         className="h-[50px] px-8 py-3 text-lg font-semibold text-green-800 bg-gradient-to-r from-[#D9F9E6] to-[#E0FCEB] hover:from-[#C0F0D0] hover:to-[#C7F5DA] transition-colors duration-200"
                         size="lg"
@@ -34,7 +32,9 @@ const DashboardFallback = () => {
                         }}
                     >
                         Make Payment Now
-                    </Button> :
+                    </Button> : ""
+                }
+                {!isEmailVerified ?
                     <Button
                         className="h-[50px] px-8 py-3 text-lg font-semibold text-green-800 bg-gradient-to-r from-[#D9F9E6] to-[#E0FCEB] hover:from-[#C0F0D0] hover:to-[#C7F5DA] transition-colors duration-200"
                         size="lg"
@@ -43,7 +43,7 @@ const DashboardFallback = () => {
                         }}
                     >
                         Verify Email
-                    </Button>
+                    </Button> : ""
                 }
 
             </div>
