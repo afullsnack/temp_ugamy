@@ -5,7 +5,7 @@
   "private": true,
   "packageManager": "pnpm@9.11.0",
   "scripts": {
-    "dev": "turbo dev",
+    "dev:all": "turbo dev",
     "lint": "turbo lint",
     "dev:package:api": "turbo dev --filter=@ugamy/api",
     "build:package:api": "pnpm run --filter @ugamy/api build",
