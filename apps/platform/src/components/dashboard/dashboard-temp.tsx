@@ -5,7 +5,7 @@ import Sidebar from "../common/sidebar"
 import Topbar from "../common/topbar"
 import DashboardFallback from "./dashboard-fallback"
 import CoursesTemp from "./courses-temp"
-import { isSubscribed } from '@/lib/utils'
+import { isEmailVerified, isSubscribed } from '@/lib/utils'
 
 // TODO: Refactor component
 
@@ -31,8 +31,7 @@ const DashboardTemp = () => {
                 {/* Fixed Header */}
                 <Topbar viewMode={viewMode} setViewMode={setViewMode} setSidebarOpen={setSidebarOpen} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 
-                {isSubscribed ?
-
+                {isSubscribed && isEmailVerified ?
                     <CoursesTemp viewMode={viewMode} />
                     : <DashboardFallback />
                 }
