@@ -14,7 +14,7 @@ const DashboardTemp = () => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
-    const { data: session } = authClient.useSession()
+    const { data: session, isLoading } = authClient.useSession()
 
     const filters = ["All", "Watched", "Not Watched", "Favorite"]
 
@@ -33,7 +33,8 @@ const DashboardTemp = () => {
                 {/* Fixed Header */}
                 <Topbar viewMode={viewMode} setViewMode={setViewMode} setSidebarOpen={setSidebarOpen} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 
-                {session?.user.isSubscribed ?
+                {!isLoading && session?.user && session?.user.isSubscribed ?
+
                     <CoursesTemp viewMode={viewMode} />
                     : <DashboardFallback />
                 }

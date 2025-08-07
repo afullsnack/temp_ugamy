@@ -176,24 +176,24 @@ export default function SigninForm() {
 
                 {/* Social Login */}
                 {/* <div className="flex justify-center gap-4 mb-6"> */}
-                    {/* Google login */}
-                    {/* <button
+                {/* Google login */}
+                {/* <button
                         onClick={() => handleSocialLogin("Google")}
                         className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <GoogleLoginIcon />
                     </button> */}
 
-                    {/* Facebook login */}
-                    {/* <button
+                {/* Facebook login */}
+                {/* <button
                         onClick={() => handleSocialLogin("Facebook")}
                         className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <FacebookLoginIcon />
                     </button> */}
 
-                    {/* Apple login */}
-                    {/* <button
+                {/* Apple login */}
+                {/* <button
                         onClick={() => handleSocialLogin("Apple")}
                         className="w-12 h-12 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                     >

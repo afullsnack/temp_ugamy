@@ -3,6 +3,7 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  redirect,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
@@ -11,6 +12,7 @@ import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { authClient } from '@/lib/auth-client'
 import { Toaster } from '@/components/ui/sonner'
 
 interface MyRouterContext {
@@ -18,6 +20,27 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async ({ location }) => {
+    const { data: session } = await authClient.getSession()
+
+    const unauthenticatedRoutes = [
+      '/signin',
+      '/register',
+      '/reset-password',
+      '/verify-email',
+      '/terms',
+      '/privacy',
+      '/payment-successful',
+      '/terms',
+      '/privacy',
+    ]
+
+    if (!session && !unauthenticatedRoutes.includes(location.pathname)) {
+      throw redirect({
+        to: '/signin',
+      })
+    }
+  },
 
   head: () => ({
     meta: [
