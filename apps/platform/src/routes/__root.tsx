@@ -3,11 +3,10 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
-  useNavigate
+  redirect,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import { useEffect } from 'react'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
@@ -21,6 +20,24 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async ({ location }) => {
+    const { data: session } = await authClient.getSession()
+
+    const unauthenticatedRoutes = [
+      '/signin',
+      '/register',
+      '/reset-password',
+      '/verify-email',
+      '/terms',
+      '/privacy',
+    ]
+
+    if (!session && !unauthenticatedRoutes.includes(location.pathname)) {
+      throw redirect({
+        to: '/signin',
+      })
+    }
+  },
 
   head: () => ({
     meta: [
@@ -43,25 +60,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
 
-  component: () => {
-    const { data: session, isLoading } = authClient.useSession()
-    const navigate = useNavigate()
+  component: () => (
+    <RootDocument>
+      <Outlet />
+      <TanStackRouterDevtools />
 
-    useEffect(() => {
-      if (!isLoading && !session) {
-        navigate({ to: "/signin" })
-      }
-    }, [session, isLoading, navigate])
-
-    return (
-      <RootDocument>
-        <Outlet />
-        <TanStackRouterDevtools />
-
-        <TanStackQueryLayout />
-      </RootDocument>
-    )
-  },
+      <TanStackQueryLayout />
+    </RootDocument>
+  ),
   notFoundComponent: () => (
     <div>
       <h1>Not Found</h1>
