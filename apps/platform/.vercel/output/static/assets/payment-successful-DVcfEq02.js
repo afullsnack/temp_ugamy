@@ -1,0 +1,6 @@
+import{u as s,j as e}from"./main-sOPGwSMr.js";import{B as a}from"./button-CKUIHMt9.js";import{c}from"./createLucideIcon-DpNtYPoD.js";/**
+ * @license lucide-react v0.476.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const n=[["path",{d:"M18 6 7 17l-5-5",key:"116fxf"}],["path",{d:"m22 10-7.5 7.5L13 16",key:"ke71qq"}]],l=c("CheckCheck",n),o=()=>{const t=s();return e.jsx("div",{className:"bg-white w-full min-h-screen flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8",children:e.jsxs("div",{className:"max-w-md w-full space-y-6 text-center",children:[e.jsx("div",{className:"flex justify-center",children:e.jsx(l,{className:"h-24 w-24 text-primary"})}),e.jsx("h1",{className:"text-4xl font-bold text-gray-900",children:"Payment Successful!"}),e.jsx("p",{className:"text-lg text-gray-700",children:"Thank You!"}),e.jsx("p",{className:"text-md text-gray-600",children:"Your EAFC Tutorial Series Is Now Fully Unlocked."}),e.jsx("div",{className:"pt-4",children:e.jsx(a,{variant:"default",onClick:()=>{t({to:"/dashboard"})},className:"w-full h-[50px] py-3 px-6 text-lg text-white font-semibold",children:"Continue to dashboard"})})]})})},m=function(){return e.jsx(e.Fragment,{children:e.jsx(o,{})})};export{m as component};

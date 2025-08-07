@@ -1,7 +1,7 @@
-import {  clsx } from 'clsx'
+import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { authClient } from './auth-client';
-import type {ClassValue} from 'clsx';
+import type { ClassValue } from 'clsx';
 
 export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs))
@@ -20,54 +20,41 @@ export interface ISession {
     token: string;
     createdAt: Date;
     updatedAt: Date;
-    ipAddress: string;
-    userAgent: string;
+    ipAddress?: string | null | undefined;
+    userAgent?: string | null | undefined;
     userId: string;
     id: string;
-    isSubscribed: boolean;
+    isSubscribed?: boolean;
   };
   user: {
     name: string;
     email: string;
     emailVerified: boolean;
-    image: string | null;
+    image?: string | null | undefined;
     createdAt: Date;
     updatedAt: Date;
-    username: string;
-    displayUsername: string;
-    phoneNumber: string;
-    phoneNumberVerified: boolean;
+    username?: string | null | undefined;
+    displayUsername?: string | null | undefined;
+    phoneNumber?: string | null | undefined;
+    phoneNumberVerified?: boolean | null | undefined;
     id: string;
-    isSubscribed: boolean;
+    isSubscribed?: boolean;
   };
 }
 
-const getSession = async (): Promise<ISession | null> => {
-  const { data: session } = await authClient.getSession()
+let session: ISession | null = null;
+let isSubscribed = false;
+let isEmailVerified = false;
+let isAuthenticated = false;
 
-  return session ?? null
-}
-export const session = await getSession()
-
-const getSubscription = async () => {
-  const session = await getSession()
-
-  return session?.user.isSubscribed
-}
-export const isSubscribed = await getSubscription()
-
-const EmailVerified = async () => {
-  const session = await getSession()
-
-  return session?.user.emailVerified
-}
-export const isEmailVerified = await EmailVerified()
-
-const Authenticated = async () => {
-  const session = await getSession()
-
-  return session !== null
+const initializeValues = async () => {
+  const { data: sessionData } = await authClient.getSession();
+  session = sessionData ?? null;
+  isSubscribed = session?.user.isSubscribed ?? false;
+  isEmailVerified = session?.user.emailVerified ?? false;
+  isAuthenticated = session !== null;
 }
 
-export const isAuthenticated = await Authenticated()
+initializeValues();
 
+export { session, isSubscribed, isEmailVerified, isAuthenticated };
