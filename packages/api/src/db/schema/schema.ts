@@ -60,3 +60,11 @@ export const insertPlanSchema = createInsertSchema(plans, {
 
 export const selectPlanSchema = createSelectSchema(plans)
 export const patchPlanSchema = insertPlanSchema.partial()
+
+
+// TODO: Create schema for videos
+export const videos = sqliteTable("videos", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  key: text("key").notNull(),
+  metadata: text("metadata", {mode: "json"})
+})
