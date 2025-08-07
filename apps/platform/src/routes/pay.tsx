@@ -14,10 +14,10 @@ function RouteComponent() {
 
     // Redirect users to email verification page if their email is not verified
     useEffect(() => {
-        if (!isVerified) {
+        if (session?.user.emailVerified && session?.user.emailVerified === false) {
            window.location.href = '/verify-email'
         }
-    }, [])
+    }, [session?.user.emailVerified])
 
     return (
         <div className='relative bg-white w-full min-h-screen flex items-center justify-center overflow-hidden'>
