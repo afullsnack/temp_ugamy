@@ -30,6 +30,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       '/verify-email',
       '/terms',
       '/privacy',
+      '/payment-successful',
+      '/terms',
+      '/privacy',
     ]
 
     if (!session && !unauthenticatedRoutes.includes(location.pathname)) {
