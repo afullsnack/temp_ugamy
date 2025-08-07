@@ -3,13 +3,14 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent } from "stoker/openapi/helpers";
 
 import env from "@/env";
-import { TigrisService } from "@/lib/asset-storage";
+import { TigrisClient, TigrisService } from "@/lib/asset-storage";
 import { createRouter } from "@/lib/create-app";
 
+const tags = ["Uploads"];
 const router = createRouter()
   .openapi(
     createRoute({
-      tags: ["Uploads"],
+      tags,
       method: "post",
       path: "/upload",
       request: {
@@ -22,7 +23,7 @@ const router = createRouter()
                   type: "string", // OpenAPI requires 'string' for binary data
                   format: "binary",
                 }),
-                type: z.string(),
+                type: z.enum(["profile", "video"]).default("profile").describe("Type of media being uploaded"),
                 identifier: z.string(),
               }),
             },
@@ -33,7 +34,6 @@ const router = createRouter()
         [HttpStatusCodes.OK]: jsonContent(
           z.object({
             message: z.string(),
-            link: z.string(),
             key: z.string(),
           }),
           "Successful upload response",
@@ -74,12 +74,11 @@ const router = createRouter()
         );
         console.log("Uploaded", result);
 
-        // TODO: store link in db
-        const link = await tigrisService.createDownloadLink(env.BUCKET_NAME || "", keyToGet);
-        console.log("Signed link", link);
+        // TODO: Store key to db, if profile - store inside of user table
+        // TODO: Store key to file table of video
+        
         return c.json({
           message: "Upload successful",
-          link,
           key: keyToGet,
         }, HttpStatusCodes.OK);
       }
@@ -88,6 +87,66 @@ const router = createRouter()
         message: "Could not upload file",
       }, HttpStatusCodes.UNPROCESSABLE_ENTITY);
     },
+  )
+  .openapi(
+    createRoute({
+      tags,
+      method: "get",
+      path: "/upload/stream",
+      request: {
+        "query": z.object({
+          key: z.string()
+        })
+      },
+      responses: {
+        [HttpStatusCodes.OK]: {
+          content: {
+            "application/octet-stream": {
+              schema: z.any()
+            }
+          },
+          description: "Stream for object"
+        }
+      }
+    }),
+    async (c) => {
+      const key = c.req.query("key")
+      console.log("Key to object", key)
+
+      const isDownload = false
+      const tigrisClient = new TigrisClient({
+        endpoint: env.AWS_ENDPOINT_URL_S3 || "",
+        accessKeyId: env.AWS_ACCESS_KEY_ID || "",
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "",
+        region: env.AWS_REGION,
+      })
+      const { body: response, metadata } = await tigrisClient.downloadFile({
+        bucket: env.BUCKET_NAME || "",
+        key: key || "",
+      })
+
+      if (isDownload) {
+        c.header("Content-Type", "application/pdf");
+        c.header("Content-Length", metadata.size?.toString() || "0");
+        c.header("Content-Disposition", `attachment; filename=${key}.pdf`);
+      } else {
+        c.header("Content-Type", metadata.contentType || "application/octet-stream");
+        c.header("Content-Length", metadata.size?.toString() || "0");
+        c.header("Content-Disposition", `inline; filename=${key}`);
+      }
+      c.header('Access-Control-Allow-Origin', `http://localhost:3000, https://ugamy.com, https://www.ugamy.com`);
+      c.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+      c.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+      c.header('Cache-Control', 'public, max-age=3600');
+      c.header('X-Content-Type-Options', 'nosniff');
+      c.header('X-Frame-Options', 'DENY');
+      c.header('Content-Security-Policy', "default-src 'self'");
+      c.header('Cross-Origin-Embedder-Policy', 'require-corp');
+      c.header('Cross-Origin-Resource-Policy', 'cross-origin');
+      c.status(200)
+
+      return c.body(response as ReadableStream, 200)
+    }
   );
 
 export default router;
