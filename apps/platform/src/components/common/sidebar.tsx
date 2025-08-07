@@ -1,11 +1,11 @@
 import { Play, X } from 'lucide-react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import BrandLogo from './brand-logo'
 import type { Dispatch, FC, SetStateAction } from 'react'
-import ProfileImage from "@/public/profile-image.png"
+import ProfileImage from "/profile-image.png"
 import { authClient } from '@/lib/auth-client'
 import { formatDate } from '@/lib/utils'
 
@@ -28,11 +28,14 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
     const navigate = useNavigate()
     const { data: session } = authClient.useSession()
 
+    const queryClient = useQueryClient()
+
     // Sign in mutation
     const { mutateAsync, isPending } = useMutation({
         mutationFn: signOut,
         onSuccess: () => {
-            window.location.reload()
+            queryClient.clear()
+            navigate({ to: "/signin" })
         },
         onError: (error) => {
             toast.error(error.message || "Error signing you out")

@@ -3,14 +3,17 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useNavigate
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
+import { useEffect } from 'react'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { authClient } from '@/lib/auth-client'
 import { Toaster } from '@/components/ui/sonner'
 
 interface MyRouterContext {
@@ -40,14 +43,25 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
 
-  component: () => (
-    <RootDocument>
-      <Outlet />
-      <TanStackRouterDevtools />
+  component: () => {
+    const { data: session, isLoading } = authClient.useSession()
+    const navigate = useNavigate()
 
-      <TanStackQueryLayout />
-    </RootDocument>
-  ),
+    useEffect(() => {
+      if (!isLoading && !session) {
+        navigate({ to: "/signin" })
+      }
+    }, [session, isLoading, navigate])
+
+    return (
+      <RootDocument>
+        <Outlet />
+        <TanStackRouterDevtools />
+
+        <TanStackQueryLayout />
+      </RootDocument>
+    )
+  },
   notFoundComponent: () => (
     <div>
       <h1>Not Found</h1>

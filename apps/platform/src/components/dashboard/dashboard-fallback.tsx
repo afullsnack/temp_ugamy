@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
-import FallbackIllust from "@/public/dashboard-fallback-illust.png"
+import FallbackIllust from "/dashboard-fallback-illust.png"
 import { authClient } from "@/lib/auth-client"
 
 const DashboardFallback = () => {
