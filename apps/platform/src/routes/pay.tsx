@@ -21,6 +21,14 @@ function RouteComponent() {
         }
     }, [session, isLoading, navigate])
 
+    // Redirect users to dashboard if they are subscribed
+    // TODO: Create a user redirect page and embed this logic there
+    useEffect(() => {
+        if (!isLoading && session?.user && session?.user.emailVerified && session?.user.isSubscribed) {
+            navigate({ to: "/dashboard" })
+        }
+    }, [session, isLoading, navigate])
+
     return (
         <div className='relative bg-white w-full min-h-screen flex items-center justify-center overflow-hidden'>
             {/* Background Gaming Elements */}

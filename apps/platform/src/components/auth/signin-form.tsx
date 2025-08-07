@@ -57,7 +57,11 @@ export default function SigninForm() {
         mutationFn: signIn,
         onSuccess: (response) => {
             queryClient.resetQueries()
-            navigate({ to: "/pay" })
+            if (response.user.isSubscribed) {
+                navigate({ to: "/dashboard" })
+            } else {
+                navigate({ to: "/pay" })
+            }
             toast.success(`Hey ${response.user.name}, welcome back!`)
         },
         onError: (error) => {
