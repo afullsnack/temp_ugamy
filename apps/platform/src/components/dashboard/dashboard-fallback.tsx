@@ -38,7 +38,7 @@ const DashboardFallback = () => {
                 <div className="space-y-2">
                     <h2 className="text-2xl font-bold text-gray-900">Oops!</h2>
                     <p className="text-gray-600 max-w-sm mx-auto">
-                        No courses to view yet, may payment to get access to course videos.
+                        No courses to view yet, make payment to get access to course videos.
                     </p>
                 </div>
 

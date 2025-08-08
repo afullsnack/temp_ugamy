@@ -144,7 +144,7 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
                     </Button>
                 </div>
                 <Button variant="link" onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
-                    {isPending ? "Logging you out" : "Logout"}
+                    {isPending ? "Logging you out.." : "Logout"}
                 </Button>
             </div>
         </div>
