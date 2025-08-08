@@ -24,7 +24,7 @@ export interface ISession {
     userAgent?: string | null | undefined;
     userId: string;
     id: string;
-    isSubscribed?: boolean;
+    isSubscribed?: boolean | undefined;
   };
   user: {
     name: string;
@@ -38,23 +38,7 @@ export interface ISession {
     phoneNumber?: string | null | undefined;
     phoneNumberVerified?: boolean | null | undefined;
     id: string;
-    isSubscribed?: boolean;
+    isSubscribed?: boolean | undefined;
   };
 }
 
-let session: ISession | null = null;
-let isSubscribed = false;
-let isEmailVerified = false;
-let isAuthenticated = false;
-
-const initializeValues = async () => {
-  const { data: sessionData } = await authClient.getSession();
-  session = sessionData ?? null;
-  isSubscribed = session?.user.isSubscribed ?? false;
-  isEmailVerified = session?.user.emailVerified ?? false;
-  isAuthenticated = session !== null;
-}
-
-initializeValues();
-
-export { session, isSubscribed, isEmailVerified, isAuthenticated };

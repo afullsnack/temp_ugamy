@@ -1,32 +1,54 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import type { ISession } from '@/lib/utils'
 import PaymentSelectionScreen from '@/components/common/payment-selection-screen'
 import WelcomeScreen from '@/components/auth/welcome-screen'
-import { isEmailVerified, isSubscribed } from "@/lib/utils"
+import { authClient } from '@/lib/auth-client'
+import PaySkeleton from '@/components/ui/skeletons/pay-skeleton'
 
 export const Route = createFileRoute('/pay')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
+    const [session, setSession] = useState<ISession | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const { data: sessionData, isPending: loading } = authClient.useSession();
+
+    useEffect(() => {
+        if (!loading) {
+            setIsLoading(false);
+            setSession(sessionData as ISession);
+        }
+    }, [sessionData, loading]);
+
     const navigate = useNavigate()
+    console.log("EMAIL VERIFICATION: ", session?.user.emailVerified)
 
     // Redirect users to email verification page if their email is not verified
     useEffect(() => {
-        if (!isEmailVerified) {
+        if (!session?.user.emailVerified) {
             toast.error("Please verify your email to continue")
-            navigate({ to: "/verify-email" })
+            navigate({
+                 to: "/verify-email",
+                 search: (prev) => ({ ...prev, email: `${session?.user.email}` }),
+             })
         }
-    }, [isEmailVerified, navigate])
+    }, [session?.user.emailVerified, navigate])
 
     // Redirect users to dashboard if they are subscribed
     // TODO: Create a user redirect page and embed this logic there
     useEffect(() => {
-        if (isEmailVerified && isSubscribed) {
+        if (session?.user.emailVerified && session.user.isSubscribed) {
             navigate({ to: "/dashboard" })
         }
-    }, [isEmailVerified, isSubscribed, navigate])
+    }, [session?.user.emailVerified, session?.user.isSubscribed, navigate])
+
+    if (isLoading) {
+        return <PaySkeleton />
+    }
 
 
     return (
