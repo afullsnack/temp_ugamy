@@ -81,7 +81,7 @@ export default function VerifyEmailForm() {
         onSuccess: () => {
             toast.success("Proceed to sign in")
             navigate({
-                to: "/signin"
+                to: "/dashboard"
             })
         },
         onError: (error) => {
