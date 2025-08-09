@@ -1,5 +1,6 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { plans } from "./schema";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { courseEnrollments, plans, videoLikes, videoWatchProgress } from "./schema";
+import { relations } from "drizzle-orm";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -16,7 +17,10 @@ export const user = sqliteTable("user", {
   paymentReference: text("payment_reference"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
-});
+}, (table) => ({
+    emailIdx: index("users_email_idx").on(table.email),
+    usernameIdx: index("users_username_idx").on(table.username)
+  }));
 
 export const session = sqliteTable("session", {
   id: text("id").primaryKey(),
@@ -53,3 +57,11 @@ export const verification = sqliteTable("verification", {
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
 });
+
+
+// Define relations
+export const usersRelations = relations(user, ({ many }) => ({
+  enrollments: many(courseEnrollments),
+  watchProgress: many(videoWatchProgress),
+  videoLikes: many(videoLikes),
+}));

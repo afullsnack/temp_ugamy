@@ -10,5 +10,5 @@ export default defineConfig({
     url: env.DATABASE_URL,
     authToken: env.DATABASE_AUTH_TOKEN,
   },
-  breakpoints: env.NODE_ENV === "development"? false : true
+  breakpoints: env.NODE_ENV !== "development"
 });
