@@ -2,12 +2,15 @@ import { Play, X } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
+import SidebarSkeleton from '../ui/skeletons/sidebar-skeleton'
 import BrandLogo from './brand-logo'
-import type { Dispatch, FC, SetStateAction } from 'react'
-import ProfileImage from "/profile-image.png"
+import type { Dispatch, FC, SetStateAction } from 'react';
+import type {ISession} from '@/lib/utils';
 import { authClient } from '@/lib/auth-client'
-import { formatDate } from '@/lib/utils'
+import {  formatDate } from '@/lib/utils'
+
 
 interface IProps {
     sidebarOpen: boolean
@@ -25,8 +28,19 @@ const signOut = async () => {
 }
 
 const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
+    const [session, setSession] = useState<ISession | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const { data: sessionData, isPending: loading } = authClient.useSession();
+
+    useEffect(() => {
+        if (!loading) {
+            setIsLoading(false);
+            setSession(sessionData as ISession);
+        }
+    }, [sessionData, loading]);
+
     const navigate = useNavigate()
-    const { data: session } = authClient.useSession()
 
     const queryClient = useQueryClient()
 
@@ -44,6 +58,10 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
 
     const handleSignout = async () => {
         await mutateAsync()
+    }
+
+    if (isLoading) {
+        return <SidebarSkeleton />
     }
 
     return (
@@ -126,7 +144,7 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
                     </Button>
                 </div>
                 <Button variant="link" onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
-                    {isPending ? "Logging you out" : "Logout"}
+                    {isPending ? "Logging you out.." : "Logout"}
                 </Button>
             </div>
         </div>

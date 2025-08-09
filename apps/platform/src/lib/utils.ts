@@ -1,6 +1,7 @@
-import {  clsx } from 'clsx'
+import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import type {ClassValue} from 'clsx';
+import { authClient } from './auth-client';
+import type { ClassValue } from 'clsx';
 
 export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs))
@@ -13,3 +14,31 @@ export function formatDate(date: Date | undefined): string {
 
   return `${day}/${month}/${year}`;
 }
+export interface ISession {
+  session: {
+    expiresAt: Date;
+    token: string;
+    createdAt: Date;
+    updatedAt: Date;
+    ipAddress?: string | null | undefined;
+    userAgent?: string | null | undefined;
+    userId: string;
+    id: string;
+    isSubscribed?: boolean | undefined;
+  };
+  user: {
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    image?: string | null | undefined;
+    createdAt: Date;
+    updatedAt: Date;
+    username?: string | null | undefined;
+    displayUsername?: string | null | undefined;
+    phoneNumber?: string | null | undefined;
+    phoneNumberVerified?: boolean | null | undefined;
+    id: string;
+    isSubscribed?: boolean | undefined;
+  };
+}
+
