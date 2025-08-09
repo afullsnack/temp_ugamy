@@ -12,41 +12,34 @@ export const Route = createFileRoute('/pay')({
 })
 
 function RouteComponent() {
-    const [session, setSession] = useState<ISession | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    const { data: sessionData, isPending: loading } = authClient.useSession();
-
-    useEffect(() => {
-        if (!loading) {
-            setIsLoading(false);
-            setSession(sessionData as ISession);
-        }
-    }, [sessionData, loading]);
+    const { data: session, isPending: loading } = authClient.useSession();
+    console.log("IS PENDING: ", loading)
+    console.log("SESSION: ", session)
 
     const navigate = useNavigate()
     console.log("EMAIL VERIFICATION: ", session?.user.emailVerified)
 
-    // Redirect users to email verification page if their email is not verified
+// Redirect unverified users to email verification page before allowing payment access
     useEffect(() => {
-        if (!session?.user.emailVerified) {
+        if (!loading && session !== null && !session?.user.emailVerified) {
             toast.error("Please verify your email to continue")
             navigate({
                  to: "/verify-email",
                  search: (prev) => ({ ...prev, email: `${session?.user.email}` }),
              })
         }
-    }, [session?.user.emailVerified, navigate])
+    }, [session, navigate])
 
     // Redirect users to dashboard if they are subscribed
     // TODO: Create a user redirect page and embed this logic there
     useEffect(() => {
-        if (session?.user.emailVerified && session.user.isSubscribed) {
+        if (!loading && session !== null && session?.user.isSubscribed) {
+            toast.info("You are already subscribed")
             navigate({ to: "/dashboard" })
         }
-    }, [session?.user.emailVerified, session?.user.isSubscribed, navigate])
+    }, [loading, session, navigate])
 
-    if (isLoading) {
+    if (loading) {
         return <PaySkeleton />
     }
 
