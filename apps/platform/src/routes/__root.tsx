@@ -88,7 +88,8 @@ function RootComponent() {
       <body>
         <Toaster position='top-center' richColors />
         {loading ? (
-          <AppLoadingSkeleton />
+          // TODO: Replace with splash screen
+          <span>Loading...</span>
         ) : (
           <>
             <Outlet />

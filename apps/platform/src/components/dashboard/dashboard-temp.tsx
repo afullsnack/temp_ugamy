@@ -3,10 +3,10 @@
 import { useState } from "react"
 import Sidebar from "../common/sidebar"
 import Topbar from "../common/topbar"
-import DashboardTempSkeleton from "../ui/skeletons/dashboard-temp-skeleton"
 import DashboardFallback from "./dashboard-fallback"
 import CoursesTemp from "./courses-temp"
 import { authClient } from "@/lib/auth-client"
+import AppLoadingSkeleton from "../common/app-loading-skeleton"
 
 // TODO: Refactor component
 
@@ -20,7 +20,7 @@ const DashboardTemp = () => {
     const { data: session, isPending: loading } = authClient.useSession();
 
     if (loading) {
-        return <DashboardTempSkeleton />
+        return <AppLoadingSkeleton />
     }
 
 
