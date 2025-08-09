@@ -1,15 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import axios from 'axios'
 import { Check, Shield } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { BrandLogoDark } from "./brand-logo-dark"
-import type { ISession } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
+import { useNavigate } from "@tanstack/react-router"
 
 
 // TODO: Improve API integration implementation
@@ -37,12 +37,8 @@ export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeR
 
 export default function PaymentSelectionScreen() {
     const [selectedPayment, setSelectedPayment] = useState("paystack")
-    const [session, setSession] = useState<ISession | null>(null);
-    const { data: sessionData } = authClient.useSession();
-
-    useEffect(() => {
-        return setSession(sessionData as ISession);
-    }, [sessionData]);
+    const { data: session, isPending: loading } = authClient.useSession();
+    const navigate = useNavigate()
 
     // Subscribe API mutation
     const SubscribeMutation = useMutation({
@@ -57,13 +53,16 @@ export default function PaymentSelectionScreen() {
     })
 
     const handleContinuePayment = () => {
-        if (!session?.user.email) {
+        if (!loading && session !== null && !session?.user.email) {
             toast.error("Please login to continue")
-            return
+            return navigate({
+                to: "/signin",
+                search: (prev) => ({ ...prev, redirect: "/pay" }),
+            })
         }
 
         SubscribeMutation.mutate({
-            email: `${session.user.email}`,
+            email: `${session?.user.email}`,
             amount: "1000000",
             // Create a constant for this
             callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'
