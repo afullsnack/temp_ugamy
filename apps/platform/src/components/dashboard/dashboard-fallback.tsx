@@ -32,7 +32,7 @@ const DashboardFallback = () => {
                     </p>
                 </div>
 
-                {!loading && !session?.user.isSubscribed && session?.user.emailVerified ?
+                {!loading && session !== null && !session?.user.isSubscribed && session?.user.emailVerified ?
                     <Button
                         className="h-[50px] px-8 py-3 text-lg font-semibold text-green-800 bg-gradient-to-r from-[#D9F9E6] to-[#E0FCEB] hover:from-[#C0F0D0] hover:to-[#C7F5DA] transition-colors duration-200"
                         size="lg"
@@ -43,7 +43,7 @@ const DashboardFallback = () => {
                         Make Payment Now
                     </Button> : ""
                 }
-                {!loading && !session?.user.emailVerified ?
+                {!loading && session !== null && !session?.user.emailVerified ?
                     <Button
                         className="h-[50px] px-8 py-3 text-lg font-semibold text-green-800 bg-gradient-to-r from-[#D9F9E6] to-[#E0FCEB] hover:from-[#C0F0D0] hover:to-[#C7F5DA] transition-colors duration-200"
                         size="lg"
