@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from 'axios'
 import { Check, Shield } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
@@ -8,8 +8,8 @@ import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { BrandLogoDark } from "./brand-logo-dark"
 import { Button } from "@/components/ui/button"
-import { authClient } from "@/lib/auth-client"
 import { useNavigate } from "@tanstack/react-router"
+import { useSession } from "@/lib/auth-hooks"
 
 
 // TODO: Improve API integration implementation
@@ -37,8 +37,13 @@ export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeR
 
 export default function PaymentSelectionScreen() {
     const [selectedPayment, setSelectedPayment] = useState("paystack")
-    const { data: session, isPending: loading } = authClient.useSession();
     const navigate = useNavigate()
+
+    const {
+        session,
+        user,
+        isPending: loading
+    } = useSession()
 
     // Subscribe API mutation
     const SubscribeMutation = useMutation({
@@ -53,7 +58,7 @@ export default function PaymentSelectionScreen() {
     })
 
     const handleContinuePayment = () => {
-        if (!loading && session !== null && !session?.user.email) {
+        if (!loading && session !== null && !user?.email) {
             toast.error("Please login to continue")
             return navigate({
                 to: "/signin",
@@ -62,7 +67,7 @@ export default function PaymentSelectionScreen() {
         }
 
         SubscribeMutation.mutate({
-            email: `${session?.user.email}`,
+            email: `${user?.email}`,
             amount: "1000000",
             // Create a constant for this
             callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'
@@ -70,7 +75,7 @@ export default function PaymentSelectionScreen() {
     }
 
     return (
-        <div className="z-10 min-h-screen h-fit bg-inherit flex items-start md:items-center justify-center">
+        <div className="z-10 w-full min-h-screen h-fit bg-inherit flex items-start md:items-center justify-center">
             <div className="bg-white w-full pt-[80px] md:pt-8 p-8">
                 <div className="md:hidden w-full flex items-center justify-center pb-[50px] p-0">
                     <BrandLogoDark />

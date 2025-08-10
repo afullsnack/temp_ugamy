@@ -16,6 +16,7 @@ import type { CheckedState } from "@radix-ui/react-checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
+import { useSession } from "@/lib/auth-hooks"
 
 export const loginSchema = z.object({
     email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
@@ -24,25 +25,27 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>
 
-const signIn = async (payload: Omit<LoginFormData, "rememberMe">) => {
-    const { error, data } = await authClient.signIn.email({
-        email: payload.email,
-        password: payload.password,
-    })
-
-    if (error) {
-        throw error
-    }
-
-    return data
-}
-
 export default function SigninForm() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
     const [showPassword, setShowPassword] = useState(false)
-    const [rememberMe, setRememberMe] = useState<CheckedState>(false)
+    const [rememberMe, setRememberMe] = useState<CheckedState>(true)
+
+
+    const signIn = async (payload: Omit<LoginFormData, "rememberMe">) => {
+        const { error, data } = await authClient.signIn.email({
+            email: payload.email,
+            password: payload.password,
+            rememberMe: rememberMe as boolean,
+        })
+
+        if (error) {
+            throw error
+        }
+
+        return data
+    }
 
     const form = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
@@ -57,12 +60,12 @@ export default function SigninForm() {
         mutationFn: signIn,
         onSuccess: (response) => {
             queryClient.resetQueries()
-            if (response?.user.emailVerified) {
+            if (response?.user?.emailVerified) {
                 navigate({ to: "/dashboard" })
-            } else {
+            }else if (!response?.user?.isSubscribed) {
                 navigate({ to: "/pay" })
             }
-            toast.success(`Hey ${response.user.name}, welcome back!`)
+            toast.success(`Hey ${response?.user?.name}, welcome back!`)
         },
         onError: (error) => {
             toast.error(error.message || "Error signing you in. Try again")
@@ -74,7 +77,7 @@ export default function SigninForm() {
     }
 
     return (
-        <div className="z-10 bg-white min-h-screen flex items-center justify-center">
+        <div className="z-10 bg-white w-full min-h-screen flex items-center justify-center">
             <div className="bg-white w-full pt-[80px] md:pt-8 p-8">
                 <div className="md:hidden w-full flex items-center justify-center pb-[50px] p-0">
                     <BrandLogoDark />
@@ -153,6 +156,7 @@ export default function SigninForm() {
                         {/* Remember Me Checkbox */}
                         <div className="flex items-center gap-[10px]">
                             <Checkbox
+                                defaultChecked={true}
                                 checked={rememberMe}
                                 onCheckedChange={setRememberMe}
                                 className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"

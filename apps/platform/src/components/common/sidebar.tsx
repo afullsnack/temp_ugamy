@@ -5,9 +5,10 @@ import { useNavigate } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import SidebarSkeleton from '../ui/skeletons/sidebar-skeleton'
 import BrandLogo from './brand-logo'
-import type { Dispatch, FC, SetStateAction } from 'react';
+import { type Dispatch, type FC, type SetStateAction } from 'react';
 import { authClient } from '@/lib/auth-client'
 import {  formatDate } from '@/lib/utils'
+import { useSession } from '@/lib/auth-hooks'
 
 
 interface IProps {
@@ -26,7 +27,10 @@ const signOut = async () => {
 }
 
 const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
-    const { data: session, isPending: loading } = authClient.useSession();
+    const {
+        user,
+        isPending: loading
+    } = useSession()
 
     const navigate = useNavigate()
 
@@ -86,25 +90,25 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
                             className="w-full h-full object-cover"
                         />
                     </div> */}
-                    <h2 className="text-xl md:text-2xl font-semibold mb-4">{session?.user.name ?? "N/A"}</h2>
+                    <h2 className="text-xl md:text-2xl font-semibold mb-4">{user?.name ?? "N/A"}</h2>
                 </div>
 
                 <div className="space-y-3 text-sm text-center mb-8">
                     <div>
                         <span className="text-gray-400">Username: </span>
-                        <span className="text-teal-400">{session?.user.displayUsername ?? "N/A"}</span>
+                        <span className="text-teal-400">{user?.displayUsername ?? "N/A"}</span>
                     </div>
                     <div>
                         <span className="text-gray-400">Email: </span>
-                        <span className="text-teal-400">{session?.user.email ?? "N/A"}</span>
+                        <span className="text-teal-400">{user?.email ?? "N/A"}</span>
                     </div>
                     <div>
                         <span className="text-gray-400">Phone: </span>
-                        <span className="text-teal-400">{session?.user.phoneNumber ?? "N/A"}</span>
+                        <span className="text-teal-400">{user?.phoneNumber ?? "N/A"}</span>
                     </div>
                     <div>
                         <span className="text-gray-400">Join Date: </span>
-                        <span className="text-teal-400">{formatDate(session?.user.createdAt as Date) || "N/A"}</span>
+                        <span className="text-teal-400">{formatDate(user?.createdAt as Date) || "N/A"}</span>
                     </div>
                 </div>
 
@@ -131,8 +135,8 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
                         Password Reset
                     </Button>
                 </div>
-                <Button variant="link" onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
-                    {isPending ? "Logging you out.." : "Logout"}
+                <Button variant="link" disabled={isPending} onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
+                    {isPending ? "Logging you out..." : "Logout"}
                 </Button>
             </div>
         </div>

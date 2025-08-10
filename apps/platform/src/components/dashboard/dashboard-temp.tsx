@@ -5,24 +5,25 @@ import Sidebar from "../common/sidebar"
 import Topbar from "../common/topbar"
 import DashboardFallback from "./dashboard-fallback"
 import CoursesTemp from "./courses-temp"
-import { authClient } from "@/lib/auth-client"
 import AppLoadingSkeleton from "../common/app-loading-skeleton"
+import { useSession } from "@/lib/auth-hooks"
 
 // TODO: Refactor component
-
 const DashboardTemp = () => {
     const [activeFilter, setActiveFilter] = useState("All")
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [sidebarOpen, setSidebarOpen] = useState(false)
-
     const filters = ["All", "Watched", "Not Watched", "Favorite"]
 
-    const { data: session, isPending: loading } = authClient.useSession();
+    const {
+        session,
+        user,
+        isPending: loading
+    } = useSession()
 
     if (loading) {
         return <AppLoadingSkeleton />
     }
-
 
     return (
         <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -39,10 +40,11 @@ const DashboardTemp = () => {
                 {/* Fixed Header */}
                 <Topbar viewMode={viewMode} setViewMode={setViewMode} setSidebarOpen={setSidebarOpen} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 
-                {!loading && session !== null && session?.user.isSubscribed && session.user.emailVerified ?
+                {!loading && session !== null && user?.isSubscribed && user?.emailVerified ?
                     <CoursesTemp viewMode={viewMode} /> : ""
                 }
-                {!loading && session !== null && (!session?.user.isSubscribed || !session.user.emailVerified) ?
+
+                {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ?
                     <DashboardFallback /> : ""
                 }
             </div>

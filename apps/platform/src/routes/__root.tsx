@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
@@ -17,6 +17,9 @@ import type { QueryClient } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
 import { Toaster } from '@/components/ui/sonner'
 import AppLoadingSkeleton from '@/components/common/app-loading-skeleton.tsx'
+import type { ISession } from '@/lib/utils.ts'
+import { useSession } from '@/lib/auth-hooks.ts'
+import GlobalLoadingWidget from '@/components/common/global-loading-widget.tsx'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -54,7 +57,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootComponent() {
-  const { data: session, isPending: loading } = authClient.useSession()
+  const {
+    session,
+    isPending: loading
+  } = useSession()
+
   const navigate = useNavigate()
   const location = useRouterState({ select: (s) => s.location })
 
@@ -77,7 +84,7 @@ function RootComponent() {
     if (!loading && session === null && !isUnauthRoute) {
       navigate({ to: '/signin' })
     }
-  }, [session, loading, location.pathname, navigate])
+  }, [loading, session, location.pathname, navigate])
   
 
   return (
@@ -88,8 +95,7 @@ function RootComponent() {
       <body>
         <Toaster position='top-center' richColors />
         {loading ? (
-          // TODO: Replace with splash screen
-          <span>Loading...</span>
+          <GlobalLoadingWidget />
         ) : (
           <>
             <Outlet />
