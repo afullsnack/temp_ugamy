@@ -24,25 +24,27 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>
 
-const signIn = async (payload: Omit<LoginFormData, "rememberMe">) => {
-    const { error, data } = await authClient.signIn.email({
-        email: payload.email,
-        password: payload.password,
-    })
-
-    if (error) {
-        throw error
-    }
-
-    return data
-}
-
 export default function SigninForm() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
     const [showPassword, setShowPassword] = useState(false)
-    const [rememberMe, setRememberMe] = useState<CheckedState>(false)
+    const [rememberMe, setRememberMe] = useState<CheckedState>(true)
+
+
+    const signIn = async (payload: Omit<LoginFormData, "rememberMe">) => {
+        const { error, data } = await authClient.signIn.email({
+            email: payload.email,
+            password: payload.password,
+            rememberMe: rememberMe as boolean,
+        })
+
+        if (error) {
+            throw error
+        }
+
+        return data
+    }
 
     const form = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
@@ -153,6 +155,7 @@ export default function SigninForm() {
                         {/* Remember Me Checkbox */}
                         <div className="flex items-center gap-[10px]">
                             <Checkbox
+                                defaultChecked={true}
                                 checked={rememberMe}
                                 onCheckedChange={setRememberMe}
                                 className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"

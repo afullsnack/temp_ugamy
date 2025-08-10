@@ -5,9 +5,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import SidebarSkeleton from '../ui/skeletons/sidebar-skeleton'
 import BrandLogo from './brand-logo'
-import type { Dispatch, FC, SetStateAction } from 'react';
+import { useEffect, useState, type Dispatch, type FC, type SetStateAction } from 'react';
 import { authClient } from '@/lib/auth-client'
-import {  formatDate } from '@/lib/utils'
+import {  formatDate, type ISession } from '@/lib/utils'
 
 
 interface IProps {
@@ -26,7 +26,21 @@ const signOut = async () => {
 }
 
 const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
-    const { data: session, isPending: loading } = authClient.useSession();
+    const [session, setSession] = useState<ISession | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchSession() {
+            const { data, error } = await authClient.getSession();
+            if (error) {
+                console.error('Failed to fetch session:', error);
+            }
+            setSession(data as ISession);
+            setLoading(false);
+        }
+
+        fetchSession();
+    }, []);
 
     const navigate = useNavigate()
 
@@ -131,8 +145,8 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
                         Password Reset
                     </Button>
                 </div>
-                <Button variant="link" onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
-                    {isPending ? "Logging you out.." : "Logout"}
+                <Button variant="link" disabled={isPending} onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
+                    {isPending ? "Logging you out..." : "Logout"}
                 </Button>
             </div>
         </div>

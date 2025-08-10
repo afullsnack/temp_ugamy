@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
@@ -17,6 +17,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
 import { Toaster } from '@/components/ui/sonner'
 import AppLoadingSkeleton from '@/components/common/app-loading-skeleton.tsx'
+import type { ISession } from '@/lib/utils.ts'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -54,7 +55,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootComponent() {
-  const { data: session, isPending: loading } = authClient.useSession()
+  const [session, setSession] = useState<ISession | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSession() {
+      const { data, error } = await authClient.getSession();
+      if (error) {
+        console.error('Failed to fetch session:', error);
+      }
+      setSession(data as ISession);
+      setLoading(false);
+    }
+
+    fetchSession();
+  }, []);
   const navigate = useNavigate()
   const location = useRouterState({ select: (s) => s.location })
 

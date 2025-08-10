@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from 'axios'
 import { Check, Shield } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
@@ -10,6 +10,7 @@ import { BrandLogoDark } from "./brand-logo-dark"
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
 import { useNavigate } from "@tanstack/react-router"
+import type { ISession } from "@/lib/utils"
 
 
 // TODO: Improve API integration implementation
@@ -37,8 +38,22 @@ export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeR
 
 export default function PaymentSelectionScreen() {
     const [selectedPayment, setSelectedPayment] = useState("paystack")
-    const { data: session, isPending: loading } = authClient.useSession();
     const navigate = useNavigate()
+    const [session, setSession] = useState<ISession | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchSession() {
+            const { data, error } = await authClient.getSession();
+            if (error) {
+                console.error('Failed to fetch session:', error);
+            }
+            setSession(data as ISession);
+            setLoading(false);
+        }
+
+        fetchSession();
+    }, []);
 
     // Subscribe API mutation
     const SubscribeMutation = useMutation({

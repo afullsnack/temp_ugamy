@@ -1,15 +1,29 @@
 import { useNavigate } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
 import DashboardFallbackSkeleton from "../ui/skeletons/dashboard-fallback-skeleton"
-import type { ISession } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import FallbackIllust from "/dashboard-fallback-illust.png"
 import { authClient } from "@/lib/auth-client"
+import { useEffect, useState } from "react"
+import type { ISession } from "@/lib/utils"
 
 const DashboardFallback = () => {
-    const { data: session, isPending: loading } = authClient.useSession();
-
     const navigate = useNavigate()
+    const [session, setSession] = useState<ISession | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchSession() {
+            const { data, error } = await authClient.getSession();
+            if (error) {
+                console.error('Failed to fetch session:', error);
+            }
+            setSession(data as ISession);
+            setLoading(false);
+        }
+
+        fetchSession();
+    }, []);
+
 
     if (loading) {
         return <DashboardFallbackSkeleton />

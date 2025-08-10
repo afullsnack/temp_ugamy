@@ -12,21 +12,32 @@ export const Route = createFileRoute('/pay')({
 })
 
 function RouteComponent() {
-    const { data: session, isPending: loading } = authClient.useSession();
-    console.log("IS PENDING: ", loading)
-    console.log("SESSION: ", session)
+    const [session, setSession] = useState<ISession | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchSession() {
+            const { data, error } = await authClient.getSession();
+            if (error) {
+                console.error('Failed to fetch session:', error);
+            }
+            setSession(data as ISession);
+            setLoading(false);
+        }
+
+        fetchSession();
+    }, []);
 
     const navigate = useNavigate()
-    console.log("EMAIL VERIFICATION: ", session?.user.emailVerified)
 
-// Redirect unverified users to email verification page before allowing payment access
+    // Redirect unverified users to email verification page before allowing payment access
     useEffect(() => {
         if (!loading && session !== null && !session?.user.emailVerified) {
             toast.error("Please verify your email to continue")
             navigate({
-                 to: "/verify-email",
-                 search: (prev) => ({ ...prev, email: `${session?.user.email}` }),
-             })
+                to: "/verify-email",
+                search: (prev) => ({ ...prev, email: `${session?.user.email}` }),
+            })
         }
     }, [session, navigate])
 
