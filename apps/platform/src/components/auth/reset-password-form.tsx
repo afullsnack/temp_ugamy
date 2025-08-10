@@ -44,7 +44,6 @@ const ResetPasswordForm = () => {
         mutationFn: ResetPassword,
         onSuccess: () => {
             queryClient.resetQueries()
-            toast.success("proceed to sign in")
             navigate({ to: "/signin" })
         },
         onError: (error) => {

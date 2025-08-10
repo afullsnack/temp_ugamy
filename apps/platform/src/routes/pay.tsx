@@ -1,42 +1,33 @@
-import { useEffect, useState } from 'react'
+"use client";
+
+import { useEffect } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import type { ISession } from '@/lib/utils'
 import PaymentSelectionScreen from '@/components/common/payment-selection-screen'
 import WelcomeScreen from '@/components/auth/welcome-screen'
-import { authClient } from '@/lib/auth-client'
 import PaySkeleton from '@/components/ui/skeletons/pay-skeleton'
+import { useSession } from '@/lib/auth-hooks'
 
 export const Route = createFileRoute('/pay')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
-    const [session, setSession] = useState<ISession | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function fetchSession() {
-            const { data, error } = await authClient.getSession();
-            if (error) {
-                console.error('Failed to fetch session:', error);
-            }
-            setSession(data as ISession);
-            setLoading(false);
-        }
-
-        fetchSession();
-    }, []);
+    const {
+        session,
+        user,
+        isPending: loading
+    } = useSession()
 
     const navigate = useNavigate()
 
     // Redirect unverified users to email verification page before allowing payment access
     useEffect(() => {
-        if (!loading && session !== null && !session?.user.emailVerified) {
+        if (!loading && session !== null && !user?.emailVerified) {
             toast.error("Please verify your email to continue")
             navigate({
                 to: "/verify-email",
-                search: (prev) => ({ ...prev, email: `${session?.user.email}` }),
+                search: (prev) => ({ ...prev, email: `${user?.email}` }),
             })
         }
     }, [session, navigate])
@@ -44,7 +35,7 @@ function RouteComponent() {
     // Redirect users to dashboard if they are subscribed
     // TODO: Create a user redirect page and embed this logic there
     useEffect(() => {
-        if (!loading && session !== null && session?.user.isSubscribed) {
+        if (!loading && session !== null && user?.isSubscribed) {
             toast.info("You are already subscribed")
             navigate({ to: "/dashboard" })
         }

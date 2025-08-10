@@ -8,9 +8,8 @@ import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { BrandLogoDark } from "./brand-logo-dark"
 import { Button } from "@/components/ui/button"
-import { authClient } from "@/lib/auth-client"
 import { useNavigate } from "@tanstack/react-router"
-import type { ISession } from "@/lib/utils"
+import { useSession } from "@/lib/auth-hooks"
 
 
 // TODO: Improve API integration implementation
@@ -39,21 +38,12 @@ export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeR
 export default function PaymentSelectionScreen() {
     const [selectedPayment, setSelectedPayment] = useState("paystack")
     const navigate = useNavigate()
-    const [session, setSession] = useState<ISession | null>(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchSession() {
-            const { data, error } = await authClient.getSession();
-            if (error) {
-                console.error('Failed to fetch session:', error);
-            }
-            setSession(data as ISession);
-            setLoading(false);
-        }
-
-        fetchSession();
-    }, []);
+    const {
+        session,
+        user,
+        isPending: loading
+    } = useSession()
 
     // Subscribe API mutation
     const SubscribeMutation = useMutation({
@@ -68,7 +58,7 @@ export default function PaymentSelectionScreen() {
     })
 
     const handleContinuePayment = () => {
-        if (!loading && session !== null && !session?.user.email) {
+        if (!loading && session !== null && !user?.email) {
             toast.error("Please login to continue")
             return navigate({
                 to: "/signin",
@@ -77,7 +67,7 @@ export default function PaymentSelectionScreen() {
         }
 
         SubscribeMutation.mutate({
-            email: `${session?.user.email}`,
+            email: `${user?.email}`,
             amount: "1000000",
             // Create a constant for this
             callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'

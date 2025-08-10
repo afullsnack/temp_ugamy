@@ -16,6 +16,7 @@ import type { CheckedState } from "@radix-ui/react-checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
+import { useSession } from "@/lib/auth-hooks"
 
 export const loginSchema = z.object({
     email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
@@ -27,6 +28,11 @@ export type LoginFormData = z.infer<typeof loginSchema>
 export default function SigninForm() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+
+    const {
+        user,
+        isPending: loading
+    } = useSession()
 
     const [showPassword, setShowPassword] = useState(false)
     const [rememberMe, setRememberMe] = useState<CheckedState>(true)
@@ -57,14 +63,9 @@ export default function SigninForm() {
     // Sign in mutation
     const { mutateAsync, isPending } = useMutation({
         mutationFn: signIn,
-        onSuccess: (response) => {
+        onSuccess: () => {
             queryClient.resetQueries()
-            if (response?.user.emailVerified) {
-                navigate({ to: "/dashboard" })
-            } else {
-                navigate({ to: "/pay" })
-            }
-            toast.success(`Hey ${response.user.name}, welcome back!`)
+            toast.success(`Hey ${user?.name}, welcome back!`)
         },
         onError: (error) => {
             toast.error(error.message || "Error signing you in. Try again")
@@ -72,7 +73,16 @@ export default function SigninForm() {
     })
 
     const onSubmit = async (values: LoginFormData) => {
-        await mutateAsync(values)
+        await mutateAsync(values).then(() => {
+            if (!loading && user?.emailVerified) {
+                navigate({ to: "/dashboard" })
+            }
+            if (!loading && !user?.isSubscribed) {
+                navigate({ to: "/pay" })
+            }
+        }).catch(() => {
+
+        })
     }
 
     return (

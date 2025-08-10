@@ -80,9 +80,6 @@ export default function VerifyEmailForm() {
         mutationFn: VerifyEmail,
         onSuccess: () => {
             toast.success("Proceed to sign in")
-            navigate({
-                to: "/dashboard"
-            })
         },
         onError: (error) => {
             toast.error(error.message || "An unexpected error occured, kindly try again")
@@ -93,7 +90,10 @@ export default function VerifyEmailForm() {
         await mutateAsync({
             code: values.code,
             email: search.email ?? ""
+        }).then(() => {
+            navigate({ to: "/dashboard" })
         })
+
     }
 
     return (
