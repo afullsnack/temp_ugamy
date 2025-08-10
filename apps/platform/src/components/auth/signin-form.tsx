@@ -29,11 +29,6 @@ export default function SigninForm() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
-    const {
-        user,
-        isPending: loading
-    } = useSession()
-
     const [showPassword, setShowPassword] = useState(false)
     const [rememberMe, setRememberMe] = useState<CheckedState>(true)
 
@@ -63,9 +58,14 @@ export default function SigninForm() {
     // Sign in mutation
     const { mutateAsync, isPending } = useMutation({
         mutationFn: signIn,
-        onSuccess: () => {
+        onSuccess: (response) => {
             queryClient.resetQueries()
-            toast.success(`Hey ${user?.name}, welcome back!`)
+            if (response?.user?.emailVerified) {
+                navigate({ to: "/dashboard" })
+            }else if (!response?.user?.isSubscribed) {
+                navigate({ to: "/pay" })
+            }
+            toast.success(`Hey ${response?.user?.name}, welcome back!`)
         },
         onError: (error) => {
             toast.error(error.message || "Error signing you in. Try again")
@@ -73,20 +73,11 @@ export default function SigninForm() {
     })
 
     const onSubmit = async (values: LoginFormData) => {
-        await mutateAsync(values).then(() => {
-            if (!loading && user?.emailVerified) {
-                navigate({ to: "/dashboard" })
-            }
-            if (!loading && !user?.isSubscribed) {
-                navigate({ to: "/pay" })
-            }
-        }).catch(() => {
-
-        })
+        await mutateAsync(values)
     }
 
     return (
-        <div className="z-10 bg-white min-h-screen flex items-center justify-center">
+        <div className="z-10 bg-white w-full min-h-screen flex items-center justify-center">
             <div className="bg-white w-full pt-[80px] md:pt-8 p-8">
                 <div className="md:hidden w-full flex items-center justify-center pb-[50px] p-0">
                     <BrandLogoDark />

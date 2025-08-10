@@ -75,7 +75,7 @@ export default function PaymentSelectionScreen() {
     }
 
     return (
-        <div className="z-10 min-h-screen h-fit bg-inherit flex items-start md:items-center justify-center">
+        <div className="z-10 w-full min-h-screen h-fit bg-inherit flex items-start md:items-center justify-center">
             <div className="bg-white w-full pt-[80px] md:pt-8 p-8">
                 <div className="md:hidden w-full flex items-center justify-center pb-[50px] p-0">
                     <BrandLogoDark />
