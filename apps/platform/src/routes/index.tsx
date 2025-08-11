@@ -1,5 +1,7 @@
+"use client"
+
 import { createFileRoute } from '@tanstack/react-router'
-import CourseDashboard from '@/components/dashboard/dashboard-temp'
+import DashboardTemp from '@/components/dashboard/dashboard-temp'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -7,6 +9,6 @@ export const Route = createFileRoute('/')({
 
 function App() {
   return (
-    <CourseDashboard />
+    <DashboardTemp />
   )
 }

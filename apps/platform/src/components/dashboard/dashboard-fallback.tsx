@@ -1,27 +1,18 @@
 import { useNavigate } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
 import DashboardFallbackSkeleton from "../ui/skeletons/dashboard-fallback-skeleton"
-import type { ISession } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import FallbackIllust from "/dashboard-fallback-illust.png"
-import { authClient } from "@/lib/auth-client"
+import { useSession } from "@/lib/auth-hooks"
 
 const DashboardFallback = () => {
-    const [session, setSession] = useState<ISession | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    const { data: sessionData, isPending: loading } = authClient.useSession();
-
-    useEffect(() => {
-        if (!loading) {
-            setIsLoading(false);
-            setSession(sessionData as ISession);
-        }
-    }, [sessionData, loading]);
-
     const navigate = useNavigate()
+    const {
+        session,
+        user,
+        isPending: loading
+    } = useSession()
 
-    if (isLoading) {
+    if (loading) {
         return <DashboardFallbackSkeleton />
     }
 
@@ -42,7 +33,7 @@ const DashboardFallback = () => {
                     </p>
                 </div>
 
-                {!session?.user.isSubscribed && session?.user.emailVerified ?
+                {!loading && session !== null && !user?.isSubscribed && user?.emailVerified ?
                     <Button
                         className="h-[50px] px-8 py-3 text-lg font-semibold text-green-800 bg-gradient-to-r from-[#D9F9E6] to-[#E0FCEB] hover:from-[#C0F0D0] hover:to-[#C7F5DA] transition-colors duration-200"
                         size="lg"
@@ -53,7 +44,7 @@ const DashboardFallback = () => {
                         Make Payment Now
                     </Button> : ""
                 }
-                {!session?.user.emailVerified ?
+                {!loading && session !== null && !user?.emailVerified ?
                     <Button
                         className="h-[50px] px-8 py-3 text-lg font-semibold text-green-800 bg-gradient-to-r from-[#D9F9E6] to-[#E0FCEB] hover:from-[#C0F0D0] hover:to-[#C7F5DA] transition-colors duration-200"
                         size="lg"

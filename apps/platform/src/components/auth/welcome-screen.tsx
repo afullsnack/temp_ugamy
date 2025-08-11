@@ -5,7 +5,7 @@ import BrandLogo from "../common/brand-logo"
 
 export default function WelcomeScreen() {
     return (
-        <div className="hidden md:block relative h-full bg-gradient-to-br from-slate-800 via-slate-700 to-emerald-900 overflow-hidden">
+        <div className="hidden md:block relative h-full w-full bg-gradient-to-br from-slate-800 via-slate-700 to-emerald-900 overflow-hidden">
             {/* Main Content */}
             <div className="relative z-10 h-full flex flex-col items-start justify-center gap-y-[191px] text-center p-[45px]">
                 {/* Logo */}

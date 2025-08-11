@@ -115,7 +115,7 @@ export default function SignupForm() {
     }
 
     return (
-        <div className="z-10 flex min-h-screen items-center justify-center bg-white">
+        <div className="z-10 flex w-full min-h-screen items-center justify-center bg-white">
             <div className="w-full p-8 pt-[80px] md:pt-8">
                 <div className="mb-[50px] flex w-full items-center justify-center p-0 md:hidden">
                     <BrandLogoDark />

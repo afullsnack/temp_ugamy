@@ -1,3 +1,5 @@
+"use client";
+
 import { createFileRoute } from '@tanstack/react-router'
 import SignupForm from '@/components/auth/signup-form'
 import WelcomeScreen from '@/components/auth/welcome-screen'
