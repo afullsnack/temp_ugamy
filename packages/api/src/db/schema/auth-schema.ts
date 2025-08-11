@@ -1,6 +1,7 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { courseEnrollments, plans, videoLikes, videoWatchProgress } from "./schema";
 import { relations } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+import { courseEnrollments, plans, videoLikes, videoWatchProgress } from "./schema";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -12,15 +13,15 @@ export const user = sqliteTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: integer("email_verified", { mode: "boolean" }).$defaultFn(() => false).notNull(),
   image: text("image"),
-  planId: text("plan_id").references(() => plans.id, {onDelete: "no action"}),
-  isSubscribed: integer("is_subscribed", {mode: "boolean"}).$defaultFn(() => false),
+  planId: text("plan_id").references(() => plans.id, { onDelete: "no action" }),
+  isSubscribed: integer("is_subscribed", { mode: "boolean" }).$defaultFn(() => false),
   paymentReference: text("payment_reference"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
-}, (table) => ({
-    emailIdx: index("users_email_idx").on(table.email),
-    usernameIdx: index("users_username_idx").on(table.username)
-  }));
+}, table => ({
+  emailIdx: index("users_email_idx").on(table.email),
+  usernameIdx: index("users_username_idx").on(table.username),
+}));
 
 export const session = sqliteTable("session", {
   id: text("id").primaryKey(),
@@ -57,7 +58,6 @@ export const verification = sqliteTable("verification", {
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
 });
-
 
 // Define relations
 export const usersRelations = relations(user, ({ many }) => ({

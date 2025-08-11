@@ -3,40 +3,40 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { insertTasksSchema, patchTasksSchema, selectTasksSchema } from "@/db/schema/schema";
+import { insertCourseSchema, selectCourseSchema } from "@/db/schema/schema";
 import { notFoundSchema } from "@/lib/constants";
 
-const tags = ["Tasks"];
+const tags = ["Courses"];
 
 export const list = createRoute({
-  path: "/tasks",
+  path: "/courses",
   method: "get",
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(selectTasksSchema),
-      "The list of tasks",
+      z.array(selectCourseSchema),
+      "The list of courses",
     ),
   },
 });
 
 export const create = createRoute({
-  path: "/tasks",
+  path: "/courses",
   method: "post",
   request: {
     body: jsonContentRequired(
-      insertTasksSchema,
-      "The task to create",
+      insertCourseSchema,
+      "The course to create",
     ),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectTasksSchema,
+      selectCourseSchema,
       "The created task",
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertTasksSchema),
+      createErrorSchema(insertCourseSchema),
       "The validation error(s)",
     ),
   },
