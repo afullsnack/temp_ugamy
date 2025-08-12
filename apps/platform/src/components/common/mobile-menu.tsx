@@ -62,7 +62,7 @@ const MobileMenu = create(() => {
     const handleShowIntro = () => {
         handleTogleSidebar();
         show(VideoPlayerModal, {
-            videoUrl: '../../../public/ugamy-intro-video.mp4',
+            videoUrl: "/ugamy-intro-video.mp4",
             title: "Welcome to Ugamy -- Watch Intro video",
         })
     }

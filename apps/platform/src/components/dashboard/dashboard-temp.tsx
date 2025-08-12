@@ -15,23 +15,31 @@ const DashboardTemp = () => {
     const [activeFilter, setActiveFilter] = useState("All")
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const filters = ["All", "Watched", "Not Watched", "Favorite"]
-    useEffect(() => {
-        const hasSeenIntro = localStorage.getItem("seenIntroVideo") === "true"
-        
-        if (!hasSeenIntro) {
-            show(VideoPlayerModal, {
-                videoUrl: '../../../public/ugamy-intro-video.mp4',
-                title: "Welcome to Ugamy - Intro video",
-            })
-            localStorage.setItem("seenIntroVideo", "true")
-        }
-    }, [])
 
+    // Get user session
     const {
-        session,
         user,
+        session,
         isPending: loading
     } = useSession()
+
+    const showIntroVideo = () => {
+        show(VideoPlayerModal, {
+            videoUrl: "/ugamy-intro-video.mp4",
+            title: "Welcome to Ugamy - Intro video",
+        })
+    }
+
+    const hasSeenIntro = localStorage.getItem("seenIntroVideo") === "true"
+    
+    useEffect(() => {
+        if (!loading && user?.isSubscribed && !hasSeenIntro) {
+            showIntroVideo()
+            localStorage.setItem("seenIntroVideo", "true")
+        } else if (!loading && !user?.isSubscribed) {
+            showIntroVideo()
+        }
+    }, [loading, user])
 
     if (loading) {
         return <AppLoadingSkeleton />
