@@ -5,16 +5,12 @@ import { useNavigate } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import SidebarSkeleton from '../ui/skeletons/sidebar-skeleton'
 import BrandLogo from './brand-logo'
-import { type Dispatch, type FC, type SetStateAction } from 'react';
+import { useState} from 'react';
 import { authClient } from '@/lib/auth-client'
-import {  formatDate } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
 import { useSession } from '@/lib/auth-hooks'
-
-
-interface IProps {
-    sidebarOpen: boolean
-    setSidebarOpen: Dispatch<SetStateAction<boolean>>
-}
+import { show } from '@ebay/nice-modal-react'
+import { VideoPlayerModal } from './video-player-modal'
 
 const signOut = async () => {
     const { error, data } = await authClient.signOut()
@@ -26,7 +22,10 @@ const signOut = async () => {
     return data
 }
 
-const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
+const Sidebar = () => {
+    const [visible, setVisible] = useState(false);
+
+    // Get user session
     const {
         user,
         isPending: loading
@@ -56,19 +55,27 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
         return <SidebarSkeleton />
     }
 
+    const handleShowIntro = () => {
+        show(VideoPlayerModal, {
+            videoUrl: '../../../public/ugamy-intro-video.mp4',
+            title: "Welcome to Ugamy - Intro video",
+        })
+    }
+
     return (
         <div
             className={`fixed left-0 top-0 h-full w-80 bg-[hsla(221,39%,11%,1)] flex flex-col items-center z-50 text-white p-6 transform transition-transform duration-300 ease-in-out
     lg:translate-x-0 lg:static lg:z-auto overflow-y-auto
-    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+    ${visible ? "translate-x-0" : "-translate-x-full"}
 `}
         >
-            {/* Mobile Close Button */}
+            {/* TODO: hide sidebar when this is clicked */}
             <Button
                 variant="ghost"
                 size="icon"
+                onClick={() => setVisible(false)}
+
                 className="absolute top-4 right-4 text-white hover:bg-slate-700 lg:hidden"
-                onClick={() => setSidebarOpen(false)}
             >
                 <X className="w-5 h-5" />
             </Button>
@@ -112,7 +119,7 @@ const Sidebar: FC<IProps> = ({ sidebarOpen, setSidebarOpen }) => {
                     </div>
                 </div>
 
-                <Button className="w-full bg-[hsla(221,39%,11%,1)] hover:bg-[hsla(221,39%,11%,1)] text-[hsla(199,89%,48%,1)] font-bold mb-8 cursor-pointer">
+                <Button onClick={handleShowIntro} className="w-full bg-[hsla(221,39%,11%,1)] hover:bg-[hsla(221,39%,11%,1)] text-[hsla(199,89%,48%,1)] font-bold mb-8 cursor-pointer">
                     <Play className="w-4 h-4 mr-2" />
                     Watch Intro Video
                 </Button>
