@@ -135,3 +135,169 @@ code {
     @apply bg-background text-foreground;
   }
 }
+
+/* Enhanced slider styles for video progress with better mobile support */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider::-webkit-slider-track {
+  background: linear-gradient(
+    90deg,
+    #10b981 0%,
+    #10b981 var(--progress, 0%),
+    rgba(255, 255, 255, 0.2) var(--progress, 0%),
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  cursor: pointer;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4), 0 0 0 0 rgba(16, 185, 129, 0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(-6px);
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: translateY(-6px) scale(1.15);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6), 0 0 0 8px rgba(16, 185, 129, 0.1);
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.slider::-webkit-slider-thumb:active {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.8), 0 0 0 12px rgba(16, 185, 129, 0.15);
+}
+
+.slider::-moz-range-track {
+  background: linear-gradient(
+    90deg,
+    #10b981 0%,
+    #10b981 var(--progress, 0%),
+    rgba(255, 255, 255, 0.2) var(--progress, 0%),
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  cursor: pointer;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider:focus {
+  outline: none;
+}
+
+.slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4), 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 6px;
+}
+
+.slider-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 3px;
+  transition: width 0.1s ease-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.slider-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  z-index: 0;
+}
+
+/* Enhanced security styles with better mobile touch handling */
+.video-container * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth animations for video controls */
+.video-controls-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.video-controls-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.video-controls-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.video-controls-exit-active {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+/* Custom scrollbar for mobile devices */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+

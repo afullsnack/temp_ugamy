@@ -1,17 +1,18 @@
 import { Grid3X3, List, Search } from 'lucide-react'
 import { Button } from '../ui/button'
 import type { Dispatch, FC, SetStateAction } from 'react'
+import { show } from '@ebay/nice-modal-react'
+import MobileMenu from './mobile-menu'
 
 interface IProps {
     viewMode: "grid" | "list"
     setViewMode: Dispatch<SetStateAction<"grid" | "list">>
-    setSidebarOpen: Dispatch<SetStateAction<boolean>>
     filters: Array<string>
     activeFilter: string
     setActiveFilter: Dispatch<SetStateAction<string>>
 }
 
-const Topbar: FC<IProps> = ({ viewMode, setViewMode, setSidebarOpen, filters, activeFilter, setActiveFilter }) => {
+const Topbar: FC<IProps> = ({ viewMode, setViewMode, filters, activeFilter, setActiveFilter }) => {
     return (
         <div className="fixed top-0 right-0 left-0 lg:left-80 bg-white p-4 lg:p-6 border-b z-30">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
@@ -21,7 +22,7 @@ const Topbar: FC<IProps> = ({ viewMode, setViewMode, setSidebarOpen, filters, ac
                         variant="outline"
                         size="icon"
                         className="lg:hidden bg-transparent"
-                        onClick={() => setSidebarOpen(true)}
+                        onClick={() => show(MobileMenu)}
                     >
                         <div className="w-8 h-8 bg-teal-100 rounded flex items-center justify-center">
                             <List className="w-4 h-4 text-[hsla(160,84%,39%,1)]" />
