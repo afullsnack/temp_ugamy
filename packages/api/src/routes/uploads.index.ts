@@ -5,6 +5,7 @@ import { jsonContent } from "stoker/openapi/helpers";
 import env from "@/env";
 import { TigrisClient, TigrisService } from "@/lib/asset-storage";
 import { createRouter } from "@/lib/create-app";
+import { auth } from "@/lib/auth";
 
 const tags = ["Uploads"];
 const router = createRouter()
@@ -55,6 +56,16 @@ const router = createRouter()
       const { courseId } = c.req.valid("query");
       const { type } = c.req.valid("param");
 
+      const data = await auth.api.getSession({
+        headers: c.req.raw.headers
+      })
+
+      if(!data) {
+        return c.json({
+          message: "No session found"
+        }, HttpStatusCodes.UNPROCESSABLE_ENTITY)
+      }
+
       const file = body.file;
 
       console.log("Parse Body values, params and query", body, file, courseId, type);
@@ -68,7 +79,7 @@ const router = createRouter()
 
       if (file instanceof File) {
         if (type === "profile") {
-          const keyToStore = `${type}/${identifier}`;
+          const keyToStore = `${type}/${data.session.userId}`;
           const keyToGet = `images/${keyToStore}`;
 
           const result = await tigrisService.uploadImageFile(
