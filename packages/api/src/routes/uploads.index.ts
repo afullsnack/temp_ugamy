@@ -12,7 +12,7 @@ const router = createRouter()
     createRoute({
       tags,
       method: "post",
-      path: "/upload",
+      path: "/upload/{type}",
       request: {
         body: {
           content: {
@@ -23,12 +23,16 @@ const router = createRouter()
                   type: "string", // OpenAPI requires 'string' for binary data
                   format: "binary",
                 }),
-                type: z.enum(["profile", "video"]).default("profile").describe("Type of media being uploaded"),
-                identifier: z.string(),
               }),
             },
           },
         },
+        params: z.object({
+          type: z.enum(["profile", "video"]).default("profile").describe("Type of media being uploaded"),
+        }),
+        query: z.object({
+          courseId: z.string().optional(),
+        }),
       },
       responses: {
         [HttpStatusCodes.OK]: jsonContent(
@@ -48,12 +52,12 @@ const router = createRouter()
     }),
     async (c) => {
       const body = await c.req.parseBody();
-      // const body = c.req.valid("form");
-      const file = body.file;
-      const type = body.type;
-      const identifier = body.identifier;
+      const { courseId } = c.req.valid("query");
+      const { type } = c.req.valid("param");
 
-      console.log("Parse Body values", body, file);
+      const file = body.file;
+
+      console.log("Parse Body values, params and query", body, file, courseId, type);
 
       const tigrisService = new TigrisService({
         accessKeyId: env.AWS_ACCESS_KEY_ID || "",
@@ -63,24 +67,30 @@ const router = createRouter()
       });
 
       if (file instanceof File) {
-        const keyToStore = `${type}/${identifier}`;
-        const keyToGet = `images/${keyToStore}`;
+        if (type === "profile") {
+          const keyToStore = `${type}/${identifier}`;
+          const keyToGet = `images/${keyToStore}`;
 
-        const result = await tigrisService.uploadImageFile(
-          env.BUCKET_NAME || "",
-          keyToStore,
-          Buffer.from(await file.arrayBuffer()),
-          file.type,
-        );
-        console.log("Uploaded", result);
+          const result = await tigrisService.uploadImageFile(
+            env.BUCKET_NAME || "",
+            keyToStore,
+            Buffer.from(await file.arrayBuffer()),
+            file.type,
+          );
+          console.log("Uploaded", result);
 
-        // TODO: Store key to db, if profile - store inside of user table
-        // TODO: Store key to file table of video
-        
-        return c.json({
-          message: "Upload successful",
-          key: keyToGet,
-        }, HttpStatusCodes.OK);
+          // TODO: Store key to db, if profile - store inside of user table
+          // TODO: Store key to file table of video
+
+          return c.json({
+            message: "Upload successful",
+            key: keyToGet,
+          }, HttpStatusCodes.OK);
+        }
+        else if (type === "video") {
+          // TODO: get course
+          const keyToStore = `${type}/`;
+        }
       }
 
       return c.json({
@@ -94,59 +104,60 @@ const router = createRouter()
       method: "get",
       path: "/upload/stream",
       request: {
-        "query": z.object({
-          key: z.string()
-        })
+        query: z.object({
+          key: z.string(),
+        }),
       },
       responses: {
         [HttpStatusCodes.OK]: {
           content: {
             "application/octet-stream": {
-              schema: z.any()
-            }
+              schema: z.any(),
+            },
           },
-          description: "Stream for object"
-        }
-      }
+          description: "Stream for object",
+        },
+      },
     }),
     async (c) => {
-      const key = c.req.query("key")
-      console.log("Key to object", key)
+      const key = c.req.query("key");
+      console.log("Key to object", key);
 
-      const isDownload = false
+      const isDownload = false;
       const tigrisClient = new TigrisClient({
         endpoint: env.AWS_ENDPOINT_URL_S3 || "",
         accessKeyId: env.AWS_ACCESS_KEY_ID || "",
         secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "",
         region: env.AWS_REGION,
-      })
+      });
       const { body: response, metadata } = await tigrisClient.downloadFile({
         bucket: env.BUCKET_NAME || "",
         key: key || "",
-      })
+      });
 
       if (isDownload) {
         c.header("Content-Type", "application/pdf");
         c.header("Content-Length", metadata.size?.toString() || "0");
         c.header("Content-Disposition", `attachment; filename=${key}.pdf`);
-      } else {
+      }
+      else {
         c.header("Content-Type", metadata.contentType || "application/octet-stream");
         c.header("Content-Length", metadata.size?.toString() || "0");
         c.header("Content-Disposition", `inline; filename=${key}`);
       }
-      c.header('Access-Control-Allow-Origin', `http://localhost:3000, https://ugamy.com, https://www.ugamy.com`);
-      c.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-      c.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-      c.header('Cache-Control', 'public, max-age=3600');
-      c.header('X-Content-Type-Options', 'nosniff');
-      c.header('X-Frame-Options', 'DENY');
-      c.header('Content-Security-Policy', "default-src 'self'");
-      c.header('Cross-Origin-Embedder-Policy', 'require-corp');
-      c.header('Cross-Origin-Resource-Policy', 'cross-origin');
-      c.status(200)
+      c.header("Access-Control-Allow-Origin", `http://localhost:3000, https://ugamy.com, https://www.ugamy.com`);
+      c.header("Access-Control-Allow-Methods", "GET, OPTIONS");
+      c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      c.header("Cache-Control", "public, max-age=3600");
+      c.header("X-Content-Type-Options", "nosniff");
+      c.header("X-Frame-Options", "DENY");
+      c.header("Content-Security-Policy", "default-src 'self'");
+      c.header("Cross-Origin-Embedder-Policy", "require-corp");
+      c.header("Cross-Origin-Resource-Policy", "cross-origin");
+      c.status(200);
 
-      return c.body(response as ReadableStream, 200)
-    }
+      return c.body(response as ReadableStream, 200);
+    },
   );
 
 export default router;
