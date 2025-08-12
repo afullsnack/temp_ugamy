@@ -16,6 +16,10 @@ export const user = sqliteTable("user", {
   planId: text("plan_id").references(() => plans.id, { onDelete: "no action" }),
   isSubscribed: integer("is_subscribed", { mode: "boolean" }).$defaultFn(() => false),
   paymentReference: text("payment_reference"),
+  role: text("role").default("user"),
+  banned: integer("banned", { mode: "boolean" }).default(false),
+  banReason: text("ban_reason"),
+  banExpires: integer("ban_expires", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 }, table => ({
@@ -31,6 +35,7 @@ export const session = sqliteTable("session", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
+  impersonatedBy: text("impersonated_by").references(() => user.id, { onDelete: "set null" }),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
 });
 

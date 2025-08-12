@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import { customSessionClient, emailOTPClient, phoneNumberClient, usernameClient } from "better-auth/client/plugins"
+import { adminClient, customSessionClient, emailOTPClient, phoneNumberClient, usernameClient } from "better-auth/client/plugins"
 import type {auth} from "@ugamy/api/auth-types"
 import { env } from "@/env";
 
@@ -9,7 +9,8 @@ export const authClient = createAuthClient({
     usernameClient(),
     phoneNumberClient(),
     emailOTPClient(),
-    customSessionClient<typeof auth>()
+    customSessionClient<typeof auth>(),
+    adminClient()
   ]
 })
 

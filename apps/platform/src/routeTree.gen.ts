@@ -22,6 +22,7 @@ import { Route as PayRouteImport } from './routes/pay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api-request'
@@ -85,6 +86,11 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/_auth/signup',
   path: '/signup',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
+  '/admin/login': typeof AdminLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
+  '/admin/login': typeof AdminLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/admin/login': typeof AdminLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/verify-email'
     | '/signup'
+    | '/admin/login'
     | '/demo/tanstack-query'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/verify-email'
     | '/signup'
+    | '/admin/login'
     | '/demo/tanstack-query'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/verify-email'
     | '/_auth/signup'
+    | '/admin/login'
     | '/demo/tanstack-query'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
@@ -229,6 +241,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -335,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_auth/signup': {
       id: '/_auth/signup'
       path: '/signup'
@@ -389,6 +409,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   AuthSignupRoute: AuthSignupRoute,
+  AdminLoginRoute: AdminLoginRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

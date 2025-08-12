@@ -1,7 +1,7 @@
 import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
-import { emailOTP, phoneNumber, username, customSession } from "better-auth/plugins";
+import { emailOTP, phoneNumber, username, customSession, admin } from "better-auth/plugins";
 
 import db from "@/db";
 import * as authSchema from "@/db/schema/auth-schema";
@@ -94,8 +94,27 @@ const options = {
             throw new APIError("INTERNAL_SERVER_ERROR", { message: "Failed to send password reset otp", code: error?.code || 500 });
           }
         }
+        else if(type === "sign-in") {
+          try {
+            await sendEmail({
+              to: email,
+              subject: "Signin with OTP",
+              body: `Use the OTP - ${otp} to sign into your account`,
+              name: "Ugamy"
+            })
+          }
+          catch(error: any) {
+            console.error("Failed to send signin email");
+            throw new APIError("INTERNAL_SERVER_ERROR", { message: "Failed to send password reset otp", code: error?.code || 500 });
+          }
+        }
       },
     }),
+    admin({
+      // adminUserIds: [], // fill with the default userIds that will be admins
+      defaultBanReason: "Spamming",
+      bannedUserMessage: "You have been banned from accessing this resource"
+    })
   ]
 } satisfies BetterAuthOptions
 
