@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Heart } from 'lucide-react'
 import { Button } from '../ui/button'
-import VideoModal from "./video-modal"
 import type { FC } from 'react'
 import { Progress } from "@/components/ui/progress"
 import ProfileImagePlaceholder from "/profile-image-placeholder.png"
