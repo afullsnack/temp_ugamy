@@ -55,10 +55,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootComponent() {
-  const {
-    session,
-    isPending: loading
-  } = useSession()
+  const { session, isPending: loading } = useSession()
 
   const navigate = useNavigate()
   const location = useRouterState({ select: (s) => s.location })
@@ -84,14 +81,13 @@ function RootComponent() {
     }
   }, [loading, session, location.pathname, navigate])
 
-
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
-        <Toaster position='top-center' richColors />
+        <Toaster position="top-center" richColors />
         {loading ? (
           <GlobalLoadingWidget />
         ) : (

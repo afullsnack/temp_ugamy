@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -12,12 +12,15 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
+import { useSession } from '@/lib/auth-hooks'
+import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/admin/login')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const router = useRouter()
   const [selectedValue, setSelectedValue] = useState<'admin-1' | 'admin-2'>(
     'admin-1',
   )
@@ -25,17 +28,58 @@ function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
+    const verifyOTP = async (otp: string) => {
+      const { data, error } = await authClient.signIn.emailOtp({
+        email:
+          selectedValue === 'admin-1'
+            ? 'miraclef60@gmail.com'
+            : 'jesudara.j@gmail.com',
+        otp: otp,
+      })
+      if (error) {
+        return toast.error(error.message || 'Failed to verify OTP try again')
+      }
+
+      console.log(data, 'Data of user')
+      router.navigate({ to: '/admin/dashboard' })
+    }
     if (otpValue && otpValue.length >= 6) {
       // TODO: submit otp for verification
       console.log('OTP Value', otpValue)
+      verifyOTP(otpValue)
     }
   }, [otpValue])
+
+  const { session, user, isPending: loading } = useSession()
+  console.log('Loading, user, session', loading, user, session)
+
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') {
+        router.navigate({ to: '/admin/dashboard' })
+      }
+    }
+  }, [session, user])
 
   useEffect(() => {
     if (isLoading) {
       ;(async () => {
         try {
+          const { error } = await authClient.emailOtp.sendVerificationOtp({
+            email:
+              selectedValue === 'admin-1'
+                ? 'miraclef60@gmail.com'
+                : 'jesudara.j@gmail.com',
+            type: 'sign-in',
+          })
           await new Promise((resolve) => setTimeout(resolve, 2000))
+          if (error) {
+            setIsLoading(false)
+            toast.error(
+              error.message || 'Failed to send OTP, please try again later',
+            )
+            return
+          }
           setIsLoading(false)
           toast.success('OTP Code sent')
         } catch (error) {
