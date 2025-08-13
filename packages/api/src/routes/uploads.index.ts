@@ -4,8 +4,8 @@ import { jsonContent } from "stoker/openapi/helpers";
 
 import env from "@/env";
 import { TigrisClient, TigrisService } from "@/lib/asset-storage";
-import { createRouter } from "@/lib/create-app";
 import { auth } from "@/lib/auth";
+import { createRouter } from "@/lib/create-app";
 
 const tags = ["Uploads"];
 const router = createRouter()
@@ -57,13 +57,13 @@ const router = createRouter()
       const { type } = c.req.valid("param");
 
       const data = await auth.api.getSession({
-        headers: c.req.raw.headers
-      })
+        headers: c.req.raw.headers,
+      });
 
-      if(!data) {
+      if (!data) {
         return c.json({
-          message: "No session found"
-        }, HttpStatusCodes.UNPROCESSABLE_ENTITY)
+          message: "No session found",
+        }, HttpStatusCodes.UNPROCESSABLE_ENTITY);
       }
 
       const file = body.file;
@@ -71,6 +71,12 @@ const router = createRouter()
       console.log("Parse Body values, params and query", body, file, courseId, type);
 
       const tigrisService = new TigrisService({
+        accessKeyId: env.AWS_ACCESS_KEY_ID || "",
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "",
+        endpoint: env.AWS_ENDPOINT_URL_S3,
+        region: env.AWS_REGION,
+      });
+      const tigrisClient = new TigrisClient({
         accessKeyId: env.AWS_ACCESS_KEY_ID || "",
         secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "",
         endpoint: env.AWS_ENDPOINT_URL_S3,
@@ -91,7 +97,6 @@ const router = createRouter()
           console.log("Uploaded", result);
 
           // TODO: Store key to db, if profile - store inside of user table
-          // TODO: Store key to file table of video
 
           return c.json({
             message: "Upload successful",
@@ -100,7 +105,21 @@ const router = createRouter()
         }
         else if (type === "video") {
           // TODO: get course
-          const keyToStore = `${type}/`;
+          const keyToStore = `${type}/${courseId}/`;
+
+          const result = await tigrisClient.streamUpload(
+            env.BUCKET_NAME || "",
+            keyToStore,
+            file.stream(),
+          );
+          console.log("Stream result", result);
+
+          // TODO: Store key to file table of video
+
+          return c.json({
+            message: "Video Upload successful",
+            key: keyToStore,
+          }, HttpStatusCodes.OK);
         }
       }
 
