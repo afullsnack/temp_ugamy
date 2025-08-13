@@ -1,18 +1,25 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Heart } from 'lucide-react'
 import { Button } from '../ui/button'
-import VideoModal from "./video-modal"
 import type { FC } from 'react'
 import { Progress } from "@/components/ui/progress"
 import ProfileImagePlaceholder from "/profile-image-placeholder.png"
+import { VideoPlayerModal } from '../common/video-player-modal'
+import { show } from '@ebay/nice-modal-react'
 
 interface IProps {
     viewMode: "grid" | "list"
 }
 
 const CoursesTemp: FC<IProps> = ({ viewMode }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false)
     const [favorites, setFavorites] = useState(new Set([1]))
+
+    const showVideo = () => {
+        show(VideoPlayerModal, {
+            videoUrl: "/ugamy-intro-video.mp4",
+            title: "Welcome to Ugamy - Intro video",
+        })
+    }
 
     const toggleFavorite = (episodeId: number) => {
         const newFavorites = new Set(favorites)
@@ -87,7 +94,7 @@ const CoursesTemp: FC<IProps> = ({ viewMode }) => {
                         `}
                     >
                         {episodes.map((episode) => (
-                            <div key={episode.id} className="bg-white rounded-lg overflow-hidden shadow-sm border cursor-pointer" onClick={() => setIsModalOpen(true)}>
+                            <div key={episode.id} className="bg-white rounded-lg overflow-hidden shadow-sm border cursor-pointer" onClick={showVideo}>
                                 <div className="relative">
                                     <img
                                         src={episode.thumbnail || ProfileImagePlaceholder}
@@ -134,10 +141,6 @@ const CoursesTemp: FC<IProps> = ({ viewMode }) => {
                     </div>
                 </div>
             </div>
-
-            {/* Video Modal */}
-            {/* TODO: Use EBAY-MODAL TO RENDER MODALS */}
-            <VideoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </>
     )
 }

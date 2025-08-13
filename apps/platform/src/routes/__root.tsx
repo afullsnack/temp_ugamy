@@ -8,18 +8,16 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
-import { authClient } from '@/lib/auth-client'
 import { Toaster } from '@/components/ui/sonner'
-import AppLoadingSkeleton from '@/components/common/app-loading-skeleton.tsx'
-import type { ISession } from '@/lib/utils.ts'
 import { useSession } from '@/lib/auth-hooks.ts'
 import GlobalLoadingWidget from '@/components/common/global-loading-widget.tsx'
+import NiceModal from '@ebay/nice-modal-react'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -85,7 +83,7 @@ function RootComponent() {
       navigate({ to: '/signin' })
     }
   }, [loading, session, location.pathname, navigate])
-  
+
 
   return (
     <html lang="en">
@@ -98,9 +96,11 @@ function RootComponent() {
           <GlobalLoadingWidget />
         ) : (
           <>
-            <Outlet />
-            <TanStackRouterDevtools />
-            <TanStackQueryLayout />
+            <NiceModal.Provider>
+              <Outlet />
+              <TanStackRouterDevtools />
+              <TanStackQueryLayout />
+            </NiceModal.Provider>
           </>
         )}
         <Scripts />
