@@ -1,10 +1,12 @@
 import { auth } from "@/lib/auth";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
+import courses from "@/routes/courses/courses.index";
 import index from "@/routes/index.route";
-import payments from "@/routes/payments/payments.index"
-import webhooks from "@/routes/webhooks/webhooks.index"
-import uploads from "@/routes/uploads.index"
+import payments from "@/routes/payments/payments.index";
+import uploads from "@/routes/uploads.index";
+import videos from "@/routes/videos/videos.index";
+import webhooks from "@/routes/webhooks/webhooks.index";
 // import { TigrisClient } from "@/lib/asset-storage";
 // import env from "@/env";
 
@@ -16,7 +18,9 @@ const routes = [
   index,
   payments,
   webhooks,
-  uploads
+  uploads,
+  courses,
+  videos,
   // tasks,
 ] as const;
 
