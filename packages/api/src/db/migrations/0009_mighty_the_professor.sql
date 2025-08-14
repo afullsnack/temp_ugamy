@@ -1,4 +1,4 @@
-PRAGMA foreign_keys=OFF;
+PRAGMA foreign_keys=OFF;--> statement-breakpoint
 CREATE TABLE `__new_videos` (
 	`id` text PRIMARY KEY NOT NULL,
 	`key` text NOT NULL,
@@ -14,11 +14,11 @@ CREATE TABLE `__new_videos` (
 	`updated_at` integer,
 	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE cascade
 );
-
-INSERT INTO `__new_videos`("id", "key", "course_id", "metadata", "title", "description", "thumbnail_url", "duration", "order_index", "is_published", "created_at", "updated_at") SELECT "id", "key", "course_id", "metadata", "title", "description", "thumbnail_url", "duration", "order_index", "is_published", "created_at", "updated_at" FROM `videos`;
-DROP TABLE `videos`;
-ALTER TABLE `__new_videos` RENAME TO `videos`;
-PRAGMA foreign_keys=ON;
-CREATE INDEX `videos_course_id_idx` ON `videos` (`course_id`);
-CREATE INDEX `videos_published_idx` ON `videos` (`is_published`);
-CREATE INDEX `videos_course_order_idx` ON `videos` (`course_id`,`order_index`);
+--> statement-breakpoint
+INSERT INTO `__new_videos`("id", "key", "course_id", "metadata", "title", "description", "thumbnail_url", "duration", "order_index", "is_published", "created_at", "updated_at") SELECT "id", "key", "course_id", "metadata", "title", "description", "thumbnail_url", "duration", "order_index", "is_published", "created_at", "updated_at" FROM `videos`;--> statement-breakpoint
+DROP TABLE `videos`;--> statement-breakpoint
+ALTER TABLE `__new_videos` RENAME TO `videos`;--> statement-breakpoint
+PRAGMA foreign_keys=ON;--> statement-breakpoint
+CREATE INDEX `videos_course_id_idx` ON `videos` (`course_id`);--> statement-breakpoint
+CREATE INDEX `videos_published_idx` ON `videos` (`is_published`);--> statement-breakpoint
+CREATE INDEX `videos_course_order_idx` ON `videos` (`course_id`,`order_index`);--> statement-breakpoint
