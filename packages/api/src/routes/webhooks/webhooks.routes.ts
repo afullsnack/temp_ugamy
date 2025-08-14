@@ -6,6 +6,7 @@ const tags = ["Webhooks"];
 export const paystack = createRoute({
   tags,
   method: "post",
+  hide: true,
   path: "/webhook/paystack",
   request: {
     body: {

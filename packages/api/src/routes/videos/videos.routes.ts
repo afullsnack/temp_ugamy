@@ -1,9 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent } from "stoker/openapi/helpers";
-import { createErrorSchema, IdUUIDParamsSchema } from "stoker/openapi/schemas";
-
-import { insertVideoSchema, selectVideoSchema } from "@/db/schema/schema";
+import { IdUUIDParamsSchema } from "stoker/openapi/schemas";
 
 const tags = ["Videos"];
 export const create = createRoute({
@@ -29,16 +27,19 @@ export const create = createRoute({
       },
     },
     query: z.object({
-      courseId: z.string(),
+      courseId: z.string().uuid(),
     }),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectVideoSchema,
+      z.object({}),
       "Video created",
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
-      createErrorSchema(insertVideoSchema),
+      z.object({
+        success: z.boolean(),
+        message: z.string().optional(),
+      }),
       "Invalid video data",
     ),
   },
@@ -49,11 +50,13 @@ export const list = createRoute({
   path: "/videos",
   method: "get",
   request: {
-    query: IdUUIDParamsSchema,
+    query: z.object({
+      id: z.string().uuid(),
+    }),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(selectVideoSchema),
+      z.array(z.any()),
       "Videos list",
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
@@ -71,13 +74,11 @@ export const getOne = createRoute({
   path: "/videos/{id}",
   method: "get",
   request: {
-    params: z.object({
-      id: z.string().uuid(),
-    }),
+    params: IdUUIDParamsSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectVideoSchema,
+      z.object({}),
       "Video",
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
@@ -106,8 +107,15 @@ export const stream = createRoute({
           schema: z.any(),
         },
       },
-      description: "Stream video",
+      description: "Video stream",
     },
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      z.object({
+        success: z.boolean(),
+        message: z.string().optional(),
+      }),
+      "Invalid video key param",
+    ),
   },
 });
 

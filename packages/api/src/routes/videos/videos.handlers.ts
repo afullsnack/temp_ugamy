@@ -100,6 +100,13 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   const { key } = c.req.valid("param");
   console.log("Key to video", key);
 
+  if (!key) {
+    return c.json({
+      success: false,
+      message: "Key not provided",
+    }, HttpStatusCodes.BAD_REQUEST);
+  }
+
   const isDownload = false;
   const tigrisClient = new TigrisClient({
     endpoint: env.AWS_ENDPOINT_URL_S3 || "",
