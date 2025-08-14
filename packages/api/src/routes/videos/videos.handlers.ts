@@ -86,7 +86,6 @@ export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
   });
 
   if (!video) {
-    // @ts-expect-error "Deep type nesting"
     return c.json({
       success: false,
       message: "Video not found with provided id",
