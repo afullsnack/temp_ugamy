@@ -31,7 +31,9 @@ import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api
 import { Route as DemoSentryTestingRouteImport } from './routes/demo.sentry.testing'
 import { Route as AdminCoursesNewRouteImport } from './routes/admin/courses/new'
 import { Route as AdminCoursesIdVideosRouteImport } from './routes/admin/courses/$id.videos'
+import { Route as AdminCoursesIdVideosIndexRouteImport } from './routes/admin/courses/$id.videos.index'
 import { Route as AdminCoursesIdVideosNewRouteImport } from './routes/admin/courses/$id.videos.new'
+import { Route as AdminCoursesIdVideosVidWatchRouteImport } from './routes/admin/courses/$id.videos.$vid.watch'
 import { ServerRoute as ApiDemoNamesServerRouteImport } from './routes/api.demo-names'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -136,11 +138,23 @@ const AdminCoursesIdVideosRoute = AdminCoursesIdVideosRouteImport.update({
   path: '/admin/courses/$id/videos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCoursesIdVideosIndexRoute =
+  AdminCoursesIdVideosIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminCoursesIdVideosRoute,
+  } as any)
 const AdminCoursesIdVideosNewRoute = AdminCoursesIdVideosNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => AdminCoursesIdVideosRoute,
 } as any)
+const AdminCoursesIdVideosVidWatchRoute =
+  AdminCoursesIdVideosVidWatchRouteImport.update({
+    id: '/$vid/watch',
+    path: '/$vid/watch',
+    getParentRoute: () => AdminCoursesIdVideosRoute,
+  } as any)
 const ApiDemoNamesServerRoute = ApiDemoNamesServerRouteImport.update({
   id: '/api/demo-names',
   path: '/api/demo-names',
@@ -169,6 +183,8 @@ export interface FileRoutesByFullPath {
   '/admin/courses': typeof AdminCoursesIndexRoute
   '/admin/courses/$id/videos': typeof AdminCoursesIdVideosRouteWithChildren
   '/admin/courses/$id/videos/new': typeof AdminCoursesIdVideosNewRoute
+  '/admin/courses/$id/videos/': typeof AdminCoursesIdVideosIndexRoute
+  '/admin/courses/$id/videos/$vid/watch': typeof AdminCoursesIdVideosVidWatchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -190,8 +206,9 @@ export interface FileRoutesByTo {
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
-  '/admin/courses/$id/videos': typeof AdminCoursesIdVideosRouteWithChildren
   '/admin/courses/$id/videos/new': typeof AdminCoursesIdVideosNewRoute
+  '/admin/courses/$id/videos': typeof AdminCoursesIdVideosIndexRoute
+  '/admin/courses/$id/videos/$vid/watch': typeof AdminCoursesIdVideosVidWatchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -216,6 +233,8 @@ export interface FileRoutesById {
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/courses/$id/videos': typeof AdminCoursesIdVideosRouteWithChildren
   '/admin/courses/$id/videos/new': typeof AdminCoursesIdVideosNewRoute
+  '/admin/courses/$id/videos/': typeof AdminCoursesIdVideosIndexRoute
+  '/admin/courses/$id/videos/$vid/watch': typeof AdminCoursesIdVideosVidWatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,6 +260,8 @@ export interface FileRouteTypes {
     | '/admin/courses'
     | '/admin/courses/$id/videos'
     | '/admin/courses/$id/videos/new'
+    | '/admin/courses/$id/videos/'
+    | '/admin/courses/$id/videos/$vid/watch'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -262,8 +283,9 @@ export interface FileRouteTypes {
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/admin/courses'
-    | '/admin/courses/$id/videos'
     | '/admin/courses/$id/videos/new'
+    | '/admin/courses/$id/videos'
+    | '/admin/courses/$id/videos/$vid/watch'
   id:
     | '__root__'
     | '/'
@@ -287,6 +309,8 @@ export interface FileRouteTypes {
     | '/admin/courses/'
     | '/admin/courses/$id/videos'
     | '/admin/courses/$id/videos/new'
+    | '/admin/courses/$id/videos/'
+    | '/admin/courses/$id/videos/$vid/watch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -475,11 +499,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCoursesIdVideosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/courses/$id/videos/': {
+      id: '/admin/courses/$id/videos/'
+      path: '/'
+      fullPath: '/admin/courses/$id/videos/'
+      preLoaderRoute: typeof AdminCoursesIdVideosIndexRouteImport
+      parentRoute: typeof AdminCoursesIdVideosRoute
+    }
     '/admin/courses/$id/videos/new': {
       id: '/admin/courses/$id/videos/new'
       path: '/new'
       fullPath: '/admin/courses/$id/videos/new'
       preLoaderRoute: typeof AdminCoursesIdVideosNewRouteImport
+      parentRoute: typeof AdminCoursesIdVideosRoute
+    }
+    '/admin/courses/$id/videos/$vid/watch': {
+      id: '/admin/courses/$id/videos/$vid/watch'
+      path: '/$vid/watch'
+      fullPath: '/admin/courses/$id/videos/$vid/watch'
+      preLoaderRoute: typeof AdminCoursesIdVideosVidWatchRouteImport
       parentRoute: typeof AdminCoursesIdVideosRoute
     }
   }
@@ -498,10 +536,14 @@ declare module '@tanstack/react-start/server' {
 
 interface AdminCoursesIdVideosRouteChildren {
   AdminCoursesIdVideosNewRoute: typeof AdminCoursesIdVideosNewRoute
+  AdminCoursesIdVideosIndexRoute: typeof AdminCoursesIdVideosIndexRoute
+  AdminCoursesIdVideosVidWatchRoute: typeof AdminCoursesIdVideosVidWatchRoute
 }
 
 const AdminCoursesIdVideosRouteChildren: AdminCoursesIdVideosRouteChildren = {
   AdminCoursesIdVideosNewRoute: AdminCoursesIdVideosNewRoute,
+  AdminCoursesIdVideosIndexRoute: AdminCoursesIdVideosIndexRoute,
+  AdminCoursesIdVideosVidWatchRoute: AdminCoursesIdVideosVidWatchRoute,
 }
 
 const AdminCoursesIdVideosRouteWithChildren =

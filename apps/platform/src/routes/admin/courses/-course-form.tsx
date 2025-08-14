@@ -1,7 +1,8 @@
 'use client'
 
 import type React from 'react'
-
+import { useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import z from 'zod'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { env } from '@/env'
 
 interface CourseFormProps {
   courseId?: string
@@ -31,6 +42,13 @@ interface CourseData {
   price: string
   is_published: boolean
 }
+
+const courseSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  slug: z.string(),
+})
+type CourseFormData = z.infer<typeof courseSchema>
 
 export function CourseForm({ courseId }: CourseFormProps) {
   const router = useRouter()
@@ -47,76 +65,82 @@ export function CourseForm({ courseId }: CourseFormProps) {
   useEffect(() => {
     if (courseId) {
       // Load existing course data
-      fetchCourseData(courseId)
+      // fetchCourseData(courseId)
     }
   }, [courseId])
 
-  const fetchCourseData = async (id: string) => {
-    try {
-      const response = await fetch(`/api/courses/${id}`)
-      if (response.ok) {
-        const course = await response.json()
-        setFormData({
-          title: course.title || '',
-          description: course.description || '',
-          instructor: course.instructor || '',
-          thumbnail_url: course.thumbnail_url || '',
-          price: course.price?.toString() || '0.00',
-          is_published: course.is_published || false,
-        })
-      }
-    } catch (error) {
-      toast.error('Error', {
-        description: 'Failed to load course data',
-      })
-    }
-  }
+  // const fetchCourseData = async (id: string) => {
+  //   try {
+  //     const response = await fetch(`/api/courses/${id}`)
+  //     if (response.ok) {
+  //       const course = await response.json()
+  //       setFormData({
+  //         title: course.title || '',
+  //         description: course.description || '',
+  //         instructor: course.instructor || '',
+  //         thumbnail_url: course.thumbnail_url || '',
+  //         price: course.price?.toString() || '0.00',
+  //         is_published: course.is_published || false,
+  //       })
+  //     }
+  //   } catch (error) {
+  //     toast.error('Error', {
+  //       description: 'Failed to load course data',
+  //     })
+  //   }
+  // }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault()
+  //   setLoading(true)
 
-    try {
-      const url = courseId ? `/api/courses/${courseId}` : '/api/courses'
-      const method = courseId ? 'PUT' : 'POST'
+  //   try {
+  //     const url = courseId ? `/api/courses/${courseId}` : '/api/courses'
+  //     const method = courseId ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          price: Number.parseFloat(formData.price),
-        }),
-      })
+  //     const response = await fetch(url, {
+  //       method,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         ...formData,
+  //         price: Number.parseFloat(formData.price),
+  //       }),
+  //     })
 
-      if (response.ok) {
-        toast.success('Success', {
-          description: `Course ${courseId ? 'updated' : 'created'} successfully`,
-        })
-        router.navigate({ to: '/admin/courses' })
-      } else {
-        throw new Error('Failed to save course')
-      }
-    } catch (error) {
-      toast.error('Error', {
-        description: `Failed to ${courseId ? 'update' : 'create'} course`,
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     if (response.ok) {
+  //       toast.success('Success', {
+  //         description: `Course ${courseId ? 'updated' : 'created'} successfully`,
+  //       })
+  //       router.navigate({ to: '/admin/courses' })
+  //     } else {
+  //       throw new Error('Failed to save course')
+  //     }
+  //   } catch (error) {
+  //     toast.error('Error', {
+  //       description: `Failed to ${courseId ? 'update' : 'create'} course`,
+  //     })
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
-  const handleInputChange = (
-    field: keyof CourseData,
-    value: string | boolean,
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
+  const form = useForm<CourseFormData>({
+    resolver: zodResolver(courseSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      slug: '',
+    },
+  })
+
+  const [watchedTitle] = useWatch({
+    control: form.control,
+    name: ['title'],
+  })
+
+  console.log('watched', watchedTitle)
 
   return (
     <Card>
@@ -129,90 +153,117 @@ export function CourseForm({ courseId }: CourseFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="title">Course Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="Enter course title"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Enter course description"
-              rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="instructor">Instructor</Label>
-            <Input
-              id="instructor"
-              value={formData.instructor}
-              onChange={(e) => handleInputChange('instructor', e.target.value)}
-              placeholder="Enter instructor name"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail_url">Thumbnail URL</Label>
-            <Input
-              id="thumbnail_url"
-              value={formData.thumbnail_url}
-              onChange={(e) =>
-                handleInputChange('thumbnail_url', e.target.value)
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(async (values) => {
+              // Call submit
+              const response = await fetch(`${env.VITE_API_URL}/courses`, {
+                method: 'POST',
+                body: JSON.stringify({
+                  ...values,
+                  slug: watchedTitle.toLowerCase().split(' ').join('-'),
+                }),
+              })
+              if (response.ok) {
+                const result = await response.json()
+                console.log('New course submitted')
               }
-              placeholder="Enter thumbnail image URL"
+            })}
+            className="space-y-6"
+          >
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Course Title:
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="price">Price ($)</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData.price}
-              onChange={(e) => handleInputChange('price', e.target.value)}
-              placeholder="0.00"
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Description:
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={6}
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_published"
-              checked={formData.is_published}
-              onCheckedChange={(checked) =>
-                handleInputChange('is_published', checked)
-              }
+            <FormField
+              control={form.control}
+              name="slug"
+              disabled
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Course Slug:
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      value={watchedTitle.toLowerCase().split(' ').join('-')}
+                      onChange={() =>
+                        field.onChange(
+                          watchedTitle.toLowerCase().split(' ').join('-'),
+                        )
+                      }
+                      // {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <Label htmlFor="is_published">Publish Course</Label>
-          </div>
 
-          <div className="flex gap-4">
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {courseId ? 'Update Course' : 'Create Course'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.navigate({ to: '/admin/courses' })}
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+            {/*<div className="flex items-center space-x-2">
+              <Switch
+                id="is_published"
+                checked={formData.is_published}
+                onCheckedChange={(checked) =>
+                  handleInputChange('is_published', checked)
+                }
+              />
+              <Label htmlFor="is_published">Publish Course</Label>
+            </div>*/}
+
+            <div className="flex gap-4">
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {courseId ? 'Update Course' : 'Create Course'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.navigate({ to: '/admin/courses' })}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   )

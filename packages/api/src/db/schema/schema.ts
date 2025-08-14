@@ -66,7 +66,7 @@ export const patchCourseSchema = insertCourseSchema.partial();
 export const videos = sqliteTable("videos", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   key: text("key").notNull(),
-  courseId: integer("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
+  courseId: text("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
   metadata: text("metadata", { mode: "json" }),
   title: text("title").notNull(),
   description: text("description"),

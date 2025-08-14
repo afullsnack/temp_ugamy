@@ -1,13 +1,12 @@
-import { VideoForm } from './-video-form'
 import { createFileRoute, Link, useParams } from '@tanstack/react-router'
+import { VideoPlayer } from './-video-player'
 
-export const Route = createFileRoute('/admin/courses/$id/videos/new')({
+export const Route = createFileRoute('/admin/courses/$id/videos/$vid/watch')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const params = useParams({ from: '/admin/courses/$id/videos/new' })
-  console.log('Params:', params)
+  const params = useParams({ from: '/admin/courses/$id/videos/$vid/watch' })
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
@@ -21,14 +20,14 @@ function RouteComponent() {
               >
                 ← Back to Videos
               </Link>
-              <h1 className="text-2xl font-bold mt-2">Add New Video</h1>
+              <h1 className="text-2xl font-bold mt-2">Watch Video</h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <VideoForm courseId={params.id} />
+      <main className="container mx-auto px-4 py-8">
+        <VideoPlayer courseId={params.id} videoId={params.vid} />
       </main>
     </div>
   )

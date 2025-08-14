@@ -18,34 +18,46 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { env } from '@/env'
+import { useForm } from 'react-hook-form'
+import z from 'zod'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 
 interface VideoFormProps {
   courseId: string
   videoId?: string
 }
 
-interface VideoData {
-  title: string
-  description: string
-  video_url: string
-  thumbnail_url: string
-  duration: string
-  order_index: string
-  is_published: boolean
-}
+const videoFormSchema = z.object({
+  video: z.instanceof(FileList),
+  title: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  duration: z.number(),
+})
+type VideoFormData = z.infer<typeof videoFormSchema>
 
 export function VideoForm({ courseId, videoId }: VideoFormProps) {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState<VideoData>({
-    title: '',
-    description: '',
-    video_url: '',
-    thumbnail_url: '',
-    duration: '0',
-    order_index: '1',
-    is_published: false,
+
+  const form = useForm<VideoFormData>({
+    defaultValues: {
+      video: undefined,
+      title: '',
+      slug: '',
+      description: '',
+      duration: 0,
+    },
   })
+  const watchTitle = form.watch('title')
+  const slug = watchTitle.toLowerCase().split(' ').join('-')
 
   useEffect(() => {
     if (videoId) {
@@ -55,52 +67,59 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
 
   const fetchVideoData = async (id: string) => {
     try {
-      const response = await fetch(`/api/videos/${id}`)
+      const response = await fetch(`${env.VITE_API_URL}/videos/${id}`)
       if (response.ok) {
         const video = await response.json()
-        setFormData({
-          title: video.title || '',
-          description: video.description || '',
-          video_url: video.video_url || '',
-          thumbnail_url: video.thumbnail_url || '',
-          duration: video.duration?.toString() || '0',
-          order_index: video.order_index?.toString() || '1',
-          is_published: video.is_published || false,
-        })
       }
     } catch (error) {
+      console.log('Failed video fetch', error)
       toast.error('Error', {
         description: 'Failed to load video data',
       })
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const handleSubmit = async (values: VideoFormData) => {
+    // Validation
+    console.log('Values', values)
+    const video = values.video[0]
+    console.log('Video', video)
+
+    if (video.type !== 'video/mp4') {
+      toast.error('Error', {
+        description: 'Invalid video format',
+      })
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('video', video)
+    formData.append('title', values.title)
+    formData.append('slug', slug)
+    formData.append('description', values.description)
+    formData.append('duration', values.duration.toString())
 
     try {
-      const url = videoId ? `/api/videos/${videoId}` : '/api/videos'
+      const url = videoId ? `/videos/${videoId}` : '/videos'
       const method = videoId ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${env.VITE_API_URL}${url}?courseId=${courseId}`,
+        {
+          method,
+          body: formData,
+          credentials: 'include',
         },
-        body: JSON.stringify({
-          ...formData,
-          course_id: Number.parseInt(courseId),
-          duration: Number.parseInt(formData.duration),
-          order_index: Number.parseInt(formData.order_index),
-        }),
-      })
+      )
 
       if (response.ok) {
         toast.success('Success', {
           description: `Video ${videoId ? 'updated' : 'created'} successfully`,
         })
-        router.navigate({ to: `/courses/${courseId}/videos` })
+        router.navigate({
+          to: `/admin/courses/$id/videos`,
+          params: { id: courseId },
+        })
       } else {
         throw new Error('Failed to save video')
       }
@@ -108,19 +127,7 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
       toast('Error', {
         description: `Failed to ${videoId ? 'update' : 'create'} video`,
       })
-    } finally {
-      setLoading(false)
     }
-  }
-
-  const handleInputChange = (
-    field: keyof VideoData,
-    value: string | boolean,
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
   }
 
   const formatDuration = (seconds: number) => {
@@ -140,112 +147,142 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="title">Video Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="Enter video title"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Enter video description"
-              rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="video_url">Video URL</Label>
-            <Input
-              id="video_url"
-              value={formData.video_url}
-              onChange={(e) => handleInputChange('video_url', e.target.value)}
-              placeholder="Enter video URL (e.g., YouTube, Vimeo, or direct link)"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail_url">Thumbnail URL</Label>
-            <Input
-              id="thumbnail_url"
-              value={formData.thumbnail_url}
-              onChange={(e) =>
-                handleInputChange('thumbnail_url', e.target.value)
-              }
-              placeholder="Enter thumbnail image URL"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duration (seconds)</Label>
-              <Input
-                id="duration"
-                type="number"
-                min="0"
-                value={formData.duration}
-                onChange={(e) => handleInputChange('duration', e.target.value)}
-                placeholder="0"
-              />
-              {Number.parseInt(formData.duration) > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Duration: {formatDuration(Number.parseInt(formData.duration))}
-                </p>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((values) => handleSubmit(values))}
+            className="space-y-6"
+          >
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Video Title
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Enter video title"
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      required
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="order_index">Order</Label>
-              <Input
-                id="order_index"
-                type="number"
-                min="1"
-                value={formData.order_index}
-                onChange={(e) =>
-                  handleInputChange('order_index', e.target.value)
-                }
-                placeholder="1"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_published"
-              checked={formData.is_published}
-              onCheckedChange={(checked) =>
-                handleInputChange('is_published', checked)
-              }
             />
-            <Label htmlFor="is_published">Publish Video</Label>
-          </div>
+            <FormField
+              control={form.control}
+              name="slug"
+              disabled
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Slug
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={slug}
+                      onChange={() => field.onChange(slug)}
+                      placeholder="Video slug"
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      required
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="flex gap-4">
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {videoId ? 'Update Video' : 'Add Video'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                router.navigate({ to: `/courses/${courseId}/videos` })
-              }
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Video Description
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Enter video description"
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      required
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="duration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Duration (seconds)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Enter video duration"
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      required
+                    />
+                  </FormControl>
+                  {field.value > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Duration: {formatDuration(field.value)} min(s)
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="video"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Select video
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...form.register('video')}
+                      type="file"
+                      placeholder="Select video"
+                      className="border-teal-400 focus:border-teal-500 focus:ring-teal-500"
+                      required
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-4">
+              <Button type="submit" disabled={form.formState.isLoading}>
+                {form.formState.isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {videoId ? 'Update Video' : 'Add Video'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  router.navigate({ to: `/admin/courses/${courseId}/videos` })
+                }
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   )

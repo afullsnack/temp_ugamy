@@ -28,7 +28,10 @@ export default function createApp() {
     }));
 
   app.notFound(notFound);
-  app.onError(onError);
+  app.onError((err, c) => {
+    console.log("error on app", err);
+    return onError(err, c);
+  });
 
   return app;
 }

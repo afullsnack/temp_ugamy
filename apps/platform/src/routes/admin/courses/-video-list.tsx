@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Edit, Trash2, Play, Clock, Eye } from 'lucide-react'
+import { Edit, Trash2, Play, Clock, Eye, LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
-import { Link } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/react-router'
+import { env } from '@/env'
+import { useQuery } from '@tanstack/react-query'
+import { id } from 'zod/v4/locales'
 
 interface Video {
   id: number
@@ -26,37 +29,48 @@ interface VideoListProps {
 }
 
 export function VideoList({ courseId }: VideoListProps) {
-  const [videos, setVideos] = useState<Array<Video>>([])
-  const [loading, setLoading] = useState(true)
-  const [courseName, setCourseName] = useState('')
-
-  useEffect(() => {
-    fetchVideos()
-    fetchCourseInfo()
-  }, [courseId])
+  const router = useRouter()
+  const { data: videos, isLoading: videosLoading } = useQuery({
+    queryKey: ['videos'],
+    queryFn: async () => {
+      return await fetchVideos()
+    },
+  })
+  const { data: courseName, isLoading: courseInfoLoading } = useQuery({
+    queryKey: ['courseInfo'],
+    queryFn: async () => {
+      return await fetchCourseInfo()
+    },
+  })
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch(`/api/courses/${courseId}/videos`)
+      const response = await fetch(
+        `${env.VITE_API_URL}/videos?id=${courseId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
       if (response.ok) {
         const data = await response.json()
-        setVideos(data)
+        console.log('Videos:', data)
+        return data
       }
     } catch (error) {
       toast.error('Error', {
         description: 'Failed to load videos',
       })
-    } finally {
-      setLoading(false)
     }
   }
 
   const fetchCourseInfo = async () => {
     try {
-      const response = await fetch(`/api/courses/${courseId}`)
+      const response = await fetch(`${env.VITE_API_URL}/courses/${courseId}`)
       if (response.ok) {
         const course = await response.json()
-        setCourseName(course.title)
+        return course.title
       }
     } catch (error) {
       // Silently fail - course name is not critical
@@ -72,7 +86,6 @@ export function VideoList({ courseId }: VideoListProps) {
       })
 
       if (response.ok) {
-        setVideos(videos.filter((video) => video.id !== id))
         toast.success('Success', {
           description: 'Video deleted successfully',
         })
@@ -90,8 +103,8 @@ export function VideoList({ courseId }: VideoListProps) {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
-  if (loading) {
-    return <div className="text-center py-8">Loading videos...</div>
+  if (videosLoading || courseInfoLoading) {
+    return <LoaderCircle className="size-6 animate-spin" />
   }
 
   return (
@@ -112,16 +125,29 @@ export function VideoList({ courseId }: VideoListProps) {
             <p className="text-muted-foreground mb-4">
               No videos found for this course
             </p>
-            <Link to={`/admin/courses/${courseId}/videos/new`}>
-              <Button>Add Your First Video</Button>
-            </Link>
+            <Button
+              // asChild
+              onClick={() =>
+                router.navigate({
+                  to: `/admin/courses/$id/videos/new`,
+                  params: { id: courseId },
+                })
+              }
+            >
+              {/*<Link
+                to={`/admin/courses/$id/videos/new-video`}
+                params={{ id: courseId }}
+              >*/}
+              Add Your First Video Fool
+              {/*</Link>*/}
+            </Button>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
           {videos
-            .sort((a, b) => a.order_index - b.order_index)
-            .map((video) => (
+            .sort((a: any, b: any) => a.order_index - b.order_index)
+            .map((video: any) => (
               <Card key={video.id}>
                 <CardContent className="p-6">
                   <div className="flex gap-4">
@@ -146,10 +172,10 @@ export function VideoList({ courseId }: VideoListProps) {
                           </p>
                         </div>
                         <Badge
-                          variant={video.is_published ? 'default' : 'secondary'}
+                          variant={video.isPublished ? 'default' : 'secondary'}
                           className="ml-2"
                         >
-                          {video.is_published ? 'Published' : 'Draft'}
+                          {video.isPublished ? 'Published' : 'Draft'}
                         </Badge>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
@@ -158,26 +184,27 @@ export function VideoList({ courseId }: VideoListProps) {
                           {formatDuration(video.duration)}
                         </div>
                         <div className="flex items-center gap-1">
-                          <span>Order: {video.order_index}</span>
+                          <span>Order: {video.orderIndex}</span>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Link
-                          to={`/courses/${courseId}/videos/${video.id}/watch`}
-                        >
-                          <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link
+                            to={`/admin/courses/$id/videos/$vid/watch`}
+                            params={{ id: courseId, vid: video.id }}
+                          >
                             <Eye className="mr-2 h-4 w-4" />
                             Preview
-                          </Button>
-                        </Link>
-                        <Link
+                          </Link>
+                        </Button>
+                        {/*<Link
                           to={`/courses/${courseId}/videos/${video.id}/edit`}
-                        >
-                          <Button variant="outline" size="sm">
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </Button>
-                        </Link>
+                        >*/}
+                        <Button variant="outline" size="sm">
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </Button>
+                        {/*</Link>*/}
                         <Button
                           variant="outline"
                           size="sm"

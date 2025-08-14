@@ -6,6 +6,7 @@ import * as routes from "./videos.routes";
 const router = createRouter()
   .openapi(routes.create, handlers.create)
   .openapi(routes.getOne, handlers.getOne)
-  .openapi(routes.list, handlers.list);
+  .openapi(routes.list, handlers.list)
+  .openapi(routes.stream, handlers.stream);
 
 export default router;

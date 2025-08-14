@@ -1,25 +1,28 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-  ListObjectsV2Command,
-  HeadObjectCommand,
-  CreateBucketCommand,
-  DeleteBucketCommand,
-  ListBucketsCommand,
-  CopyObjectCommand,
-  PutObjectCommandInput,
-  GetObjectCommandInput,
-  DeleteObjectCommandInput,
-  ListObjectsV2CommandInput,
-  HeadObjectCommandInput,
+import type {
+  CopyObjectCommandInput,
   CreateBucketCommandInput,
   DeleteBucketCommandInput,
-  CopyObjectCommandInput,
-} from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Upload } from '@aws-sdk/lib-storage';
+  DeleteObjectCommandInput,
+  GetObjectCommandInput,
+  HeadObjectCommandInput,
+  ListObjectsV2CommandInput,
+  PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
+
+import {
+  CopyObjectCommand,
+  CreateBucketCommand,
+  DeleteBucketCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  ListBucketsCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // Configuration interface
 export interface TigrisConfig {
@@ -81,7 +84,7 @@ export interface PresignedUrlOptions {
   bucket: string;
   key: string;
   expiresIn?: number; // seconds, default 3600 (1 hour)
-  operation?: 'GET' | 'PUT' | 'DELETE';
+  operation?: "GET" | "PUT" | "DELETE";
 }
 
 // Copy object options interface
@@ -91,7 +94,7 @@ export interface CopyObjectOptions {
   destinationBucket: string;
   destinationKey: string;
   metadata?: Record<string, string>;
-  metadataDirective?: 'COPY' | 'REPLACE';
+  metadataDirective?: "COPY" | "REPLACE";
   contentType?: string;
 }
 
@@ -100,8 +103,8 @@ export class TigrisClient {
 
   constructor(config: TigrisConfig) {
     this.s3Client = new S3Client({
-      region: config.region || 'auto',
-      endpoint: config.endpoint || 'https://fly.storage.tigris.dev',
+      region: config.region || "auto",
+      endpoint: config.endpoint || "https://fly.storage.tigris.dev",
       credentials: {
         accessKeyId: config.accessKeyId,
         secretAccessKey: config.secretAccessKey,
@@ -139,14 +142,16 @@ export class TigrisClient {
         });
 
         const result = await upload.done();
-        console.log('Upload result', result);
-        return result.ETag || '';
-      } else {
+        console.log("Upload result", result);
+        return result.ETag || "";
+      }
+      else {
         const command = new PutObjectCommand(uploadParams);
         const result = await this.s3Client.send(command);
-        return result.ETag || '';
+        return result.ETag || "";
       }
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to upload file: ${error}`);
     }
   }
@@ -173,7 +178,7 @@ export class TigrisClient {
       const result = await this.s3Client.send(command);
 
       if (!result.Body) {
-        throw new Error('No body returned from download');
+        throw new Error("No body returned from download");
       }
 
       const metadata: ObjectMetadata = {
@@ -190,8 +195,9 @@ export class TigrisClient {
         body: result.Body as ReadableStream | Blob | Buffer,
         metadata,
       };
-    } catch (error) {
-      console.log("Failed to donwload file:", error)
+    }
+    catch (error) {
+      console.log("Failed to donwload file:", error);
       throw new Error(`Failed to download file: ${error}`);
     }
   }
@@ -218,7 +224,8 @@ export class TigrisClient {
         contentType: result.ContentType,
         metadata: result.Metadata,
       };
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to get file metadata: ${error}`);
     }
   }
@@ -235,7 +242,8 @@ export class TigrisClient {
 
       const command = new DeleteObjectCommand(params);
       await this.s3Client.send(command);
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to delete file: ${error}`);
     }
   }
@@ -261,8 +269,8 @@ export class TigrisClient {
       const command = new ListObjectsV2Command(params);
       const result = await this.s3Client.send(command);
 
-      const objects: ObjectMetadata[] = (result.Contents || []).map((obj) => ({
-        key: obj.Key || '',
+      const objects: ObjectMetadata[] = (result.Contents || []).map(obj => ({
+        key: obj.Key || "",
         lastModified: obj.LastModified,
         etag: obj.ETag,
         size: obj.Size,
@@ -274,7 +282,8 @@ export class TigrisClient {
         isTruncated: result.IsTruncated || false,
         nextContinuationToken: result.NextContinuationToken,
       };
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to list objects: ${error}`);
     }
   }
@@ -291,7 +300,8 @@ export class TigrisClient {
 
       const command = new CreateBucketCommand(params);
       await this.s3Client.send(command);
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to create bucket: ${error}`);
     }
   }
@@ -307,7 +317,8 @@ export class TigrisClient {
 
       const command = new DeleteBucketCommand(params);
       await this.s3Client.send(command);
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to delete bucket: ${error}`);
     }
   }
@@ -320,11 +331,12 @@ export class TigrisClient {
       const command = new ListBucketsCommand({});
       const result = await this.s3Client.send(command);
 
-      return (result.Buckets || []).map((bucket) => ({
-        name: bucket.Name || '',
+      return (result.Buckets || []).map(bucket => ({
+        name: bucket.Name || "",
         creationDate: bucket.CreationDate,
       }));
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to list buckets: ${error}`);
     }
   }
@@ -345,8 +357,9 @@ export class TigrisClient {
 
       const command = new CopyObjectCommand(params);
       const result = await this.s3Client.send(command);
-      return result.CopyObjectResult?.ETag || '';
-    } catch (error) {
+      return result.CopyObjectResult?.ETag || "";
+    }
+    catch (error) {
       throw new Error(`Failed to copy object: ${error}`);
     }
   }
@@ -358,20 +371,20 @@ export class TigrisClient {
     try {
       let command;
 
-      switch (options.operation || 'GET') {
-        case 'GET':
+      switch (options.operation || "GET") {
+        case "GET":
           command = new GetObjectCommand({
             Bucket: options.bucket,
             Key: options.key,
           });
           break;
-        case 'PUT':
+        case "PUT":
           command = new PutObjectCommand({
             Bucket: options.bucket,
             Key: options.key,
           });
           break;
-        case 'DELETE':
+        case "DELETE":
           command = new DeleteObjectCommand({
             Bucket: options.bucket,
             Key: options.key,
@@ -386,7 +399,8 @@ export class TigrisClient {
       });
 
       return signedUrl;
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Failed to generate presigned URL: ${error}`);
     }
   }
@@ -398,7 +412,8 @@ export class TigrisClient {
     try {
       await this.getFileMetadata(bucket, key);
       return true;
-    } catch {
+    }
+    catch {
       return false;
     }
   }
@@ -413,7 +428,7 @@ export class TigrisClient {
     options?: {
       contentType?: string;
       metadata?: Record<string, string>;
-    }
+    },
   ): Promise<string> {
     try {
       const upload = new Upload({
@@ -430,13 +445,14 @@ export class TigrisClient {
       });
 
       // Track upload progress
-      upload.on('httpUploadProgress', (progress) => {
+      upload.on("httpUploadProgress", (progress) => {
         console.log(`Upload progress: ${progress.loaded}/${progress.total} bytes`);
       });
 
       const result = await upload.done();
-      return result.ETag || '';
-    } catch (error) {
+      return result.ETag || "";
+    }
+    catch (error) {
       throw new Error(`Failed to stream upload: ${error}`);
     }
   }
@@ -445,7 +461,7 @@ export class TigrisClient {
    * Batch delete multiple objects
    */
   async deleteMultipleFiles(bucket: string, keys: string[]): Promise<void> {
-    const deletePromises = keys.map((key) => this.deleteFile(bucket, key));
+    const deletePromises = keys.map(key => this.deleteFile(bucket, key));
     await Promise.all(deletePromises);
   }
 
@@ -456,8 +472,8 @@ export class TigrisClient {
     if (body instanceof Buffer) {
       return body.length > 5 * 1024 * 1024; // 5MB
     }
-    if (typeof body === 'string') {
-      return Buffer.byteLength(body, 'utf8') > 5 * 1024 * 1024;
+    if (typeof body === "string") {
+      return Buffer.byteLength(body, "utf8") > 5 * 1024 * 1024;
     }
     return false; // For streams, always use multipart upload
   }
@@ -479,10 +495,10 @@ export class TigrisService {
       bucket,
       key: fileName,
       body: content,
-      contentType: 'text/plain',
+      contentType: "text/plain",
       metadata: {
         uploadedAt: new Date().toISOString(),
-        fileType: 'text',
+        fileType: "text",
       },
     });
   }
@@ -494,7 +510,7 @@ export class TigrisService {
     bucket: string,
     fileName: string,
     imageBuffer: Buffer,
-    mimeType: string
+    mimeType: string,
   ): Promise<string> {
     return await this.client.uploadFile({
       bucket,
@@ -503,9 +519,9 @@ export class TigrisService {
       contentType: mimeType,
       metadata: {
         uploadedAt: new Date().toISOString(),
-        fileType: 'image',
+        fileType: "image",
       },
-      cacheControl: 'max-age=31536000', // Cache for 1 year
+      cacheControl: "max-age=31536000", // Cache for 1 year
     });
   }
 
@@ -516,7 +532,7 @@ export class TigrisService {
     const result = await this.client.downloadFile({ bucket, key });
 
     if (result.body instanceof Buffer) {
-      return result.body.toString('utf-8');
+      return result.body.toString("utf-8");
     }
 
     // Handle ReadableStream
@@ -526,15 +542,16 @@ export class TigrisService {
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done)
+          break;
         chunks.push(value);
       }
 
       const buffer = Buffer.concat(chunks.map(chunk => Buffer.from(chunk)));
-      return buffer.toString('utf-8');
+      return buffer.toString("utf-8");
     }
 
-    throw new Error('Unsupported body type');
+    throw new Error("Unsupported body type");
   }
 
   /**
@@ -543,7 +560,7 @@ export class TigrisService {
   async getFilesInDirectory(bucket: string, directory: string): Promise<ObjectMetadata[]> {
     const result = await this.client.listObjects({
       bucket,
-      prefix: directory.endsWith('/') ? directory : `${directory}/`,
+      prefix: directory.endsWith("/") ? directory : `${directory}/`,
     });
 
     return result.objects;
@@ -555,13 +572,13 @@ export class TigrisService {
   async createDownloadLink(
     bucket: string,
     key: string,
-    expiresInMinutes?: number
+    expiresInMinutes?: number,
   ): Promise<string> {
     return await this.client.generatePresignedUrl({
       bucket,
       key,
-      operation: 'GET',
-      expiresIn: expiresInMinutes? expiresInMinutes * 60 : undefined, // Convert minutes to seconds
+      operation: "GET",
+      expiresIn: expiresInMinutes ? expiresInMinutes * 60 : undefined, // Convert minutes to seconds
     });
   }
 }

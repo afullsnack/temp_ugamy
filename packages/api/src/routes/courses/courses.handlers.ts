@@ -8,7 +8,8 @@ import { courses } from "@/db/schema/schema";
 import type { CreateCourseRoute, GetOneCourseRoute, ListCourseRoute } from "./courses.routes";
 
 export const create: AppRouteHandler<CreateCourseRoute> = async (c) => {
-  const body = c.req.valid("json");
+  const body = await c.req.raw.json();
+  console.log("BOdy data", body);
   const existingSlug = await db.query.courses.findFirst({
     where(fields, ops) {
       return ops.eq(fields.slug, body.slug);
