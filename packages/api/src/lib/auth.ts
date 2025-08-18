@@ -95,6 +95,7 @@ const options = {
           }
         }
         else if(type === "sign-in") {
+          console.log('Received email request', type, email)
           try {
             await sendEmail({
               to: email,
