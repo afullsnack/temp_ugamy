@@ -21,6 +21,7 @@ import {
     Settings,
     Maximize,
     Minimize,
+    MoreHorizontal,
 } from "lucide-react"
 import { env } from "@/env"
 
@@ -87,6 +88,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     const [playbackRate, setPlaybackRate] = useState(1)
     const [isFullscreen, setIsFullscreen] = useState(false)
     const [showControls, setShowControls] = useState(true)
+    const [isMobile, setIsMobile] = useState(false)
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
 
     const videoRef = useRef<HTMLVideoElement>(null)
@@ -286,35 +288,85 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     }, [isPlaying, currentTime])
 
     useEffect(() => {
-        const handleMouseMove = () => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth < 768) // md breakpoint
+        }
+
+        checkIsMobile()
+        window.addEventListener("resize", checkIsMobile)
+
+        return () => window.removeEventListener("resize", checkIsMobile)
+    }, [])
+
+    useEffect(() => {
+        const showControlsTemporarily = () => {
             setShowControls(true)
             if (controlsTimeoutRef.current) {
                 clearTimeout(controlsTimeoutRef.current)
             }
+
+            // Different timeout durations based on device type
             if (isPlaying) {
+                const timeout = isMobile ? 3000 : 3000 // 3 seconds for both, but can be customized
                 controlsTimeoutRef.current = setTimeout(() => {
                     setShowControls(false)
-                }, 3000)
+                }, timeout)
+            }
+        }
+
+        const handleUserActivity = (e: Event) => {
+            // Prevent showing controls when clicking on control elements themselves
+            const target = e.target as HTMLElement
+            if (target.closest("[data-controls]")) {
+                return
+            }
+            showControlsTemporarily()
+        }
+
+        const handleMouseMove = () => {
+            if (!isMobile) {
+                showControlsTemporarily()
+            }
+        }
+
+        const handleTouchStart = () => {
+            if (isMobile) {
+                showControlsTemporarily()
+            }
+        }
+
+        const handleClick = () => {
+            showControlsTemporarily()
+        }
+
+        const handleMouseLeave = () => {
+            if (!isMobile && isPlaying) {
+                setShowControls(false)
             }
         }
 
         const container = containerRef.current
         if (container) {
+            // Mouse events for desktop/tablet
             container.addEventListener("mousemove", handleMouseMove)
-            container.addEventListener("mouseleave", () => {
-                if (isPlaying) setShowControls(false)
-            })
+            container.addEventListener("mouseleave", handleMouseLeave)
+
+            // Touch events for mobile
+            container.addEventListener("touchstart", handleTouchStart)
+
+            // Click/tap events for all devices
+            container.addEventListener("click", handleClick)
         }
 
         return () => {
             if (container) {
                 container.removeEventListener("mousemove", handleMouseMove)
-                container.removeEventListener("mouseleave", () => {
-                    if (isPlaying) setShowControls(false)
-                })
+                container.removeEventListener("mouseleave", handleMouseLeave)
+                container.removeEventListener("touchstart", handleTouchStart)
+                container.removeEventListener("click", handleClick)
             }
         }
-    }, [isPlaying])
+    }, [isPlaying, isMobile])
 
     const updateWatchProgress = async () => {
         if (!videoRef.current) return
@@ -450,17 +502,16 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 bg-background">
-            <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-2xl group">
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 space-y-6 bg-background">
+            <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-2xl group mx-auto">
                 <video
                     ref={videoRef}
-                    className="w-full aspect-video"
+                    className="w-full aspect-video object-contain mx-auto block"
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
                     poster={video.thumbnailUrl}
-                    onClick={togglePlay}
                 >
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
@@ -476,41 +527,175 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                             variant="ghost"
                             size="lg"
                             onClick={togglePlay}
-                            className="bg-black/50 hover:bg-black/70 text-white border-2 border-white/20 rounded-full p-6 transition-all duration-200 hover:scale-110"
+                            data-controls="true"
+                            className="bg-black/50 hover:bg-black/70 text-white border-2 border-white/20 rounded-full p-4 md:p-6 transition-all duration-200 hover:scale-110 touch-manipulation"
                         >
-                            {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
+                            {isPlaying ? (
+                                <Pause className="h-6 w-6 md:h-8 md:w-8" />
+                            ) : (
+                                <Play className="h-6 w-6 md:h-8 md:w-8 ml-1" />
+                            )}
                         </Button>
                     </div>
 
                     {/* Bottom controls */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 md:p-6 space-y-3 md:space-y-4" data-controls="true">
                         {/* Progress bar */}
                         <div className="space-y-2">
-                            <Slider
-                                value={[currentTime]}
-                                max={videoRef.current?.duration ?? duration}
-                                step={0.1}
-                                onValueChange={handleSeek}
-                                className="w-full [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_.bg-primary]:bg-primary"
-                            />
+                            <div className="py-2">
+                                <Slider
+                                    value={[currentTime]}
+                                    max={videoRef.current?.duration ?? duration}
+                                    step={0.1}
+                                    onValueChange={handleSeek}
+                                    className="w-full [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 md:[&_[role=slider]]:h-4 md:[&_[role=slider]]:w-4 [&_.bg-primary]:bg-primary touch-manipulation"
+                                />
+                            </div>
 
-                            <div className="flex items-center justify-between text-white text-sm">
+                            <div className="flex items-center justify-between text-white text-xs md:text-sm">
                                 <span>
                                     {formatTime(currentTime)} / {formatTime(videoRef.current?.duration ?? duration)}
                                 </span>
                                 <div className="flex items-center gap-2">
                                     {progress.watched && (
-                                        <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+                                        <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
                                             <Eye className="mr-1 h-3 w-3" />
-                                            Watched
+                                            <span className="hidden sm:inline">Watched</span>
                                         </Badge>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Control buttons */}
-                        <div className="flex items-center justify-between">
+                        {/* Mobile controls - simplified layout */}
+                        <div className="md:hidden">
+                            <div className="flex items-center justify-between mb-4">
+                                {/* Primary controls */}
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={rewind}
+                                        className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
+                                    >
+                                        <RotateCcw className="h-4 w-4" />
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={togglePlay}
+                                        className="text-white hover:text-white hover:bg-primary/20 bg-primary/10 p-2 mx-1 touch-manipulation"
+                                    >
+                                        {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={fastForward}
+                                        className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
+                                    >
+                                        <SkipForward className="h-4 w-4" />
+                                    </Button>
+                                </div>
+
+                                {/* Secondary controls */}
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={toggleLike}
+                                        className={`text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation ${progress.liked ? "text-red-400" : ""}`}
+                                    >
+                                        <Heart className={`h-4 w-4 ${progress.liked ? "fill-current" : ""}`} />
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={toggleFullscreen}
+                                        className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
+                                    >
+                                        {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                                    </Button>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
+                                            >
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className="bg-card border-border w-48" align="end">
+                                            <DropdownMenuItem
+                                                onClick={goToPreviousVideo}
+                                                disabled={playlist.length === 0 || currentVideoIndex === 0}
+                                                className="text-sm"
+                                            >
+                                                <SkipBack className="h-4 w-4 mr-2" />
+                                                Previous
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={goToNextVideo}
+                                                disabled={playlist.length === 0 || currentVideoIndex === playlist.length - 1}
+                                                className="text-sm"
+                                            >
+                                                <SkipForward className="h-4 w-4 mr-2" />
+                                                Next
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={toggleMute} className="text-sm">
+                                                {isMuted || volume === 0 ? (
+                                                    <VolumeX className="h-4 w-4 mr-2" />
+                                                ) : (
+                                                    <Volume2 className="h-4 w-4 mr-2" />
+                                                )}
+                                                {isMuted || volume === 0 ? "Unmute" : "Mute"}
+                                            </DropdownMenuItem>
+                                            <div className="px-2 py-1 text-xs text-muted-foreground border-t">Speed</div>
+                                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                                                <DropdownMenuItem
+                                                    key={speed}
+                                                    onClick={() => changePlaybackSpeed(speed)}
+                                                    className={`text-sm pl-6 ${playbackRate === speed ? "bg-accent" : ""}`}
+                                                >
+                                                    {speed}x
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 bg-black/30 rounded-lg p-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={toggleMute}
+                                    className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation flex-shrink-0"
+                                >
+                                    {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                                </Button>
+                                <div className="flex-1 min-w-0">
+                                    <Slider
+                                        value={[isMuted ? 0 : volume]}
+                                        max={1}
+                                        step={0.1}
+                                        onValueChange={handleVolumeChange}
+                                        className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 touch-manipulation"
+                                    />
+                                </div>
+                                <span className="text-white text-xs min-w-[2rem] text-right">
+                                    {Math.round((isMuted ? 0 : volume) * 100)}%
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Desktop controls - original layout */}
+                        <div className="hidden md:flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 {/* Previous video */}
                                 <Button
