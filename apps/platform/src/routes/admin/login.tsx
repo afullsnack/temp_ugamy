@@ -54,6 +54,7 @@ function RouteComponent() {
   console.log('Loading, user, session', loading, user, session)
 
   useEffect(() => {
+    console.log('Admin', user)
     if (user) {
       if (user.role === 'admin') {
         router.navigate({ to: '/admin/dashboard' })
@@ -65,7 +66,7 @@ function RouteComponent() {
     if (isLoading) {
       ;(async () => {
         try {
-          const { error } = await authClient.emailOtp.sendVerificationOtp({
+          const { error, data } = await authClient.emailOtp.sendVerificationOtp({
             email:
               selectedValue === 'admin-1'
                 ? 'miraclef60@gmail.com'
@@ -81,6 +82,7 @@ function RouteComponent() {
             return
           }
           setIsLoading(false)
+          console.log("OTP Sent", data)
           toast.success('OTP Code sent')
         } catch (error) {
           console.error(error)

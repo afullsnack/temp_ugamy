@@ -46,10 +46,10 @@ export const courses = sqliteTable("courses", {
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .$defaultFn(() => new Date())
     .$onUpdateFn(() => new Date()),
-}, table => ({
-  slugIdx: index("courses_slug_idx").on(table.slug),
-  publishedIdx: index("courses_published_idx").on(table.isPublished),
-}));
+}, table => [
+  index("courses_slug_idx").on(table.slug),
+  index("courses_published_idx").on(table.isPublished),
+]);
 
 export const selectCourseSchema = createSelectSchema(courses);
 export const insertCourseSchema = createInsertSchema(courses).required({
