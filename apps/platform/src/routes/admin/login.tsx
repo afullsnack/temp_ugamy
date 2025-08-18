@@ -21,19 +21,30 @@ export const Route = createFileRoute('/admin/login')({
 
 function RouteComponent() {
   const router = useRouter()
-  const [selectedValue, setSelectedValue] = useState<'admin-1' | 'admin-2'>(
+  const [selectedValue, setSelectedValue] = useState<'admin-1' | 'admin-2' | 'admin-3'>(
     'admin-1',
   )
   const [otpValue, setOTPValue] = useState<string | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(false)
 
+
+  const getAdminEmail = (adminValue: 'admin-1' | 'admin-2' | 'admin-3') => {
+    switch (adminValue) {
+      case 'admin-1':
+        return 'miraclef60@gmail.com';
+      case 'admin-2':
+        return 'jesudara.j@gmail.com';
+      case 'admin-3':
+        return 'adiejoel14@gmail.com';
+      default:
+        return 'miraclef60@gmail.com'
+    }
+  }
+
   useEffect(() => {
     const verifyOTP = async (otp: string) => {
       const { data, error } = await authClient.signIn.emailOtp({
-        email:
-          selectedValue === 'admin-1'
-            ? 'miraclef60@gmail.com'
-            : 'jesudara.j@gmail.com',
+        email: getAdminEmail(selectedValue),
         otp: otp,
       })
       if (error) {
@@ -64,13 +75,11 @@ function RouteComponent() {
 
   useEffect(() => {
     if (isLoading) {
-      ;(async () => {
+      ; (async () => {
         try {
           const { error, data } = await authClient.emailOtp.sendVerificationOtp({
             email:
-              selectedValue === 'admin-1'
-                ? 'miraclef60@gmail.com'
-                : 'jesudara.j@gmail.com',
+              getAdminEmail(selectedValue),
             type: 'sign-in',
           })
           await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -105,7 +114,7 @@ function RouteComponent() {
             className="flex flex-col gap-4"
             defaultValue={selectedValue}
             value={selectedValue}
-            onValueChange={(value: 'admin-1' | 'admin-2') =>
+            onValueChange={(value: 'admin-1' | 'admin-2' | 'admin-3') =>
               setSelectedValue(value)
             }
           >
@@ -117,6 +126,11 @@ function RouteComponent() {
             <ToggleGroupItem value="admin-2" aria-label="Toggle italic">
               <Button type="button" size="default" variant="ghost">
                 jesudara.j@gmail.com
+              </Button>
+            </ToggleGroupItem>
+            <ToggleGroupItem value='admin-3' aria-label='Toggle italic'>
+              <Button type="button" size="default" variant="ghost">
+                adiejoel14@gmail.com
               </Button>
             </ToggleGroupItem>
           </ToggleGroup>
