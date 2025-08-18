@@ -54,7 +54,7 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data, isLoading, error }) => {
 
     return (
         <>
-            <div className="w-full h-full flex-1 overflow-y-auto pt-40 lg:pt-40">
+            <div className="w-full h-full flex-1 overflow-y-auto">
                 <div className="p-4 lg:p-6">
                     {error && <CoursesErrorStateWidget error={error} />}
 
@@ -81,7 +81,7 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data, isLoading, error }) => {
                             {/* Courses Grid */}
                             <div
                                 className={`
-                                    grid gap-4 lg:gap-6 mb-8
+                                    grid gap-6 lg:gap-6 mb-8
                                     ${viewMode === "grid"
                                         ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
                                         : "grid-cols-1"
@@ -115,16 +115,21 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data, isLoading, error }) => {
                                                     className={`w-4 h-4 ${favorites.has(course.id) ? "fill-red-500 text-red-500" : "text-gray-400"}`}
                                                 />
                                             </Button>
-                                            <Badge className={`absolute bottom-2 left-2 text-xs ${getDifficultyColor(course.difficulty)}`}>
+                                            <Badge className={`absolute bottom-2 left-2 text-sm ${getDifficultyColor(course.difficulty)}`}>
                                                 {course.difficulty}
                                             </Badge>
                                         </div>
                                         <div className="p-4">
-                                            <h3 className="font-medium text-gray-900 text-sm leading-tight mb-2">{course.title}</h3>
-                                            <p className="text-xs text-gray-600 line-clamp-2 mb-2">{course.description}</p>
+                                            {/* Titls */}
+                                            <h3 className="font-medium text-gray-900 text-lg leading-tight mb-2">{course.title}</h3>
+
+                                            {/* Description */}
+                                            <p className="text-base text-gray-600 line-clamp-2 mb-2">{course.description}</p>
+
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                <div className="flex items-center gap-1 text-sm text-gray-500">
                                                     <Clock className="w-3 h-3" />
+                                                    last updated:
                                                     <span>{new Date(course.createdAt).toLocaleDateString()}</span>
                                                 </div>
                                                 {course.isPublished && (

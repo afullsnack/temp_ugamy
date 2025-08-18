@@ -79,11 +79,11 @@ export const CourseDetailsTemplate = () => {
 
     return (
         <div className="relative min-h-screen h-fit bg-background overflow-y-auto mt-[50px]">
-            <div className=" bg-white bg-gradient-to-br from-primary/10 via-background to-accent/5 border-b border-border">
+            <div className="bg-white bg-gradient-to-br from-primary/20 via-background to-accent/5 border-b border-border">
                 <div className="container mx-auto px-4 py-8">
                     <Link
                         to="/dashboard"
-                        className=" flex items-center text-lg text-muted-foreground hover:text-foreground mb-6"
+                        className=" flex items-center txt-base lg:text-lg text-muted-foreground hover:text-foreground mb-6"
                     >
                         <ChevronLeft /> Back to Courses
                     </Link>

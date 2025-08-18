@@ -14,23 +14,9 @@ interface IProps {
 
 export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters, activeFilter, setActiveFilter }) => {
     return (
-        <div className="fixed top-0 right-0 left-0 bg-white p-4 lg:p-6 border-b z-30">
+        <div className="bg-white bg-gradient-to-br from-primary/20 via-background to-accent/5 p-4 lg:p-6 pt-[90px] lg:pt-[100px] border-b z-30">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
-                <div className="flex items-center gap-3">
-                    {/* Mobile Menu Button */}
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="lg:hidden bg-transparent"
-                        onClick={() => show(MobileMenu)}
-                    >
-                        <div className="w-8 h-8 bg-teal-100 rounded flex items-center justify-center">
-                            <List className="w-4 h-4 text-[hsla(160,84%,39%,1)]" />
-                        </div>
-                    </Button>
-
-                    <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Courses</h1>
-                </div>
+                <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Courses</h1>
                 <Button variant="outline" size="icon">
                     <Search className="w-4 h-4" />
                 </Button>

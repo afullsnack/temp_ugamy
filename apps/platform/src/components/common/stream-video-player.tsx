@@ -603,9 +603,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                             disabled={bufferingState.isBuffering || bufferingState.isLoading}
                             className="bg-black/50 hover:bg-black/70 text-white border-2 border-white/20 rounded-full p-4 md:p-6 transition-all duration-200 hover:scale-110 touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {bufferingState.isBuffering || bufferingState.isLoading ? (
-                                <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin" />
-                            ) : isPlaying ? (
+                            {isPlaying ? (
                                 <Pause className="h-6 w-6 md:h-8 md:w-8" />
                             ) : (
                                 <Play className="h-6 w-6 md:h-8 md:w-8 ml-1" />

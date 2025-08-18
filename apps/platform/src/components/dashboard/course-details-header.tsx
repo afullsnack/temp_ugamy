@@ -10,7 +10,7 @@ interface IProps {
 
 export const CourseDetailsHeader: FC<IProps> = ({ title }) => {
     return (
-        <div className="fixed top-0 right-0 left-0 lg:left-80 bg-white p-4 lg:p-6 border-b z-30">
+        <div className="bg-white p-4 lg:p-6 border-b z-30">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
                 <div className="flex items-center gap-3">
                     {/* Mobile Menu Button */}
