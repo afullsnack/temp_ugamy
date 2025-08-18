@@ -6,7 +6,7 @@ export const PaymentSuccessWidget = () => {
     const navigate = useNavigate()
 
     return (
-        <div className="bg-white w-full min-h-screen flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="bg-white w-full min-h-screen flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8 mt-[50px]">
             <div className="max-w-md w-full space-y-6 text-center">
                 <div className="flex justify-center">
                     <CheckCheck className="h-24 w-24 text-primary" />

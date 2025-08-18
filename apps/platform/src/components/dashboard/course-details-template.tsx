@@ -78,8 +78,8 @@ export const CourseDetailsTemplate = () => {
     )
 
     return (
-        <div className="relative min-h-screen h-fit bg-background overflow-y-auto">
-            <div className="sticky top-0 left-0 right-0 bg-white bg-gradient-to-br from-primary/10 via-background to-accent/5 border-b border-border z-30">
+        <div className="relative min-h-screen h-fit bg-background overflow-y-auto mt-[50px]">
+            <div className=" bg-white bg-gradient-to-br from-primary/10 via-background to-accent/5 border-b border-border">
                 <div className="container mx-auto px-4 py-8">
                     <Link
                         to="/dashboard"

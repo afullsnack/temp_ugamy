@@ -22,6 +22,7 @@ import {
     Maximize,
     Minimize,
     MoreHorizontal,
+    Loader2,
 } from "lucide-react"
 import { env } from "@/env"
 
@@ -48,6 +49,13 @@ interface VideoProgress {
     watched: boolean
     liked: boolean
     watch_time: number
+}
+
+interface BufferingState {
+    isBuffering: boolean
+    isLoading: boolean
+    canPlay: boolean
+    hasStarted: boolean
 }
 
 const VideoPlayerSkeleton = () => (
@@ -90,6 +98,13 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     const [showControls, setShowControls] = useState(true)
     const [isMobile, setIsMobile] = useState(false)
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
+
+    const [bufferingState, setBufferingState] = useState<BufferingState>({
+        isBuffering: false,
+        isLoading: true,
+        canPlay: false,
+        hasStarted: false,
+    })
 
     const videoRef = useRef<HTMLVideoElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -155,6 +170,44 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
             // Silently fail - progress tracking is not critical
         },
     })
+
+    const handleLoadStart = () => {
+        setBufferingState((prev) => ({ ...prev, isLoading: true, canPlay: false }))
+    }
+
+    const handleLoadedData = () => {
+        setBufferingState((prev) => ({ ...prev, isLoading: false }))
+    }
+
+    const handleCanPlay = () => {
+        setBufferingState((prev) => ({ ...prev, canPlay: true, isBuffering: false }))
+    }
+
+    const handleWaiting = () => {
+        setBufferingState((prev) => ({ ...prev, isBuffering: true }))
+    }
+
+    const handlePlaying = () => {
+        setBufferingState((prev) => ({
+            ...prev,
+            isBuffering: false,
+            hasStarted: true,
+            canPlay: true,
+        }))
+        setIsPlaying(true)
+    }
+
+    const handlePause = () => {
+        setIsPlaying(false)
+    }
+
+    const handleSeeking = () => {
+        setBufferingState((prev) => ({ ...prev, isBuffering: true }))
+    }
+
+    const handleSeeked = () => {
+        setBufferingState((prev) => ({ ...prev, isBuffering: false }))
+    }
 
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
@@ -399,7 +452,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         } else {
             videoRef.current.play()
         }
-        setIsPlaying(!isPlaying)
     }
 
     const toggleMute = () => {
@@ -502,20 +554,40 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     }
 
     return (
-        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 space-y-6 bg-background">
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 space-y-6 bg-inherit">
             <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-2xl group mx-auto">
                 <video
                     ref={videoRef}
                     className="w-full aspect-video object-contain mx-auto block"
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
+                    onPlay={handlePlaying}
+                    onPause={handlePause}
                     poster={video.thumbnailUrl}
+                    preload="metadata"
+                    playsInline
+                    onLoadStart={handleLoadStart}
+                    onLoadedData={handleLoadedData}
+                    onCanPlay={handleCanPlay}
+                    onWaiting={handleWaiting}
+                    onPlaying={handlePlaying}
+                    onSeeking={handleSeeking}
+                    onSeeked={handleSeeked}
                 >
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
+
+                {(bufferingState.isBuffering || bufferingState.isLoading) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+                        <div className="flex flex-col items-center gap-3">
+                            <Loader2 className="h-8 w-8 md:h-12 md:w-12 text-white animate-spin" />
+                            <p className="text-white text-sm md:text-base font-medium">
+                                {bufferingState.isLoading ? "Loading video..." : "Buffering..."}
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 <div
                     className={`absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"
@@ -528,9 +600,12 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                             size="lg"
                             onClick={togglePlay}
                             data-controls="true"
-                            className="bg-black/50 hover:bg-black/70 text-white border-2 border-white/20 rounded-full p-4 md:p-6 transition-all duration-200 hover:scale-110 touch-manipulation"
+                            disabled={bufferingState.isBuffering || bufferingState.isLoading}
+                            className="bg-black/50 hover:bg-black/70 text-white border-2 border-white/20 rounded-full p-4 md:p-6 transition-all duration-200 hover:scale-110 touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isPlaying ? (
+                            {bufferingState.isBuffering || bufferingState.isLoading ? (
+                                <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin" />
+                            ) : isPlaying ? (
                                 <Pause className="h-6 w-6 md:h-8 md:w-8" />
                             ) : (
                                 <Play className="h-6 w-6 md:h-8 md:w-8 ml-1" />
@@ -548,6 +623,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                                     max={videoRef.current?.duration ?? duration}
                                     step={0.1}
                                     onValueChange={handleSeek}
+                                    disabled={bufferingState.isBuffering || bufferingState.isLoading}
                                     className="w-full [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 md:[&_[role=slider]]:h-4 md:[&_[role=slider]]:w-4 [&_.bg-primary]:bg-primary touch-manipulation"
                                 />
                             </div>
@@ -557,6 +633,15 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                                     {formatTime(currentTime)} / {formatTime(videoRef.current?.duration ?? duration)}
                                 </span>
                                 <div className="flex items-center gap-2">
+                                    {bufferingState.isBuffering && (
+                                        <Badge
+                                            variant="secondary"
+                                            className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs"
+                                        >
+                                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                            <span className="hidden sm:inline">Buffering</span>
+                                        </Badge>
+                                    )}
                                     {progress.watched && (
                                         <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
                                             <Eye className="mr-1 h-3 w-3" />
