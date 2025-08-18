@@ -148,13 +148,13 @@ export default function SignupForm() {
                             )}
                         />
 
-                        {/* Username */}
+                        {/* Gamer's tag */}
                         <FormField
                             control={form.control}
                             name="username"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-sm text-gray-700">Username:</FormLabel>
+                                    <FormLabel className="text-sm text-gray-700">Gamer's tag:</FormLabel>
                                     <FormControl>
                                         <Input type="text" placeholder="Enter info" {...field} className="w-full" />
                                     </FormControl>

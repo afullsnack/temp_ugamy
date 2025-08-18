@@ -22,6 +22,7 @@ import { Route as PayRouteImport } from './routes/pay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
+import { Route as CourseDetailsIdRouteImport } from './routes/course-details/$id'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
@@ -91,6 +92,11 @@ const IndexRoute = IndexRouteImport.update({
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourseDetailsIdRoute = CourseDetailsIdRouteImport.update({
+  id: '/course-details/$id',
+  path: '/course-details/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof AuthSignupRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/course-details/$id': typeof CourseDetailsIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/admin/courses/new': typeof AdminCoursesNewRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/signup': typeof AuthSignupRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/course-details/$id': typeof CourseDetailsIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/admin/courses/new': typeof AdminCoursesNewRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/_auth/signup': typeof AuthSignupRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/course-details/$id': typeof CourseDetailsIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/admin/courses/new': typeof AdminCoursesNewRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/course-details/$id'
     | '/demo/tanstack-query'
     | '/admin/courses/new'
     | '/demo/sentry/testing'
@@ -277,6 +287,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/course-details/$id'
     | '/demo/tanstack-query'
     | '/admin/courses/new'
     | '/demo/sentry/testing'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/_auth/signup'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/course-details/$id'
     | '/demo/tanstack-query'
     | '/admin/courses/new'
     | '/demo/sentry/testing'
@@ -327,6 +339,7 @@ export interface RootRouteChildren {
   AuthSignupRoute: typeof AuthSignupRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  CourseDetailsIdRoute: typeof CourseDetailsIdRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   AdminCoursesNewRoute: typeof AdminCoursesNewRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
@@ -434,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course-details/$id': {
+      id: '/course-details/$id'
+      path: '/course-details/$id'
+      fullPath: '/course-details/$id'
+      preLoaderRoute: typeof CourseDetailsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
@@ -563,6 +583,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignupRoute: AuthSignupRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLoginRoute: AdminLoginRoute,
+  CourseDetailsIdRoute: CourseDetailsIdRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   AdminCoursesNewRoute: AdminCoursesNewRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,

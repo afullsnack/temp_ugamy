@@ -109,7 +109,7 @@ const MobileMenu = create(() => {
 
                     <div className="space-y-3 text-sm text-center mb-8">
                         <div>
-                            <span className="text-gray-400">Username: </span>
+                            <span className="text-gray-400">Gamer's tag: </span>
                             <span className="text-teal-400">{user?.displayUsername ?? "N/A"}</span>
                         </div>
                         <div>

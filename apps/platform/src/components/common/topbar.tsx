@@ -29,7 +29,7 @@ const Topbar: FC<IProps> = ({ viewMode, setViewMode, filters, activeFilter, setA
                         </div>
                     </Button>
 
-                    <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Course Episodes</h1>
+                    <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Courses</h1>
                 </div>
                 <Button variant="outline" size="icon">
                     <Search className="w-4 h-4" />

@@ -9,6 +9,15 @@ import { useSession } from "@/lib/auth-hooks"
 import Sidebar from "../common/sidebar"
 import { show } from "@ebay/nice-modal-react"
 import { VideoPlayerModal } from "../common/video-player-modal"
+import axios from "axios"
+import { useQuery } from "@tanstack/react-query"
+import { env } from '@/env'
+import type { IGetCourseResponse } from "@/lib/types"
+
+const getCourses = async (): Promise<IGetCourseResponse[]> => {
+    const response = await axios.get(`${env.VITE_API_URL}/courses`)
+    return response.data
+}
 
 // TODO: Refactor component
 const DashboardTemp = () => {
@@ -31,7 +40,7 @@ const DashboardTemp = () => {
     }
 
     const hasSeenIntro = localStorage.getItem("seenIntroVideo") === "true"
-    
+
     useEffect(() => {
         if (!loading && user?.isSubscribed && !hasSeenIntro) {
             showIntroVideo()
@@ -45,6 +54,12 @@ const DashboardTemp = () => {
         return <AppLoadingSkeleton />
     }
 
+    // Get Courses API query
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['courses'],
+        queryFn: getCourses
+    })
+
     return (
         <div className="flex h-screen bg-gray-100 overflow-hidden">
             <div className="fixed top-0 left-0 z-50 w-fit h-full hidden lg:block">
@@ -57,7 +72,7 @@ const DashboardTemp = () => {
                 <Topbar viewMode={viewMode} setViewMode={setViewMode} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 
                 {!loading && session !== null && user?.isSubscribed && user?.emailVerified ?
-                    <CoursesTemp viewMode={viewMode} /> : ""
+                    <CoursesTemp data={data!} isLoading={isLoading} error={error} viewMode={viewMode} /> : ""
                 }
 
                 {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ?
