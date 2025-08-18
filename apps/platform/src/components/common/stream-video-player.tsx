@@ -1,18 +1,19 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Slider } from "@/components/ui/slider"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
     Play,
     Pause,
     Volume2,
     VolumeX,
     Heart,
-    Clock,
     Eye,
     SkipBack,
     SkipForward,
@@ -25,6 +26,7 @@ import { env } from "@/env"
 
 interface VideoPlayerProps {
     courseId: string
+    userId: string
     videoId: string
     playlist?: Video[]
 }
@@ -47,8 +49,31 @@ interface VideoProgress {
     watch_time: number
 }
 
-export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPlayerProps) => {
-    const [video, setVideo] = useState<Video | null>(null)
+const VideoPlayerSkeleton = () => (
+    <div className="max-w-6xl mx-auto space-y-6 bg-background">
+        <div className="relative bg-card rounded-xl overflow-hidden shadow-2xl">
+            <Skeleton className="w-full aspect-video" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
+                <Skeleton className="h-2 w-full" />
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="h-8 w-8 rounded" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Skeleton className="h-8 w-16 rounded" />
+                        <Skeleton className="h-8 w-8 rounded" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+)
+
+export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlayerProps) => {
     const [progress, setProgress] = useState<VideoProgress>({
         watched: false,
         liked: false,
@@ -59,7 +84,6 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
     const [volume, setVolume] = useState(1)
-    const [loading, setLoading] = useState(true)
     const [playbackRate, setPlaybackRate] = useState(1)
     const [isFullscreen, setIsFullscreen] = useState(false)
     const [showControls, setShowControls] = useState(true)
@@ -70,17 +94,163 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
     const progressUpdateRef = useRef<NodeJS.Timeout>(null)
     const controlsTimeoutRef = useRef<NodeJS.Timeout>(null)
 
-    // Mock user ID - in a real app, this would come from authentication
-    const userId = "user123"
-
     const apiUrl = env.VITE_API_URL
-
     const playbackSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
-    useEffect(() => {
-        fetchVideo()
-        fetchProgress()
+    const queryClient = useQueryClient()
 
+    // Get Video by Id
+    const {
+        data: video,
+        isLoading: videoLoading,
+        error: videoError,
+    } = useQuery({
+        queryKey: ["video", videoId],
+        queryFn: async () => {
+            const response = await fetch(`${apiUrl}/videos/${videoId}`)
+            if (!response.ok) {
+                throw new Error("Failed to fetch video")
+            }
+            return response.json()
+        },
+    })
+
+    const { data: progressData, isLoading: progressLoading } = useQuery({
+        queryKey: ["video-progress", videoId, userId],
+        queryFn: async () => {
+            const response = await fetch(`/api/videos/${videoId}/progress?userId=${userId}`)
+            if (!response.ok) {
+                // Progress not found is okay - user hasn't watched yet
+                return { watched: false, liked: false, watch_time: 0 }
+            }
+            return response.json()
+        },
+    })
+
+    const updateProgressMutation = useMutation({
+        mutationFn: async (progressUpdate: Partial<VideoProgress>) => {
+            const response = await fetch(`/api/videos/${videoId}/progress`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    userId,
+                    ...progress,
+                    ...progressUpdate,
+                }),
+            })
+            if (!response.ok) {
+                throw new Error("Failed to update progress")
+            }
+            return response.json()
+        },
+        onSuccess: (data, variables) => {
+            setProgress((prev) => ({ ...prev, ...variables }))
+            queryClient.invalidateQueries({ queryKey: ["video-progress", videoId, userId] })
+        },
+        onError: () => {
+            // Silently fail - progress tracking is not critical
+        },
+    })
+
+    const handleKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+            if (!videoRef.current) return
+
+            // Prevent default behavior for video controls
+            const activeElement = document.activeElement
+            const isInputFocused =
+                activeElement?.tagName === "INPUT" ||
+                activeElement?.tagName === "TEXTAREA" ||
+                (activeElement as HTMLElement)?.isContentEditable === true
+
+            if (isInputFocused) return
+
+            switch (event.code) {
+                case "Space":
+                    event.preventDefault()
+                    togglePlay()
+                    break
+                case "KeyK":
+                    event.preventDefault()
+                    togglePlay()
+                    break
+                case "KeyM":
+                    event.preventDefault()
+                    toggleMute()
+                    break
+                case "KeyF":
+                    event.preventDefault()
+                    toggleFullscreen()
+                    break
+                case "ArrowLeft":
+                    event.preventDefault()
+                    rewind()
+                    break
+                case "ArrowRight":
+                    event.preventDefault()
+                    fastForward()
+                    break
+                case "ArrowUp":
+                    event.preventDefault()
+                    handleVolumeChange([Math.min(1, volume + 0.1)])
+                    break
+                case "ArrowDown":
+                    event.preventDefault()
+                    handleVolumeChange([Math.max(0, volume - 0.1)])
+                    break
+                case "Comma":
+                    if (event.shiftKey) {
+                        event.preventDefault()
+                        const currentIndex = playbackSpeeds.indexOf(playbackRate)
+                        const newIndex = Math.max(0, currentIndex - 1)
+                        changePlaybackSpeed(playbackSpeeds[newIndex])
+                    }
+                    break
+                case "Period":
+                    if (event.shiftKey) {
+                        event.preventDefault()
+                        const currentIndex = playbackSpeeds.indexOf(playbackRate)
+                        const newIndex = Math.min(playbackSpeeds.length - 1, currentIndex + 1)
+                        changePlaybackSpeed(playbackSpeeds[newIndex])
+                    }
+                    break
+                case "Digit0":
+                case "Digit1":
+                case "Digit2":
+                case "Digit3":
+                case "Digit4":
+                case "Digit5":
+                case "Digit6":
+                case "Digit7":
+                case "Digit8":
+                case "Digit9":
+                    event.preventDefault()
+                    const digit = Number.parseInt(event.code.slice(-1))
+                    const seekTime = (digit / 10) * duration
+                    videoRef.current.currentTime = seekTime
+                    setCurrentTime(seekTime)
+                    break
+            }
+        },
+        [isPlaying, volume, playbackRate, duration, playbackSpeeds],
+    )
+
+    useEffect(() => {
+        document.addEventListener("keydown", handleKeyDown)
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown)
+        }
+    }, [handleKeyDown])
+
+    useEffect(() => {
+        if (progressData) {
+            setProgress(progressData)
+        }
+    }, [progressData])
+
+    useEffect(() => {
         // Find current video index in playlist
         const index = playlist.findIndex((v) => v.id.toString() === videoId)
         if (index !== -1) {
@@ -95,7 +265,7 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
                 clearTimeout(controlsTimeoutRef.current)
             }
         }
-    }, [videoId])
+    }, [videoId, playlist])
 
     useEffect(() => {
         if (isPlaying) {
@@ -146,34 +316,6 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
         }
     }, [isPlaying])
 
-    const fetchVideo = async () => {
-        try {
-            const response = await fetch(`${apiUrl}/videos/${videoId}`)
-            if (response.ok) {
-                const videoData = await response.json()
-                setVideo(videoData)
-            }
-        } catch (error) {
-            toast.error("Error", {
-                description: "Failed to load video",
-            })
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const fetchProgress = async () => {
-        try {
-            const response = await fetch(`/api/videos/${videoId}/progress?userId=${userId}`)
-            if (response.ok) {
-                const progressData = await response.json()
-                setProgress(progressData)
-            }
-        } catch (error) {
-            // Progress not found is okay - user hasn't watched yet
-        }
-    }
-
     const updateWatchProgress = async () => {
         if (!videoRef.current) return
 
@@ -182,59 +324,19 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
         const watchedPercentage = totalDuration > 0 ? (watchTime / totalDuration) * 100 : 0
         const isWatched = watchedPercentage >= 80
 
-        try {
-            await fetch(`/api/videos/${videoId}/progress`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    userId,
-                    watch_time: watchTime,
-                    watched: isWatched,
-                    liked: progress.liked,
-                }),
-            })
-
-            setProgress((prev) => ({
-                ...prev,
-                watch_time: watchTime,
-                watched: isWatched,
-            }))
-        } catch (error) {
-            // Silently fail - progress tracking is not critical
-        }
+        updateProgressMutation.mutate({
+            watch_time: watchTime,
+            watched: isWatched,
+        })
     }
 
     const toggleLike = async () => {
-        try {
-            const newLikedState = !progress.liked
-            await fetch(`/api/videos/${videoId}/progress`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    userId,
-                    watch_time: progress.watch_time,
-                    watched: progress.watched,
-                    liked: newLikedState,
-                }),
-            })
+        const newLikedState = !progress.liked
+        updateProgressMutation.mutate({ liked: newLikedState })
 
-            setProgress((prev) => ({
-                ...prev,
-                liked: newLikedState,
-            }))
-
-            toast.info(newLikedState ? "Video liked!" : "Like removed", {
-                description: newLikedState ? "Added to your liked videos" : "Removed from liked videos",
-            })
-        } catch (error) {
-            toast.error("Error", {
-                description: "Failed to update like status",
-            })
-        }
+        toast.info(newLikedState ? "Video liked!" : "Like removed", {
+            description: newLikedState ? "Added to your liked videos" : "Removed from liked videos",
+        })
     }
 
     const togglePlay = () => {
@@ -318,6 +420,7 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
     const handleLoadedMetadata = () => {
         if (!videoRef.current) return
         setDuration(videoRef.current.duration)
+        videoRef.current.playbackRate = playbackRate
     }
 
     const handleVolumeChange = (value: number[]) => {
@@ -334,21 +437,14 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
         return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
     }
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px] bg-card rounded-lg">
-                <div className="text-center space-y-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                    <p className="text-muted-foreground">Loading video...</p>
-                </div>
-            </div>
-        )
+    if (videoLoading || progressLoading) {
+        return <VideoPlayerSkeleton />
     }
 
-    if (!video) {
+    if (videoError || !video) {
         return (
             <div className="flex items-center justify-center min-h-[400px] bg-card rounded-lg">
-                <p className="text-muted-foreground">Video not found</p>
+                <p className="text-muted-foreground">{videoError ? "Error loading video" : "Video not found"}</p>
             </div>
         )
     }
@@ -489,6 +585,16 @@ export const StreamVideoPlayer = ({ courseId, videoId, playlist = [] }: VideoPla
                                         />
                                     </div>
                                 </div>
+
+                                {/* Like button */}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={toggleLike}
+                                    className={`text-white hover:text-white hover:bg-white/20 ${progress.liked ? "text-red-400" : ""}`}
+                                >
+                                    <Heart className={`h-5 w-5 ${progress.liked ? "fill-current" : ""}`} />
+                                </Button>
                             </div>
 
                             <div className="flex items-center gap-2">

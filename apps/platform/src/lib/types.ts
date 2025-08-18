@@ -25,3 +25,19 @@ export interface IVideo {
     createdAt: string | Date
     updatedAt: string | Date
 }
+
+export interface IGetVideoByIdResponse {
+    id: string,
+    key: string,
+    courseId: string,
+    metadata: string,
+    title: string,
+    description: string,
+    thumbnailUrl: string,
+    duration: number,
+    orderIndex: number,
+    isPublished: true,
+    createdAt: string,
+    updatedAt: string,
+    // likes: []
+  }
