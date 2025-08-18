@@ -6,10 +6,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Play, Eye, Heart, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2, ChevronLeft } from "lucide-react"
+import { Play, Heart, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2, ChevronLeft } from "lucide-react"
 import axios from "axios"
 import { env } from '@/env'
-import { useParams } from "@tanstack/react-router"
+import { useNavigate, useParams } from "@tanstack/react-router"
 import type { IGetCourseResponse } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { Alert, AlertDescription } from "../ui/alert"
@@ -17,7 +17,8 @@ import { Link } from "@tanstack/react-router"
 
 
 export const CourseDetailsTemplate = () => {
-    const { id } = useParams({ from: '/course-details/$id' })
+    const { id } = useParams({ from: '/courses/$id' })
+    const navigate = useNavigate()
 
     const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set())
     const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set())
@@ -52,6 +53,10 @@ export const CourseDetailsTemplate = () => {
             newLiked.add(videoId)
         }
         setLikedVideos(newLiked)
+    }
+
+    const handleWatch = (vid: string) => {
+        navigate({ to: "/watch/$id/videos/$vid/watch", params: { id: id, vid: vid } })
     }
 
     const progressPercentage =
@@ -92,7 +97,7 @@ export const CourseDetailsTemplate = () => {
                         </div>
 
                         {/* Course Stats */}
-                        <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground font-medium">
                             {/* <div className="flex items-center gap-2">
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                                 <span className="font-semibold text-foreground">{course?.rating}</span>
@@ -156,26 +161,27 @@ export const CourseDetailsTemplate = () => {
                                 {course?.videos?.map?.((video, index) => (
                                     <Card
                                         key={video?.id}
-                                        className="bg-card border-border hover:shadow-md transition-all duration-200 group"
+                                        onClick={() => handleWatch(video?.id)}
+                                        className="bg-card border-border hover:shadow-lg hover:border-primary/20 transition-all duration-300 group cursor-pointer"
                                     >
-                                        <CardContent className="p-4">
+                                        <CardContent className="p-5">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4 flex-1">
-                                                    <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full text-primary font-semibold text-sm">
+                                                    <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl text-primary font-bold text-base shadow-sm">
                                                         {index + 1}
                                                     </div>
                                                     <div className="flex-1">
-                                                        <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                                                        <h4 className="font-bold text-foreground group-hover:text-primary transition-colors text-lg leading-tight">
                                                             {video?.title}
                                                         </h4>
-                                                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                                                            <span className="flex items-center gap-1">
-                                                                <Clock className="h-3 w-3" />
+                                                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground font-medium">
+                                                            <span className="flex items-center gap-1.5">
+                                                                <Clock className="h-3.5 w-3.5" />
                                                                 {Math.floor(video?.duration / 60)} min
                                                             </span>
                                                             {watchedVideos.has(video.id) && (
-                                                                <span className="flex items-center gap-1 text-green-600">
-                                                                    <CheckCircle2 className="h-3 w-3" />
+                                                                <span className="flex items-center gap-1.5 text-green-600 font-semibold">
+                                                                    <CheckCircle2 className="h-3.5 w-3.5" />
                                                                     Completed
                                                                 </span>
                                                             )}
@@ -187,10 +193,10 @@ export const CourseDetailsTemplate = () => {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => toggleLiked(video?.id)}
-                                                        className="h-8 w-8 p-0 hover:bg-red-50"
+                                                        className="h-9 w-9 p-0 hover:bg-red-50 rounded-xl"
                                                     >
                                                         <Heart
-                                                            className={`h-4 w-4 ${likedVideos?.has(video.id) ? "text-red-500 fill-current" : "text-muted-foreground"
+                                                            className={`h-7 w-7 ${likedVideos?.has(video.id) ? "text-red-500 fill-current" : "text-muted-foreground"
                                                                 }`}
                                                         />
                                                     </Button>

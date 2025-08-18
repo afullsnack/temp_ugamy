@@ -26,7 +26,7 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data, isLoading, error }) => {
     const [favorites, setFavorites] = useState(new Set<string>())
 
     const showDetails = (id: string | number) => {
-        navigate({ to: `/course-details/${id}` })
+        navigate({ to: `/courses/${id}` })
     }
 
     const toggleFavorite = (courseId: string) => {

@@ -2,22 +2,16 @@
 
 import AppLoadingSkeleton from '@/components/common/app-loading-skeleton'
 import Sidebar from '@/components/common/sidebar'
-import { CourseDetailsHeader } from '@/components/dashboard/course-details-header'
 import { CourseDetailsTemplate } from '@/components/dashboard/course-details-template'
 import DashboardFallback from '@/components/dashboard/dashboard-fallback'
 import { useSession } from '@/lib/auth-hooks'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 
-export const Route = createFileRoute('/course-details/$id')({
+export const Route = createFileRoute('/courses/$id')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
-    const [activeFilter, setActiveFilter] = useState("All")
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-    const filters = ["All", "Watched", "Not Watched", "Favorite"]
-
     // Get user session
     const {
         user,
