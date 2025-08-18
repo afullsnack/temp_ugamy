@@ -7,6 +7,7 @@ import PaymentSelectionScreen from '@/components/common/payment-selection-screen
 import WelcomeScreen from '@/components/auth/welcome-screen'
 import PaySkeleton from '@/components/ui/skeletons/pay-skeleton'
 import { useSession } from '@/lib/auth-hooks'
+import Topbar from '@/components/common/topbar';
 
 export const Route = createFileRoute('/pay')({
     component: RouteComponent,
@@ -47,7 +48,8 @@ function RouteComponent() {
 
 
     return (
-        <div className='relative bg-white w-full min-h-screen flex items-center justify-center overflow-hidden'>
+        <div className='relative bg-gray-100 w-full min-h-screen h-fit flex items-center justify-center'>
+            <Topbar />
             {/* Background Gaming Elements */}
             <div className="absolute inset-0 opacity-20">
                 {/* Controller Button Elements */}
@@ -90,7 +92,7 @@ function RouteComponent() {
                     </div>
                 </div>
             </div>
-            <div className='min-h-screen h-fit container flex flex-col md:flex-row md:items-start justify-start md:justify-center gap-x-3 gap-y-5 mx-auto'>
+            <div className='min-h-screen h-fit container flex flex-col md:flex-row md:items-start justify-start md:justify-center gap-x-3 gap-y-5 mx-auto mt-[50px]'>
                 <WelcomeScreen />
                 <PaymentSelectionScreen />
             </div>
