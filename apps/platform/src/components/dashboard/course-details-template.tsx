@@ -1,19 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Search, Play, Eye, Heart, AlertCircle, RefreshCw, ImageIcon } from "lucide-react"
+import { Play, Eye, Heart, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2, ChevronLeft } from "lucide-react"
 import axios from "axios"
 import { env } from '@/env'
 import { useParams } from "@tanstack/react-router"
-import type { IGetCourseResponse, IVideo } from "@/lib/types"
+import type { IGetCourseResponse } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { Alert, AlertDescription } from "../ui/alert"
-import { CourseDetailsHeader } from "./course-details-header"
+import { Link } from "@tanstack/react-router"
 
 
 export const CourseDetailsTemplate = () => {
@@ -21,6 +21,7 @@ export const CourseDetailsTemplate = () => {
 
     const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set())
     const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set())
+
 
     const getCourseDetails = async (): Promise<IGetCourseResponse> => {
         const response = await axios.get(`${env.VITE_API_URL}/courses/${id}`)
@@ -53,14 +54,15 @@ export const CourseDetailsTemplate = () => {
         setLikedVideos(newLiked)
     }
 
-    const progressPercentage = (course?.videos?.length ?? 0) > 0 ? (watchedVideos.size / (course?.videos?.length ?? 1)) * 100 : 0
+    const progressPercentage =
+        (course?.videos?.length ?? 0) > 0 ? (watchedVideos.size / (course?.videos?.length ?? 1)) * 100 : 0
 
     const VideoSkeleton = () => (
-        <Card className="bg-white border border-gray-200">
-            <CardContent className="p-3">
-                <div className="flex items-center justify-between mb-2">
+        <Card className="bg-card border-border">
+            <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
                     <Skeleton className="h-4 w-3/4" />
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                         <Skeleton className="h-6 w-6 rounded" />
                         <Skeleton className="h-6 w-6 rounded" />
                     </div>
@@ -71,134 +73,230 @@ export const CourseDetailsTemplate = () => {
     )
 
     return (
-        <div className="relative bg-gray-50 w-full h-full flex-1 overflow-y-auto pt-40 lg:pt-40">
-            <CourseDetailsHeader title={course?.title as string} />
-            <div className="container mx-auto p-4 max-w-6xl">
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
-                    {/* Video/Thumbnail Section */}
-                    <div className="lg:col-span-3">
-                        <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                            <div className="text-center">
-                                <div className="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center mx-auto mb-2">
-                                    <ImageIcon className="h-6 w-6 text-gray-500" />
-                                </div>
-                            </div>
+        <div className="relative min-h-screen h-fit bg-background overflow-y-auto">
+            <div className="sticky top-0 left-0 right-0 bg-white bg-gradient-to-br from-primary/10 via-background to-accent/5 border-b border-border z-30">
+                <div className="container mx-auto px-4 py-8">
+                    <Link
+                        to="/dashboard"
+                        className=" flex items-center text-lg text-muted-foreground hover:text-foreground mb-6"
+                    >
+                        <ChevronLeft /> Back to Courses
+                    </Link>
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        <div className="space-y-4">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                                Gaming
+                            </Badge>
+                            <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight">{course?.title}</h1>
+                            <p className="text-lg text-muted-foreground leading-relaxed">{course?.description}</p>
                         </div>
-                    </div>
 
-                    <div className="lg:col-span-2">
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">{course?.title}</h2>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-600">Category</span>
-                                    <Badge variant="secondary" className="bg-teal-100 text-teal-700 hover:bg-teal-100">
-                                        Gaming
-                                    </Badge>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-600">Episodes</span>
-                                    <span className="text-sm font-semibold text-gray-900">0</span>
-                                </div>
+                        {/* Course Stats */}
+                        <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                            {/* <div className="flex items-center gap-2">
+                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                <span className="font-semibold text-foreground">{course?.rating}</span>
+                                <span>({course?.studentsCount?.toLocaleString()} students)</span>
+                            </div> */}
+                            <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4" />
+                                {/* <span>{course?.duration}</span> */}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <BookOpen className="h-4 w-4" />
+                                <span>{course?.difficulty}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Globe className="h-4 w-4" />
+                                <span>English</span>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-                    <div className="bg-white rounded-lg p-4 border border-gray-200">
-                        <p className="text-sm text-gray-700 leading-relaxed">{course?.description}</p>
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Episodes</h3>
-
-                    {error && (
-                        <Alert variant="destructive" className="mb-6">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertDescription className="flex items-center justify-between">
-                                <span>{error instanceof Error ? error?.message : 'An error occurred'}</span>
-                                <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="ml-2 bg-transparent">
-                                    <RefreshCw className="h-4 w-4 mr-1" />
-                                    Retry
-                                </Button>
-                            </AlertDescription>
-                        </Alert>
-                    )}
-
-                    {isLoading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                            {Array.from({ length: 4 }).map((_, index) => (
-                                <VideoSkeleton key={index} />
-                            ))}
-                        </div>
-                    ) : course?.videos?.length === 0 && !error ? (
-                        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                                <Play className="h-6 w-6 text-gray-400" />
-                            </div>
-                            <h4 className="text-base font-medium text-gray-900 mb-2">No Episodes Available</h4>
-                            <p className="text-sm text-gray-500">This course doesn't have any episodes yet.</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                            {course?.videos?.map?.((video) => (
-                                <Card key={video?.id} className="bg-white border border-gray-200 hover:shadow-sm transition-shadow">
-                                    <CardContent className="p-3">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h4 className="text-sm font-medium text-gray-900 line-clamp-1">{video?.title}</h4>
-                                            <div className="flex items-center gap-1">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => toggleWatched(video?.id)}
-                                                    className="h-6 w-6 p-0 hover:bg-gray-100"
-                                                >
-                                                    <Eye
-                                                        className={`h-3.5 w-3.5 ${watchedVideos?.has(video.id) ? "text-blue-600 fill-current" : "text-gray-400"
-                                                            }`}
-                                                    />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => toggleLiked(video?.id)}
-                                                    className="h-6 w-6 p-0 hover:bg-gray-100"
-                                                >
-                                                    <Heart
-                                                        className={`h-3.5 w-3.5 ${likedVideos?.has(video.id) ? "text-red-500 fill-current" : "text-gray-400"
-                                                            }`}
-                                                    />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                        <p className="text-xs text-gray-500">Duration: {Math.floor(video?.duration / 60)} minutes</p>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    )}
-
-                    {!isLoading && !error && (course?.videos?.length ?? 0) > 0 && (
-                        <Button className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 text-sm font-medium">
-                            View All Episodes
-                        </Button>
-                    )}
-                </div>
-
-                {!isLoading && !error && (course?.videos?.length ?? 0) > 0 && (
+            {/* Main Content */}
+            <div className="container h-fit mx-auto px-4 py-12 max-w-4xl overflow-y-auto">
+                <div className="space-y-8">
+                    {/* Course Curriculum */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Course Progress</h3>
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                            <Progress value={progressPercentage} className="h-2 mb-2" />
-                            <p className="text-sm text-gray-600">
-                                {watchedVideos.size} of {course?.videos?.length} episodes completed ({Math?.round?.(progressPercentage)}%)
-                            </p>
-                        </div>
+                        <h2 className="text-2xl font-bold text-foreground mb-6">Course Content</h2>
+
+                        {error && (
+                            <Alert variant="destructive" className="mb-6">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertDescription className="flex items-center justify-between">
+                                    <span>{error?.message || 'An error occurred'}</span>
+                                    <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="ml-2">
+                                        <RefreshCw className="h-4 w-4 mr-1" />
+                                        Retry
+                                    </Button>
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {isLoading ? (
+                            <div className="space-y-3">
+                                {Array.from({ length: 6 }).map((_, index) => (
+                                    <VideoSkeleton key={index} />
+                                ))}
+                            </div>
+                        ) : course?.videos?.length === 0 && !error ? (
+                            <Card className="bg-card border-border">
+                                <CardContent className="text-center py-12">
+                                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Play className="h-8 w-8 text-muted-foreground" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-foreground mb-2">No Lessons Available</h3>
+                                    <p className="text-muted-foreground">This course doesn't have any lessons yet.</p>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="space-y-3">
+                                {course?.videos?.map?.((video, index) => (
+                                    <Card
+                                        key={video?.id}
+                                        className="bg-card border-border hover:shadow-md transition-all duration-200 group"
+                                    >
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4 flex-1">
+                                                    <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full text-primary font-semibold text-sm">
+                                                        {index + 1}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                                                            {video?.title}
+                                                        </h4>
+                                                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                                                            <span className="flex items-center gap-1">
+                                                                <Clock className="h-3 w-3" />
+                                                                {Math.floor(video?.duration / 60)} min
+                                                            </span>
+                                                            {watchedVideos.has(video.id) && (
+                                                                <span className="flex items-center gap-1 text-green-600">
+                                                                    <CheckCircle2 className="h-3 w-3" />
+                                                                    Completed
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => toggleLiked(video?.id)}
+                                                        className="h-8 w-8 p-0 hover:bg-red-50"
+                                                    >
+                                                        <Heart
+                                                            className={`h-4 w-4 ${likedVideos?.has(video.id) ? "text-red-500 fill-current" : "text-muted-foreground"
+                                                                }`}
+                                                        />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                )}
+
+                    {/* Progress Section */}
+                    {!isLoading && !error && (course?.videos?.length ?? 0) > 0 && (
+                        <Card className="bg-card border-border">
+                            <CardContent className="p-6">
+                                <h3 className="text-lg font-semibold text-foreground mb-4">Your Progress</h3>
+                                <div className="space-y-3">
+                                    <Progress value={progressPercentage} className="h-3" />
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            {watchedVideos.size} of {course?.videos?.length} lessons completed
+                                        </span>
+                                        <span className="font-semibold text-foreground">{Math.round(progressPercentage)}%</span>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Course Details */}
+                    <Card className="bg-card border-border shadow-sm">
+                        <CardContent className="p-8">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                    <BookOpen className="h-5 w-5 text-primary" />
+                                </div>
+                                <h3 className="text-xl font-bold text-foreground">Course Information</h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <BookOpen className="h-4 w-4 text-blue-600" />
+                                            </div>
+                                            <span className="font-medium text-foreground">Skill Level</span>
+                                        </div>
+                                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                                            {course?.difficulty}
+                                        </Badge>
+                                    </div>
+
+                                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                                <Clock className="h-4 w-4 text-green-600" />
+                                            </div>
+                                            <span className="font-medium text-foreground">Total Duration</span>
+                                        </div>
+                                        <span className="font-semibold text-foreground text-lg">N/A</span>
+                                    </div>
+
+                                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                                <Play className="h-4 w-4 text-purple-600" />
+                                            </div>
+                                            <span className="font-medium text-foreground">Total Lessons</span>
+                                        </div>
+                                        <span className="font-semibold text-foreground text-lg">{course?.videos?.length}</span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                                <Globe className="h-4 w-4 text-orange-600" />
+                                            </div>
+                                            <span className="font-medium text-foreground">Language</span>
+                                        </div>
+                                        <span className="font-semibold text-foreground">English</span>
+                                    </div>
+
+                                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                                                <RefreshCw className="h-4 w-4 text-emerald-600" />
+                                            </div>
+                                            <span className="font-medium text-foreground">Last Updated</span>
+                                        </div>
+                                        <span className="font-semibold text-foreground">
+                                            {course?.updatedAt ? new Date(course.updatedAt).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            }) : 'N/A'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     )
