@@ -21,7 +21,6 @@ import {
     Settings,
     Maximize,
     Minimize,
-    MoreHorizontal,
     Loader2,
 } from "lucide-react"
 import { env } from "@/env"
@@ -558,7 +557,8 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
             <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-2xl group mx-auto">
                 <video
                     ref={videoRef}
-                    className="w-full aspect-video object-contain mx-auto block"
+                    className={`w-full aspect-video object-contain mx-auto block ${isFullscreen ? "h-screen w-screen object-contain" : ""
+                        }`}
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onPlay={handlePlaying}
@@ -650,117 +650,46 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                             </div>
                         </div>
 
-                        {/* Mobile controls - simplified layout */}
                         <div className="md:hidden">
-                            <div className="flex items-center justify-between mb-4">
-                                {/* Primary controls */}
-                                <div className="flex items-center gap-1">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={rewind}
-                                        className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
-                                    >
-                                        <RotateCcw className="h-4 w-4" />
-                                    </Button>
+                            {/* Row 1: Primary playback controls */}
+                            <div className="flex items-center justify-center gap-4 mb-3">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={rewind}
+                                    className="text-white hover:text-white hover:bg-white/20 p-3 touch-manipulation"
+                                >
+                                    <RotateCcw className="h-5 w-5" />
+                                </Button>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={togglePlay}
-                                        className="text-white hover:text-white hover:bg-primary/20 bg-primary/10 p-2 mx-1 touch-manipulation"
-                                    >
-                                        {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                                    </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="lg"
+                                    onClick={togglePlay}
+                                    className="text-white hover:text-white hover:bg-primary/20 bg-primary/10 p-4 touch-manipulation"
+                                >
+                                    {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+                                </Button>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={fastForward}
-                                        className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
-                                    >
-                                        <SkipForward className="h-4 w-4" />
-                                    </Button>
-                                </div>
-
-                                {/* Secondary controls */}
-                                <div className="flex items-center gap-1">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={toggleLike}
-                                        className={`text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation ${progress.liked ? "text-red-400" : ""}`}
-                                    >
-                                        <Heart className={`h-4 w-4 ${progress.liked ? "fill-current" : ""}`} />
-                                    </Button>
-
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={toggleFullscreen}
-                                        className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
-                                    >
-                                        {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-                                    </Button>
-
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation"
-                                            >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="bg-card border-border w-48" align="end">
-                                            <DropdownMenuItem
-                                                onClick={goToPreviousVideo}
-                                                disabled={playlist.length === 0 || currentVideoIndex === 0}
-                                                className="text-sm"
-                                            >
-                                                <SkipBack className="h-4 w-4 mr-2" />
-                                                Previous
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={goToNextVideo}
-                                                disabled={playlist.length === 0 || currentVideoIndex === playlist.length - 1}
-                                                className="text-sm"
-                                            >
-                                                <SkipForward className="h-4 w-4 mr-2" />
-                                                Next
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={toggleMute} className="text-sm">
-                                                {isMuted || volume === 0 ? (
-                                                    <VolumeX className="h-4 w-4 mr-2" />
-                                                ) : (
-                                                    <Volume2 className="h-4 w-4 mr-2" />
-                                                )}
-                                                {isMuted || volume === 0 ? "Unmute" : "Mute"}
-                                            </DropdownMenuItem>
-                                            <div className="px-2 py-1 text-xs text-muted-foreground border-t">Speed</div>
-                                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
-                                                <DropdownMenuItem
-                                                    key={speed}
-                                                    onClick={() => changePlaybackSpeed(speed)}
-                                                    className={`text-sm pl-6 ${playbackRate === speed ? "bg-accent" : ""}`}
-                                                >
-                                                    {speed}x
-                                                </DropdownMenuItem>
-                                            ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={fastForward}
+                                    className="text-white hover:text-white hover:bg-white/20 p-3 touch-manipulation"
+                                >
+                                    <SkipForward className="h-5 w-5" />
+                                </Button>
                             </div>
 
-                            <div className="flex items-center gap-3 bg-black/30 rounded-lg p-2">
+                            {/* Row 2: Volume control */}
+                            <div className="flex items-center gap-3 bg-black/30 rounded-lg p-3 mb-3">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={toggleMute}
                                     className="text-white hover:text-white hover:bg-white/20 p-2 touch-manipulation flex-shrink-0"
                                 >
-                                    {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                                    {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                                 </Button>
                                 <div className="flex-1 min-w-0">
                                     <Slider
@@ -768,16 +697,85 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                                         max={1}
                                         step={0.1}
                                         onValueChange={handleVolumeChange}
-                                        className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 touch-manipulation"
+                                        className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 touch-manipulation"
                                     />
                                 </div>
-                                <span className="text-white text-xs min-w-[2rem] text-right">
+                                <span className="text-white text-sm min-w-[3rem] text-right font-medium">
                                     {Math.round((isMuted ? 0 : volume) * 100)}%
                                 </span>
                             </div>
+
+                            {/* Row 3: Secondary controls */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={toggleLike}
+                                        className={`text-white hover:text-white hover:bg-white/20 p-3 touch-manipulation ${progress.liked ? "text-red-400" : ""}`}
+                                    >
+                                        <Heart className={`h-5 w-5 ${progress.liked ? "fill-current" : ""}`} />
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={toggleFullscreen}
+                                        className="text-white hover:text-white hover:bg-white/20 p-3 touch-manipulation"
+                                    >
+                                        {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
+                                    </Button>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-white hover:text-white hover:bg-white/20 p-3 touch-manipulation"
+                                            >
+                                                <Settings className="h-5 w-5" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            className={`bg-card border-border w-48 ${isFullscreen ? "z-[9999]" : "z-50"}`}
+                                            align="end"
+                                            side="top"
+                                        >
+                                            <DropdownMenuItem
+                                                onClick={goToPreviousVideo}
+                                                disabled={playlist.length === 0 || currentVideoIndex === 0}
+                                                className="text-sm py-3"
+                                            >
+                                                <SkipBack className="h-4 w-4 mr-2" />
+                                                Previous Video
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={goToNextVideo}
+                                                disabled={playlist.length === 0 || currentVideoIndex === playlist.length - 1}
+                                                className="text-sm py-3"
+                                            >
+                                                <SkipForward className="h-4 w-4 mr-2" />
+                                                Next Video
+                                            </DropdownMenuItem>
+                                            <div className="px-2 py-2 text-xs text-muted-foreground border-t font-medium">Playback Speed</div>
+                                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                                                <DropdownMenuItem
+                                                    key={speed}
+                                                    onClick={() => changePlaybackSpeed(speed)}
+                                                    className={`text-sm pl-6 py-2 ${playbackRate === speed ? "bg-accent" : ""}`}
+                                                >
+                                                    {speed}x {speed === 1 ? "(Normal)" : ""}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Desktop controls - original layout */}
+                        {/* Desktop controls - original layout with z-index fix */}
                         <div className="hidden md:flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 {/* Previous video */}
@@ -866,7 +864,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                             </div>
 
                             <div className="flex items-center gap-2">
-                                {/* Speed control */}
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="sm" className="text-white hover:text-white hover:bg-white/20">
@@ -874,7 +871,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                                             {playbackRate}x
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="bg-card border-border">
+                                    <DropdownMenuContent className={`bg-card border-border ${isFullscreen ? "z-[9999]" : "z-50"}`}>
                                         {playbackSpeeds.map((speed) => (
                                             <DropdownMenuItem
                                                 key={speed}
