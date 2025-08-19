@@ -51,12 +51,27 @@ export const list = createRoute({
   method: "get",
   request: {
     query: z.object({
-      id: z.string().uuid(),
+      id: z.string().uuid().describe("Course of videos to fetch"),
+      limit: z.coerce.number().default(10).optional(),
+      page: z.coerce.number().default(1).optional(),
+      filter: z.enum(['liked', 'watched', 'all']).default('all').optional()
     }),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(z.any()),
+      z.object({
+        success: z.boolean(),
+        message: z.string().optional(),
+        data: z.array(z.any()),
+        pagination: z.object({
+          pageSize: z.number(),
+          page: z.number(),
+          total: z.number(),
+          nextPage: z.number().nullable(),
+          previousPage: z.number().nullable(),
+          isLastPage: z.boolean()
+        }).optional()
+      }),
       "Videos list",
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
@@ -163,6 +178,13 @@ export const trackWatched = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
+      z.object({
+        success: z.boolean(),
+        message: z.string()
+      }),
+      "Response of watched tracking"
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       z.object({
         success: z.boolean(),
         message: z.string()

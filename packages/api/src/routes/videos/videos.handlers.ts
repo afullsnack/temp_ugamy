@@ -3,7 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import db from "@/db";
-import { videoLikes, videos } from "@/db/schema/schema";
+import { videoLikes, videos, videoWatchProgress } from "@/db/schema/schema";
 import env from "@/env";
 import { TigrisClient } from "@/lib/asset-storage";
 
@@ -60,28 +60,79 @@ export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
 };
 
 export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
-  const { id } = c.req.valid("query");
-  console.log(id, "Id query");
-  const videos = await db.query.videos.findMany({
+  const { id, limit, page, filter } = c.req.valid("query");
+  const session = c.get('session');
+
+  if (limit && page && filter) {
+    const offset = ((page || 1) - 1) * (limit || 10);
+    const total = await db.$count(videos);
+    const videoList = await db.query.videos.findMany({
+      where(fields, ops) {
+        return ops.eq(fields.courseId, id);
+      },
+      with: {
+        likes: true,
+        watchProgress: true
+      },
+      limit,
+      offset,
+    });
+    const totalPages = Math.ceil(total / limit);
+    const isLastPage = page >= totalPages;
+    const nextPage = isLastPage ? null : page + 1;
+    const previousPage = page > 1 ? page - 1 : null;
+
+    const filteredVideos = filter === 'liked'
+      ? videoList.filter((video) => video.likes.some(({userId}) => userId === session.userId))
+      : filter === 'watched'
+      ? videoList.filter((video) => video.watchProgress.some(({userId}) => userId === session.userId))
+      : videoList
+
+    return c.json({
+      success: true,
+      message: "Video list gotten",
+      data: filteredVideos,
+      ...(limit && page && {
+        pagination: {
+          pageSize: limit,
+          page,
+          total,
+          nextPage,
+          previousPage,
+          isLastPage,
+        }
+      })
+    }, HttpStatusCodes.OK);
+  }
+
+  const videoList = await db.query.videos.findMany({
     where(fields, ops) {
       return ops.eq(fields.courseId, id);
     },
     with: {
       likes: true,
+      watchProgress: true
     },
   });
 
-  return c.json(videos, HttpStatusCodes.OK);
+  return c.json({
+    success: true,
+    data: videoList
+  })
+
 };
 
 export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
   const { id } = c.req.valid("param");
+  const session = c.get('session');
+
   const video = await db.query.videos.findFirst({
     where(fields, ops) {
       return ops.eq(fields.id, id);
     },
     with: {
       likes: true,
+      watchProgress: true
     },
   });
 
@@ -92,7 +143,13 @@ export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
     }, HttpStatusCodes.BAD_REQUEST);
   }
 
-  return c.json(video, HttpStatusCodes.OK);
+  return c.json({
+    ...video,
+    liked: video.likes.some(({
+      videoId,
+      userId
+    }) => videoId === id && userId === session.userId)
+  }, HttpStatusCodes.OK);
 };
 
 export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
@@ -180,6 +237,47 @@ export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
     return c.json({
       success: false,
       message: 'Something went wrong making the request'
+    }, HttpStatusCodes.INTERNAL_SERVER_ERROR)
+  }
+}
+
+export const trackWatched: AppRouteHandler<WatchedVideoRoute> = async (c) => {
+  const body = c.req.valid("json")
+  const session = c.get('session')
+
+  try {
+    const watchExist = await db.query.videoWatchProgress.findFirst({
+      where(fields, ops) {
+        return ops.and(
+          ops.eq(fields.userId, session.userId),
+          ops.eq(fields.videoId, body.videoId)
+        )
+      }
+    })
+
+    if (watchExist) {
+      return c.json({
+        success: true,
+        message: "Video already watched"
+      })
+    }
+
+    await db.insert(videoWatchProgress)
+      .values({
+        userId: session.userId,
+        videoId: body.videoId
+      })
+
+    return c.json({
+      success: true,
+      message: "Video watch progress tracked"
+    })
+  }
+  catch (watchErr) {
+    console.log('Failed to track watched', watchErr)
+    return c.json({
+      success: false,
+      message: 'Failed to track video watched'
     }, HttpStatusCodes.INTERNAL_SERVER_ERROR)
   }
 }
