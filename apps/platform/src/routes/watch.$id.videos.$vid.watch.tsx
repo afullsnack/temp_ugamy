@@ -67,7 +67,7 @@ function RouteComponent() {
                   <Skeleton className="h-12 w-3/4" />
                 </div>
               ) : (
-                <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
                   {video?.title ?? "N/A"}
                 </h1>
               )}

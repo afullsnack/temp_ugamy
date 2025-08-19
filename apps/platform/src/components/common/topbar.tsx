@@ -157,7 +157,7 @@ const Topbar = () => {
 
     return (
         <>
-            <div className="fixed w-screen top-0 left-0 right-0 h-16 bg-[hsla(221,39%,11%,1)] z-50 flex items-center justify-between px-6">
+            <div className="fixed w-screen top-0 left-0 right-0 h-16 bg-[hsla(221,39%,11%,1)] z-70 flex items-center justify-between px-6 shadow-sm">
                 {/* Left side - Logo/Brand */}
                 <div className="flex items-center">
                     <div className="w-8 h-8">
