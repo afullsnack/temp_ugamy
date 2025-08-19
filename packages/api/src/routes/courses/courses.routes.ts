@@ -46,7 +46,7 @@ export const list = createRoute({
       z.object({
         success: z.boolean(),
         message: z.string().optional(),
-        data: z.array(selectCourseSchema),
+        data: z.array(selectCourseSchema.extend({totalVideos: z.number(), totalWatchTime: z.number()})),
         pagination: z.object({
           pageSize: z.number(),
           page: z.number(),
@@ -79,7 +79,7 @@ export const getOne = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectCourseSchema,
+      selectCourseSchema.extend({totalVideos: z.number(), totalWatchTime: z.number()}),
       "Course details",
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(

@@ -117,7 +117,13 @@ export const getOne: AppRouteHandler<GetOneCourseRoute> = async (c) => {
     }, HttpStatusCodes.BAD_REQUEST);
   }
 
-  return c.json(course, HttpStatusCodes.OK);
+  const data = {
+    ...course,
+    totalVideos: course.videos.length,
+    totalWatchTime: course.videos.reduce((prevVal, curVal) => prevVal+curVal.duration, 0)
+  }
+
+  return c.json(data, HttpStatusCodes.OK);
 };
 
 
