@@ -34,13 +34,68 @@ export const create: AppRouteHandler<CreateCourseRoute> = async (c) => {
 };
 
 export const list: AppRouteHandler<ListCourseRoute> = async (c) => {
+  const { filter, page, limit } = c.req.valid("query");
+  const session = c.get('session');
+
+  if (filter && page && limit) {
+    const offset = ((page || 1) - 1) * (limit || 10);
+    const total = await db.$count(courses);
+    const courseList = await db.query.courses.findMany({
+      with: {
+        enrollments: true,
+        videos: true,
+      },
+      limit,
+      offset,
+    });
+    const totalPages = Math.ceil(total / limit);
+    const isLastPage = page >= totalPages;
+    const nextPage = isLastPage ? null : page + 1;
+    const previousPage = page > 1 ? page - 1 : null;
+
+    const filteredCourses = filter === 'enrolled'
+      ? courseList.filter((course) => course.enrollments.some(({ userId }) => userId === session.userId))
+      : courseList;
+
+    const data = filteredCourses.map((course) => ({
+      ...course,
+      totalVideos: course.videos.length,
+      totalWatchTime: course.videos.reduce((prevVal, curVal) => prevVal + curVal.duration, 0)
+    }))
+
+    return c.json({
+      success: true,
+      message: "Course list",
+      data,
+      ...(limit && page && {
+        pagination: {
+          pageSize: limit,
+          page,
+          total,
+          nextPage,
+          previousPage,
+          isLastPage,
+        }
+      })
+    }, HttpStatusCodes.OK);
+  }
+
   const courseList = await db.query.courses.findMany({
     with: {
       enrollments: true,
       videos: true,
     },
   });
-  return c.json(courseList, HttpStatusCodes.OK);
+  const data = courseList.map((course) => ({
+    ...course,
+    totalVideos: course.videos.length,
+    totalWatchTime: course.videos.reduce((prevVal, curVal) => prevVal + curVal.duration, 0)
+  }))
+
+  return c.json({
+    success: true,
+    data
+  }, HttpStatusCodes.OK);
 };
 
 export const getOne: AppRouteHandler<GetOneCourseRoute> = async (c) => {

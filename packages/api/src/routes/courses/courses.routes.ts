@@ -34,9 +34,28 @@ export const list = createRoute({
   tags,
   path: "/courses",
   method: "get",
+  request: {
+    query: z.object({
+      limit: z.coerce.number().default(10).optional(),
+      page: z.coerce.number().default(1).optional(),
+      filter: z.enum(['enrolled', 'all']).default('all').optional()
+    })
+  },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(selectCourseSchema),
+      z.object({
+        success: z.boolean(),
+        message: z.string().optional(),
+        data: z.array(selectCourseSchema),
+        pagination: z.object({
+          pageSize: z.number(),
+          page: z.number(),
+          total: z.number(),
+          nextPage: z.number().nullable(),
+          previousPage: z.number().nullable(),
+          isLastPage: z.boolean()
+        }).optional()
+      }),
       "List of courses",
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
