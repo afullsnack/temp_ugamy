@@ -3,11 +3,11 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import db from "@/db";
-import { videos } from "@/db/schema/schema";
+import { videoLikes, videos } from "@/db/schema/schema";
 import env from "@/env";
 import { TigrisClient } from "@/lib/asset-storage";
 
-import type { CreateVideoRoute, GetOneVideoRoute, ListVideosRoute, StreamVideoRoute } from "./videos.routes";
+import type { CreateVideoRoute, GetOneVideoRoute, ListVideosRoute, StreamVideoRoute, LikeVideoRoute, WatchedVideoRoute } from "./videos.routes";
 
 export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
   const body = await c.req.parseBody();
@@ -141,3 +141,45 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
 
   return c.body(response as ReadableStream, 200);
 };
+
+
+export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
+  const body = c.req.valid("json")
+  const session = c.get("session")
+
+  try {
+    const likeExist = await db.query.videoLikes.findFirst({
+      where(fields, ops) {
+        return ops.and(
+          ops.eq(fields.userId, session.userId),
+          ops.eq(fields.videoId, body.videoId)
+        )
+      }
+    })
+
+    if (likeExist) {
+      return c.json({
+        success: true,
+        message: "Video already liked!"
+      })
+    }
+
+    await db.insert(videoLikes)
+      .values({
+        userId: session.userId,
+        videoId: body.videoId
+      })
+
+    return c.json({
+      success: true,
+      message: 'Video like has been updated'
+    }, HttpStatusCodes.OK)
+  }
+  catch (likeErr) {
+    console.log('Like error', likeErr);
+    return c.json({
+      success: false,
+      message: 'Something went wrong making the request'
+    }, HttpStatusCodes.INTERNAL_SERVER_ERROR)
+  }
+}
