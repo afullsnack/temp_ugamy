@@ -78,9 +78,6 @@ export default function VerifyEmailForm() {
     // Verify Email
     const { isPending, mutateAsync } = useMutation({
         mutationFn: VerifyEmail,
-        onSuccess: () => {
-            toast.success("Proceed to sign in")
-        },
         onError: (error) => {
             toast.error(error.message || "An unexpected error occured, kindly try again")
         }
@@ -93,7 +90,6 @@ export default function VerifyEmailForm() {
         }).then(() => {
             navigate({ to: "/dashboard" })
         })
-
     }
 
     return (

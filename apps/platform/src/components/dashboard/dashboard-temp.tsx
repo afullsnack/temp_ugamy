@@ -66,13 +66,15 @@ const DashboardTemp = () => {
                 {/* Fixed Header */}
                 <DashboardHeader viewMode={viewMode} setViewMode={setViewMode} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 
-                {!loading && session !== null && user?.isSubscribed && user?.emailVerified ?
-                    <CoursesTemp data={data!} isLoading={isLoading} error={error} viewMode={viewMode} /> : ""
-                }
+                <div className="relative w-full h-full overflow-y-auto">
+                    {!loading && session !== null && user?.isSubscribed && user?.emailVerified ?
+                        <CoursesTemp data={data!} isLoading={isLoading} error={error} viewMode={viewMode} /> : ""
+                    }
 
-                {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ?
-                    <DashboardFallback /> : ""
-                }
+                    {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ?
+                        <DashboardFallback /> : ""
+                    }
+                </div>
             </div>
         </div>
     )

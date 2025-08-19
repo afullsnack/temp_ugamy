@@ -102,7 +102,7 @@ export default function SignupForm() {
         await mutateAsync(values)
             .then((data) => {
                 if (data.user.emailVerified) {
-                    toast.success("Proceed to sign in")
+                    toast.success("Email has already been verified, Proceed to sign in")
                     navigate({
                         to: "/signin"
                     })

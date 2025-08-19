@@ -1,6 +1,6 @@
 "use client"
 
-import { Play, Menu } from "lucide-react"
+import { Play, Menu, List } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -157,7 +157,7 @@ const Topbar = () => {
 
     return (
         <>
-            <div className="fixed w-screen top-0 left-0 right-0 h-16 bg-[hsla(221,39%,11%,1)] z-50 flex items-center justify-between px-6">
+            <div className="fixed w-screen top-0 left-0 right-0 h-16 bg-[hsla(221,39%,11%,1)] z-70 flex items-center justify-between px-6 shadow-sm">
                 {/* Left side - Logo/Brand */}
                 <div className="flex items-center">
                     <div className="w-8 h-8">
@@ -179,8 +179,10 @@ const Topbar = () => {
                         <div className="lg:hidden">
                             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                                 <SheetTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="text-white hover:bg-slate-700">
-                                        <Menu className="w-5 h-5" />
+                                    <Button variant="ghost" size="icon" className="bg-transparent">
+                                        <div className="w-8 h-8 bg-teal-100 rounded flex items-center justify-center">
+                                            <Menu className="w-5 h-5 text-[hsla(160,84%,39%,1)]" />
+                                        </div>
                                     </Button>
                                 </SheetTrigger>
                                 <SheetContent side="left" className="p-0 w-80">
