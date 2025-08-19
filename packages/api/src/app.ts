@@ -8,6 +8,7 @@ import payments from "@/routes/payments/payments.index";
 // import uploads from "@/routes/uploads.index";
 import videos from "@/routes/videos/videos.index";
 import webhooks from "@/routes/webhooks/webhooks.index";
+import { sessionValidation } from "@/middlewares/session-validation";
 
 const app = createApp();
 
@@ -31,7 +32,7 @@ const routes = [
 
 app.on(["POST", "GET", "DELETE", "PUT"], "/api/auth/*", async c => await auth.handler(c.req.raw));
 
-// app.use(async (c, next) => sessionValidation(c, next));
+app.use(async (c, next) => sessionValidation(c, next));
 routes.forEach((route) => {
   app.route("/", route);
 });
