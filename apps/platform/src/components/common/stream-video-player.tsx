@@ -930,7 +930,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
 
                 <video
                     ref={videoRef}
-                    className={`w-full aspect-video object-contain mx-auto block ${isFullscreen ? "h-screen w-screen object-contain" : ""
+                    className={`w-full min-h-[400px] aspect-video object-contain mx-auto block ${isFullscreen ? "h-screen w-screen object-contain" : ""
                         }`}
                     style={{
                         pointerEvents: isProtectionActive ? "none" : "auto",
