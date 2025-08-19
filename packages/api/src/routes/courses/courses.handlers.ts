@@ -3,9 +3,9 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@/lib/types";
 
 import db from "@/db";
-import { courses } from "@/db/schema/schema";
+import { courseEnrollments, courses } from "@/db/schema/schema";
 
-import type { CreateCourseRoute, GetOneCourseRoute, ListCourseRoute } from "./courses.routes";
+import type { CreateCourseRoute, GetOneCourseRoute, ListCourseRoute, EnrollCourseROute } from "./courses.routes";
 
 export const create: AppRouteHandler<CreateCourseRoute> = async (c) => {
   const body = await c.req.raw.json();
@@ -64,3 +64,20 @@ export const getOne: AppRouteHandler<GetOneCourseRoute> = async (c) => {
 
   return c.json(course, HttpStatusCodes.OK);
 };
+
+
+export const enroll: AppRouteHandler<EnrollCourseROute> = async (c) => {
+  const body = c.req.valid("json")
+  const session = c.get('session')
+
+  await db.insert(courseEnrollments)
+    .values({
+      userId: session.userId,
+      courseId: body.courseId
+    });
+
+  return c.json({
+    success: false,
+    message: 'Successfully enrolled in the course'
+  }, HttpStatusCodes.OK)
+}

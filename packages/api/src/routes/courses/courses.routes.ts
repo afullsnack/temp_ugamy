@@ -73,6 +73,37 @@ export const getOne = createRoute({
   },
 });
 
+export const enroll = createRoute({
+  tags,
+  method: "post",
+  path: "/courses/enroll",
+  request: {
+    body: jsonContent(
+      z.object({
+        courseId: z.string().uuid()
+      }),
+      "Request body"
+    )
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({
+        success: z.boolean(),
+        message: z.string().optional()
+      }),
+      "Enroll response"
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      z.object({
+        success: z.boolean(),
+        message: z.string().optional()
+      }),
+      "Bad request response"
+    )
+  }
+})
+
 export type CreateCourseRoute = typeof create;
 export type ListCourseRoute = typeof list;
 export type GetOneCourseRoute = typeof getOne;
+export type EnrollCourseROute = typeof enroll;
