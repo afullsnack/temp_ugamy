@@ -38,7 +38,7 @@ const VideoSkeleton = () => (
 // Add to component definition
 export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
     return (
-        <div className="container h-fit mx-auto py-12 max-w-4xl overflow-y-auto">
+        <div className="container h-fit mx-auto py-12 px-3 lg:px-0 max-w-4xl overflow-y-auto">
             <div className="space-y-8">
                 {/* Course Curriculum */}
                 <div>

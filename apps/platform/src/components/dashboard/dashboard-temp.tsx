@@ -64,12 +64,11 @@ const DashboardTemp = () => {
     console.log("COURSES DATA: ", courses?.data)
 
     return (
-        <div className="flex h-screen bg-gray-100 overflow-hidden">
-            <div className="flex-1 flex flex-col">
-                {/* Fixed Header */}
+        <div className="bg-gray-100 min-h-screen h-fit overflow-x-hidden">
+            <div className="w-full h-full flex-1 flex flex-col overflow-y-auto">
                 <DashboardHeader viewMode={viewMode} setViewMode={setViewMode} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 
-                <div className="relative w-full h-full overflow-y-auto">
+                <div className="relative w-full h-fit overflow-y-auto">
                     {!loading && session !== null && user?.isSubscribed && user?.emailVerified ?
                         <CoursesTemp data={courses?.data as ICourseDetails[]} isLoading={isLoading} error={error} viewMode={viewMode} /> : ""
                     }
