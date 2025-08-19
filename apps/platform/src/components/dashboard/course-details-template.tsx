@@ -6,7 +6,7 @@ import { Clock, BookOpen, Globe, ChevronLeft } from "lucide-react"
 import axios from "axios"
 import { env } from '@/env'
 import { useNavigate, useParams } from "@tanstack/react-router"
-import type { IGetCourseResponse } from "@/lib/types"
+import type { ICourseDetails, IGetCourseResponse } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import CourseEpisodesTemplate from "../common/course-episodes-templates"
@@ -20,8 +20,10 @@ export const CourseDetailsTemplate = () => {
     const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set())
 
 
-    const getCourseDetails = async (): Promise<IGetCourseResponse> => {
-        const response = await axios.get(`${env.VITE_API_URL}/courses/${id}`)
+    const getCourseDetails = async (): Promise<ICourseDetails> => {
+        const response = await axios.get(`${env.VITE_API_URL}/courses/${id}`, {
+            withCredentials: true
+        })
         return response.data
     }
 
@@ -76,7 +78,7 @@ export const CourseDetailsTemplate = () => {
                             </div> */}
                             <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4" />
-                                {/* <span>{course?.duration}</span> */}
+                                <span>{Math.floor(course?.totalWatchTime ?? 0 / 60)} min</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <BookOpen className="h-4 w-4" />
@@ -94,7 +96,7 @@ export const CourseDetailsTemplate = () => {
             {/* Main Content */}
             <CourseEpisodesTemplate
                 title="Course Content"
-                course={course}
+                course={course as ICourseDetails}
                 error={error}
                 handleWatch={handleWatch}
                 isLoading={isLoading}

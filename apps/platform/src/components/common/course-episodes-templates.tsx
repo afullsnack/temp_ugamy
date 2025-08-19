@@ -6,13 +6,13 @@ import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Play, Heart, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import type { IGetCourseResponse } from "@/lib/types"
+import type { ICourseDetails } from "@/lib/types"
 
 interface CourseEpisodesTemplateProps {
     title: string
     error: Error | null
     isLoading: boolean
-    course: IGetCourseResponse | undefined | null
+    course: ICourseDetails | undefined | null
     likedVideos: Set<string>
     watchedVideos: Set<string>
     progressPercentage: number
@@ -96,7 +96,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                                     </div>
                                                     <div className="flex-1">
                                                         <h4 className="font-bold text-foreground group-hover:text-primary transition-colors text-lg leading-tight">
-                                                            {video?.title}
+                                                            {video?.title ?? "N/A"}
                                                         </h4>
                                                         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground font-medium">
                                                             <span className="flex items-center gap-1.5">
@@ -183,7 +183,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                         </div>
                                         <span className="font-medium text-foreground text-sm lg:text-base">Total Duration</span>
                                     </div>
-                                    <span className="font-semibold text-foreground text-sm lg:text-base">N/A</span>
+                                    <span className="font-semibold text-foreground text-sm lg:text-base">{Math.floor(props.course?.totalWatchTime ?? 0 / 60) ?? 0} min</span>
                                 </div>
 
                                 <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
@@ -193,7 +193,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                         </div>
                                         <span className="font-medium text-foreground text-sm lg:text-base">Total Lessons</span>
                                     </div>
-                                    <span className="font-semibold text-foreground text-sm lg:text-base">{props.course?.videos?.length}</span>
+                                    <span className="font-semibold text-foreground text-sm lg:text-base">{props.course?.totalVideos}</span>
                                 </div>
                             </div>
 

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { env } from "@/env"
 import { useSession } from "@/lib/auth-hooks"
-import type { IGetCourseResponse, IGetVideoByIdResponse } from "@/lib/types"
+import type { ICourseDetails, IGetCourseResponse, IGetVideoByIdResponse } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router"
 import axios from "axios"
@@ -31,7 +31,17 @@ function RouteComponent() {
   const { user, isPending } = useSession()
 
   const getVideoById = async (): Promise<IGetVideoByIdResponse> => {
-    const response = await axios.get(`${env.VITE_API_URL}/videos/${videoId}`)
+    const response = await axios.get(`${env.VITE_API_URL}/videos/${videoId}`, {
+      withCredentials: true
+    })
+    return response.data
+  }
+
+
+  const getCourseDetails = async (): Promise<ICourseDetails> => {
+    const response = await axios.get(`${env.VITE_API_URL}/courses/${id}`, {
+      withCredentials: true
+    })
     return response.data
   }
 
@@ -44,11 +54,6 @@ function RouteComponent() {
     queryKey: ["video", videoId],
     queryFn: getVideoById,
   })
-
-  const getCourseDetails = async (): Promise<IGetCourseResponse> => {
-    const response = await axios.get(`${env.VITE_API_URL}/courses/${id}`)
-    return response.data
-  }
 
   // Get Course details API query
   const { data: course, isLoading, error } = useQuery({

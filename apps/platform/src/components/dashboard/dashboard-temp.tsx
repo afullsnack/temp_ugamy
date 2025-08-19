@@ -5,18 +5,19 @@ import DashboardFallback from "./dashboard-fallback"
 import CoursesTemp from "./courses-temp"
 import AppLoadingSkeleton from "../common/app-loading-skeleton"
 import { useSession } from "@/lib/auth-hooks"
-import Sidebar from "../common/sidebar"
 import { show } from "@ebay/nice-modal-react"
 import { VideoPlayerModal } from "../common/video-player-modal"
 import axios from "axios"
 import { useQuery } from "@tanstack/react-query"
 import { env } from '@/env'
-import type { IGetCourseResponse } from "@/lib/types"
+import type { ICourseDetails, IGetCourseResponse } from "@/lib/types"
 import { DashboardHeader } from "../common/dashboard-header"
 
-const getCourses = async (): Promise<IGetCourseResponse[]> => {
-    const response = await axios.get(`${env.VITE_API_URL}/courses`)
-    return response.data
+const getCourses = async (): Promise<IGetCourseResponse> => {
+    const response = await axios.get(`${env.VITE_API_URL}/courses`, {
+        withCredentials: true
+    })
+    return response?.data
 }
 
 // TODO: Refactor component
@@ -55,10 +56,12 @@ const DashboardTemp = () => {
     }
 
     // Get Courses API query
-    const { data, isLoading, error } = useQuery({
+    const { data: courses, isLoading, error } = useQuery({
         queryKey: ['courses'],
         queryFn: getCourses
     })
+
+    console.log("COURSES DATA: ", courses?.data)
 
     return (
         <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -68,7 +71,7 @@ const DashboardTemp = () => {
 
                 <div className="relative w-full h-full overflow-y-auto">
                     {!loading && session !== null && user?.isSubscribed && user?.emailVerified ?
-                        <CoursesTemp data={data!} isLoading={isLoading} error={error} viewMode={viewMode} /> : ""
+                        <CoursesTemp data={courses?.data as ICourseDetails[]} isLoading={isLoading} error={error} viewMode={viewMode} /> : ""
                     }
 
                     {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ?

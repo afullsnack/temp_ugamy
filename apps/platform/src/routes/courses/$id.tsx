@@ -1,7 +1,6 @@
 "use client"
 
 import AppLoadingSkeleton from '@/components/common/app-loading-skeleton'
-import Sidebar from '@/components/common/sidebar'
 import Topbar from '@/components/common/topbar'
 import { CourseDetailsTemplate } from '@/components/dashboard/course-details-template'
 import DashboardFallback from '@/components/dashboard/dashboard-fallback'
