@@ -119,7 +119,62 @@ export const stream = createRoute({
   },
 });
 
+export const like = createRoute({
+  tags,
+  method: 'post',
+  path: '/videos/like',
+  request: {
+    body: jsonContent(
+      z.object({
+        videoId: z.string()
+      }),
+      "Video ID to like"
+    )
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({
+        success: z.boolean(),
+        message: z.string()
+      }),
+      "Video like response"
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({
+        success: z.boolean(),
+        message: z.string()
+      }),
+      "Failed response"
+    )
+  }
+});
+
+export const trackWatched = createRoute({
+  tags,
+  method: 'post',
+  path: '/videos/watched',
+  request: {
+    body: jsonContent(
+      z.object({
+        videoId: z.string().uuid()
+      }),
+      "Video ID to track watched"
+    )
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({
+        success: z.boolean(),
+        message: z.string()
+      }),
+      "Response of watched tracking"
+    )
+  }
+})
+
 export type CreateVideoRoute = typeof create;
 export type GetOneVideoRoute = typeof getOne;
 export type ListVideosRoute = typeof list;
 export type StreamVideoRoute = typeof stream;
+export type LikeVideoRoute = typeof like;
+export type WatchedVideoRoute = typeof trackWatched;
