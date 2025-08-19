@@ -863,7 +863,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     }
 
     return (
-        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 space-y-6 bg-inherit">
+        <div className="w-full max-w-6xl mx-auto lg:px-4 sm:px-6 space-y-6 bg-inherit">
             <div
                 ref={containerRef}
                 className="relative bg-black rounded-xl overflow-hidden shadow-2xl group mx-auto"
