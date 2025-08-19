@@ -37,7 +37,7 @@ export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters, ac
                         </Button>
                     ))}
                 </div>
-                <div className="flex gap-1">
+                <div className="hidden lg:visible lg:flex gap-1">
                     <Button
                         variant={viewMode === "list" ? "default" : "outline"}
                         size="icon"

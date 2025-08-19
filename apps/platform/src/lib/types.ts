@@ -1,4 +1,4 @@
-export interface IGetCourseResponse {
+export interface ICourseDetails {
     id: string,
     title: string,
     description: string,
@@ -9,7 +9,14 @@ export interface IGetCourseResponse {
     createdAt: string | Date,
     updatedAt: string | Date,
     enrollments: Array<string>, // placeholder value
+    totalVideos: number,
+    totalWatchTime: number,
     videos: IVideo[]
+}
+
+export interface IGetCourseResponse {
+    success: true,
+    data: ICourseDetails[]
 }
 
 export interface IVideo {
@@ -40,4 +47,4 @@ export interface IGetVideoByIdResponse {
     createdAt: string,
     updatedAt: string,
     // likes: []
-  }
+}
