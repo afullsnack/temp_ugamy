@@ -28,15 +28,15 @@ const FilteredVideosTemplate: FC<IProps> = (props) => {
                 <h2 className="text-xl lg:text-2xl font-bold text-foreground mb-6">{props.title}</h2>
 
                 {props.error && (
-                    <Alert variant="destructive" className="mb-6">
-                        <AlertCircle className="h-4 w-4" />
+                    <Alert variant="destructive" className="mb-6 w-full h-fit flex items-center justify-between">
                         <AlertDescription className="flex items-center justify-between">
+                            <AlertCircle className="h-4 w-4" />
                             <span>{props.error?.message || "An error occurred"}</span>
-                            <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="ml-2">
-                                <RefreshCw className="h-4 w-4 mr-1" />
-                                Retry
-                            </Button>
                         </AlertDescription>
+                        <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="ml-2">
+                            <RefreshCw className="h-4 w-4 mr-1" />
+                            Retry
+                        </Button>
                     </Alert>
                 )}
 
@@ -48,7 +48,7 @@ const FilteredVideosTemplate: FC<IProps> = (props) => {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {!props?.videos || props?.videos?.length === 0 ? (
+                        {!props.error && !props?.videos || props?.videos?.length === 0 ? (
                             <Card className="bg-card border-border">
                                 <CardContent className="p-12 text-center">
                                     <div className="flex flex-col items-center gap-4">
@@ -57,10 +57,10 @@ const FilteredVideosTemplate: FC<IProps> = (props) => {
                                         </div>
                                         <div className="space-y-2">
                                             <h3 className="text-lg font-semibold text-foreground">
-                                                    {props.filter === "Favorites" ? "You haven't liked any lesson" : "You haven't watched any lesson yet."}
-                                                </h3>
+                                                {props.filter === "Favourites" ? "You haven't liked any lesson" : "You haven't watched any lesson yet."}
+                                            </h3>
                                             <p className="text-sm lg:text-base text-muted-foreground max-w-md">
-                                                    {props.filter === "Favorites" ? "Every lesson you like will appear here." : "Your watch history will appear here."}
+                                                {props.filter === "Favourites" ? "Every lesson you like will appear here." : "Your watch history will appear here."}
                                             </p>
                                         </div>
                                     </div>

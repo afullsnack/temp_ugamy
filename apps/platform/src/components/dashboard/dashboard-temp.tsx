@@ -22,7 +22,7 @@ const getCourses = async (): Promise<IGetCourseResponse> => {
     return response?.data
 }
 
-const filters = ["All", "Watched", "Favorites"]
+const filters = ["All", "Watched", "Favourites"]
 
 const DashboardTemp = () => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -101,7 +101,7 @@ const DashboardTemp = () => {
                         ) : null}
                         </> :
                         <FilteredVideosTemplate
-                            title={activeFilter === "Favorites" ? "Favourite Lessons" : "Watch History"}
+                            title={activeFilter === "Favourites" ? "Favourite Lessons" : "Watch History"}
                             filter={activeFilter}
                             videos={videos?.data}
                             isLoading={loadingVideos}

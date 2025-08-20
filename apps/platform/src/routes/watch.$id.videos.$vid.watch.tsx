@@ -164,7 +164,6 @@ function RouteComponent() {
             isLoading={isLoading}
             likedVideos={likedVideos}
             progressPercentage={progressPercentage}
-            toggleLiked={toggleLiked}
             watchedVideos={watchedVideos}
           />
         </section>

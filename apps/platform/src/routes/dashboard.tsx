@@ -5,7 +5,7 @@ import DashboardTemp from '@/components/dashboard/dashboard-temp'
 import Topbar from '@/components/common/topbar';
 
 const searchSchema = z.object({
-  filter: z.enum(['All', 'Watched', 'Favorites']).optional(),
+  filter: z.enum(['All', 'Watched', 'Favourites']).optional(),
 })
 
 export const Route = createFileRoute('/dashboard')({

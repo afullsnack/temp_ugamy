@@ -15,7 +15,7 @@ export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters }) 
 
     const activeFilter = (search?.filter as string) ?? "All"
 
-    const handleFilterClick = (filter: 'All' | 'Watched' | 'Favorites') => {
+    const handleFilterClick = (filter: 'All' | 'Watched' | 'Favourites') => {
         navigate({
             search: (prev) => ({
                 ...prev,
@@ -38,7 +38,7 @@ export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters }) 
                             key={filter}
                             variant={activeFilter === filter ? "default" : "outline"}
                             size="sm"
-                            onClick={() => handleFilterClick(filter as 'All' | 'Watched' | 'Favorites')}
+                            onClick={() => handleFilterClick(filter as 'All' | 'Watched' | 'Favourites')}
                             className={
                                 activeFilter === filter
                                     ? "bg-primary rounded-[8px] hover:bg-teal-700"
