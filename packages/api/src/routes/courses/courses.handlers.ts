@@ -43,7 +43,11 @@ export const list: AppRouteHandler<ListCourseRoute> = async (c) => {
     const courseList = await db.query.courses.findMany({
       with: {
         enrollments: true,
-        videos: true,
+        videos: {
+          with: {
+            likes: true
+          }
+        },
       },
       limit,
       offset,
@@ -59,6 +63,10 @@ export const list: AppRouteHandler<ListCourseRoute> = async (c) => {
 
     const data = filteredCourses.map((course) => ({
       ...course,
+      videos: course.videos.map((vid) => ({
+        ...vid,
+        isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
+      })),
       totalVideos: course.videos.length,
       totalWatchTime: course.videos.reduce((prevVal, curVal) => prevVal + curVal.duration, 0)
     }))
@@ -83,11 +91,19 @@ export const list: AppRouteHandler<ListCourseRoute> = async (c) => {
   const courseList = await db.query.courses.findMany({
     with: {
       enrollments: true,
-      videos: true,
+      videos: {
+        with: {
+          likes: true,
+        }
+      },
     },
   });
   const data = courseList.map((course) => ({
     ...course,
+    videos: course.videos.map((vid) => ({
+      ...vid,
+      isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
+    })),
     totalVideos: course.videos.length,
     totalWatchTime: course.videos.reduce((prevVal, curVal) => prevVal + curVal.duration, 0)
   }))
@@ -100,13 +116,18 @@ export const list: AppRouteHandler<ListCourseRoute> = async (c) => {
 
 export const getOne: AppRouteHandler<GetOneCourseRoute> = async (c) => {
   const { id } = c.req.valid("param");
+  const session = c.get('session');
   const course = await db.query.courses.findFirst(({
     where(fields, ops) {
       return ops.eq(fields.id, id);
     },
     with: {
       enrollments: true,
-      videos: true,
+      videos: {
+        with: {
+          likes: true
+        }
+      },
     },
   }));
 
@@ -119,6 +140,10 @@ export const getOne: AppRouteHandler<GetOneCourseRoute> = async (c) => {
 
   const data = {
     ...course,
+    videos: course.videos.map((vid) => ({
+      ...vid,
+      isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
+    })),
     totalVideos: course.videos.length,
     totalWatchTime: course.videos.reduce((prevVal, curVal) => prevVal+curVal.duration, 0)
   }

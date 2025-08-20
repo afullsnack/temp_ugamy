@@ -132,12 +132,12 @@ export const videoWatchProgress = sqliteTable("video_watch_progress", {
   isCompleted: integer("is_completed", { mode: "boolean" }).notNull().default(false),
   firstWatchedAt: integer("first_watched_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
   lastWatchedAt: integer("last_watched_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
-}, table => ({
-  userVideoIdx: index("watch_progress_user_video_idx").on(table.userId, table.videoId),
-  userIdx: index("watch_progress_user_idx").on(table.userId),
-  videoIdx: index("watch_progress_video_idx").on(table.videoId),
-  completedIdx: index("watch_progress_completed_idx").on(table.isCompleted),
-}));
+}, table => [
+  index("watch_progress_user_video_idx").on(table.userId, table.videoId),
+  index("watch_progress_user_idx").on(table.userId),
+  index("watch_progress_video_idx").on(table.videoId),
+  index("watch_progress_completed_idx").on(table.isCompleted),
+]);
 
 // Video likes
 export const videoLikes = sqliteTable("video_likes", {
