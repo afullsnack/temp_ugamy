@@ -171,7 +171,10 @@ export const trackWatched = createRoute({
   request: {
     body: jsonContent(
       z.object({
-        videoId: z.string().uuid()
+        videoId: z.string().uuid(),
+        watchedSeconds: z.number().default(0),
+        watchPercentage: z.number().default(0).describe('100% = 1, 20% = 0.2, and so on'),
+        isCompleted: z.boolean().default(false).describe('Pass true once user reaches end of video'),
       }),
       "Video ID to track watched"
     )

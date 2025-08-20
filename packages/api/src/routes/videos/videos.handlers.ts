@@ -8,6 +8,7 @@ import env from "@/env";
 import { TigrisClient } from "@/lib/asset-storage";
 
 import type { CreateVideoRoute, GetOneVideoRoute, ListVideosRoute, StreamVideoRoute, LikeVideoRoute, WatchedVideoRoute } from "./videos.routes";
+import { eq } from "drizzle-orm";
 
 export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
   const body = await c.req.parseBody();
@@ -83,15 +84,18 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
     const previousPage = page > 1 ? page - 1 : null;
 
     const filteredVideos = filter === 'liked'
-      ? videoList.filter((video) => video.likes.some(({userId}) => userId === session.userId))
+      ? videoList.filter((video) => video.likes.some(({ userId }) => userId === session.userId))
       : filter === 'watched'
-      ? videoList.filter((video) => video.watchProgress.some(({userId}) => userId === session.userId))
-      : videoList
+        ? videoList.filter((video) => video.watchProgress.some(({ userId }) => userId === session.userId))
+        : videoList
 
     return c.json({
       success: true,
       message: "Video list gotten",
-      data: filteredVideos,
+      data: filteredVideos.map((vid) => ({
+        ...vid,
+        isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
+      })),
       ...(limit && page && {
         pagination: {
           pageSize: limit,
@@ -117,7 +121,10 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
 
   return c.json({
     success: true,
-    data: videoList
+    data: videoList.map((vid) => ({
+      ...vid,
+      isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
+    }))
   })
 
 };
@@ -145,7 +152,7 @@ export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
 
   return c.json({
     ...video,
-    liked: video.likes.some(({
+    isFavorite: video.likes.some(({
       videoId,
       userId
     }) => videoId === id && userId === session.userId)
@@ -256,22 +263,33 @@ export const trackWatched: AppRouteHandler<WatchedVideoRoute> = async (c) => {
     })
 
     if (watchExist) {
+      await db.update(videoWatchProgress)
+        .set({
+          watchedSeconds: body.watchedSeconds,
+          watchPercentage: body.watchPercentage,
+          isCompleted: body.isCompleted
+        })
+        .where(eq(videoWatchProgress.videoId, body.videoId));
+
       return c.json({
         success: true,
-        message: "Video already watched"
-      })
+        message: "Video updated successfully"
+      }, HttpStatusCodes.OK)
     }
 
     await db.insert(videoWatchProgress)
       .values({
         userId: session.userId,
-        videoId: body.videoId
-      })
+        videoId: body.videoId,
+        watchedSeconds: body.watchedSeconds,
+        watchPercentage: body.watchPercentage,
+        isCompleted: body.isCompleted
+      });
 
     return c.json({
       success: true,
       message: "Video watch progress tracked"
-    })
+    }, HttpStatusCodes.OK)
   }
   catch (watchErr) {
     console.log('Failed to track watched', watchErr)
