@@ -137,6 +137,7 @@ const MobileMenu = create(() => {
                     <div className="flex gap-3">
                         <Button
                             variant="outline"
+                            disabled
                             className="flex-1 border-[hsla(160,84%,39%,1)] text-teal-400 hover:bg-[hsla(160,84%,39%,1)] hover:text-white bg-transparent"
                         >
                             Edit Profile
@@ -146,7 +147,7 @@ const MobileMenu = create(() => {
                             onClick={() => navigate({ to: "/reset-password" })}
                             className="flex-1 border-[hsla(160,84%,39%,1)] text-teal-400 hover:bg-[hsla(160,84%,39%,1)] hover:text-white bg-transparent"
                         >
-                            Password Reset
+                            Reset Password
                         </Button>
                     </div>
                     <Button variant="link" disabled={isPending} onClick={handleSignout} className="w-full text-lg text-[hsla(199,89%,48%,1)] hover:text-[hsla(199,89%,48%,1)] font-bold">
