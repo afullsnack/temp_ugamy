@@ -6,7 +6,7 @@ import { Clock, BookOpen, Globe, ChevronLeft } from "lucide-react"
 import axios from "axios"
 import { env } from '@/env'
 import { useNavigate, useParams } from "@tanstack/react-router"
-import type { ICourseDetails, IGetCourseResponse } from "@/lib/types"
+import type { ICourseDetails } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import CourseEpisodesTemplate from "../common/course-episodes-templates"
@@ -33,16 +33,6 @@ export const CourseDetailsTemplate = () => {
         queryFn: getCourseDetails
     })
 
-    const toggleLiked = (videoId: string) => {
-        const newLiked = new Set(likedVideos)
-        if (newLiked.has(videoId)) {
-            newLiked.delete(videoId)
-        } else {
-            newLiked.add(videoId)
-        }
-        setLikedVideos(newLiked)
-    }
-
     const handleWatch = (vid: string) => {
         navigate({ to: "/watch/$id/videos/$vid/watch", params: { id: id, vid: vid } })
     }
@@ -58,7 +48,7 @@ export const CourseDetailsTemplate = () => {
                         to="/dashboard"
                         className=" flex items-center txt-base lg:text-lg text-muted-foreground hover:text-foreground mb-6"
                     >
-                        <ChevronLeft /> Back to Lessons
+                        <ChevronLeft /> Back to Courses
                     </Link>
                     <div className="max-w-4xl mx-auto space-y-6">
                         <div className="space-y-4">
@@ -102,7 +92,6 @@ export const CourseDetailsTemplate = () => {
                 isLoading={isLoading}
                 likedVideos={likedVideos}
                 progressPercentage={progressPercentage}
-                toggleLiked={toggleLiked}
                 watchedVideos={watchedVideos}
             />
         </div>

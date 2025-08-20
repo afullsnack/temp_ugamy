@@ -11,6 +11,7 @@ export interface ICourseDetails {
     enrollments: Array<string>, // placeholder value
     totalVideos: number,
     totalWatchTime: number,
+    isEnrolled: boolean;
     videos: IVideo[]
 }
 
@@ -29,10 +30,15 @@ export interface IVideo {
     order: number
     courseId: string
     isPublished: boolean
+    isFavourite: boolean;
     createdAt: string | Date
     updatedAt: string | Date
 }
 
+export interface IGetVideosResponse {
+    success: boolean,
+    data: IVideo[]
+}
 export interface IGetVideoByIdResponse {
     id: string,
     key: string,

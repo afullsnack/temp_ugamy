@@ -24,6 +24,7 @@ import {
     Loader2,
 } from "lucide-react"
 import { env } from "@/env"
+import LikeVideoWidget from "./like video-widget"
 
 interface VideoPlayerProps {
     courseId: string
@@ -140,7 +141,9 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     } = useQuery({
         queryKey: ["video", videoId],
         queryFn: async () => {
-            const response = await fetch(`${apiUrl}/videos/${videoId}`)
+            const response = await fetch(`${apiUrl}/videos/${videoId}`, {
+                credentials: "include",
+            })
             if (!response.ok) {
                 throw new Error("Failed to fetch video")
             }
@@ -151,7 +154,9 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     const { data: progressData, isLoading: progressLoading } = useQuery({
         queryKey: ["video-progress", videoId, userId],
         queryFn: async () => {
-            const response = await fetch(`/api/videos/${videoId}/progress?userId=${userId}`)
+            const response = await fetch(`/api/videos/${videoId}/progress?userId=${userId}`, {
+                credentials: "include",
+            })
             if (!response.ok) {
                 // Progress not found is okay - user hasn't watched yet
                 return { watched: false, liked: false, watch_time: 0 }
@@ -167,6 +172,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     userId,
                     ...progress,
@@ -597,14 +603,14 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         })
     }
 
-    const toggleLike = async () => {
-        const newLikedState = !progress.liked
-        updateProgressMutation.mutate({ liked: newLikedState })
+    // const toggleLike = async () => {
+    //     const newLikedState = !progress.liked
+    //     updateProgressMutation.mutate({ liked: newLikedState })
 
-        toast.info(newLikedState ? "Video liked!" : "Like removed", {
-            description: newLikedState ? "Added to your liked videos" : "Removed from liked videos",
-        })
-    }
+    //     toast.info(newLikedState ? "Video liked!" : "Like removed", {
+    //         description: newLikedState ? "Added to your liked videos" : "Removed from liked videos",
+    //     })
+    // }
 
     const togglePlay = () => {
         if (!videoRef.current) return
@@ -1065,14 +1071,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                             {/* Row 3: Secondary controls */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={toggleLike}
-                                        className={`text-white hover:text-white hover:bg-white/20 p-3 touch-manipulation ${progress.liked ? "text-red-400" : ""}`}
-                                    >
-                                        <Heart className={`h-5 w-5 ${progress.liked ? "fill-current" : ""}`} />
-                                    </Button>
+                                    <LikeVideoWidget vid={videoId} />
                                 </div>
 
                                 <div className="flex items-center gap-1">
@@ -1195,14 +1194,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                                 </Button>
 
                                 {/* Like button */}
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={toggleLike}
-                                    className={`text-white hover:text-white hover:bg-white/20 ${progress.liked ? "text-red-400" : ""}`}
-                                >
-                                    <Heart className={`h-5 w-5 ${progress.liked ? "fill-current" : ""}`} />
-                                </Button>
+                                <LikeVideoWidget vid={videoId} />
                             </div>
 
                             <div className="flex items-center gap-2">
