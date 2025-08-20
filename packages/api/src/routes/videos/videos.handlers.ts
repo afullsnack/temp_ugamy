@@ -222,9 +222,11 @@ export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
     })
 
     if (likeExist) {
+      // Toggle like if video already exists
+      await db.delete(videoLikes).where(eq(videoLikes.videoId, body.videoId));
       return c.json({
         success: true,
-        message: "Video already liked!"
+        message: "Video unliked"
       })
     }
 
