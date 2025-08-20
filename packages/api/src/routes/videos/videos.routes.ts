@@ -51,7 +51,7 @@ export const list = createRoute({
   method: "get",
   request: {
     query: z.object({
-      id: z.string().uuid().describe("Course of videos to fetch"),
+      id: z.string().uuid().optional().describe("Course of videos to fetch"),
       limit: z.coerce.number().default(10).optional(),
       page: z.coerce.number().default(1).optional(),
       filter: z.enum(['liked', 'watched', 'all']).default('all').optional()

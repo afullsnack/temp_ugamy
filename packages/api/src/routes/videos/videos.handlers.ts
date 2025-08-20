@@ -61,15 +61,15 @@ export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
 };
 
 export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
-  const { id, limit, page, filter } = c.req.valid("query");
+  const { id: courseId, limit, page, filter } = c.req.valid("query");
   const session = c.get('session');
 
-  if (limit && page && filter) {
+  if (limit && page && filter && courseId) {
     const offset = ((page || 1) - 1) * (limit || 10);
     const total = await db.$count(videos);
     const videoList = await db.query.videos.findMany({
       where(fields, ops) {
-        return ops.eq(fields.courseId, id);
+        return ops.eq(fields.courseId, courseId);
       },
       with: {
         likes: true,
@@ -110,9 +110,6 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
   }
 
   const videoList = await db.query.videos.findMany({
-    where(fields, ops) {
-      return ops.eq(fields.courseId, id);
-    },
     with: {
       likes: true,
       watchProgress: true

@@ -63,6 +63,8 @@ export const list: AppRouteHandler<ListCourseRoute> = async (c) => {
 
     const data = filteredCourses.map((course) => ({
       ...course,
+    enrollments: null,
+    isEnrolled: course.enrollments.some((enroll) => enroll.courseId === course.id && enroll.userId === session.userId),
       videos: course.videos.map((vid) => ({
         ...vid,
         isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
@@ -100,6 +102,8 @@ export const list: AppRouteHandler<ListCourseRoute> = async (c) => {
   });
   const data = courseList.map((course) => ({
     ...course,
+    enrollments: null,
+    isEnrolled: course.enrollments.some((enroll) => enroll.courseId === course.id && enroll.userId === session.userId),
     videos: course.videos.map((vid) => ({
       ...vid,
       isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
@@ -140,6 +144,8 @@ export const getOne: AppRouteHandler<GetOneCourseRoute> = async (c) => {
 
   const data = {
     ...course,
+    enrollments: null,
+    isEnrolled: course.enrollments.some((enroll) => enroll.courseId === course.id && enroll.userId === session.userId),
     videos: course.videos.map((vid) => ({
       ...vid,
       isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
