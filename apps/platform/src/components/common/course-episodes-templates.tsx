@@ -59,7 +59,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                             <div className="space-y-2">
                                                 <h3 className="text-lg font-semibold text-foreground">No Lessons Available</h3>
                                                 <p className="text-muted-foreground max-w-md">
-                                                    This course doesn't have any lessons.
+                                                    This course doesn't have any lesson.
                                                 </p>
                                             </div>
                                         </div>

@@ -1,11 +1,16 @@
 "use client";
-
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
 import DashboardTemp from '@/components/dashboard/dashboard-temp'
 import Topbar from '@/components/common/topbar';
 
+const searchSchema = z.object({
+  filter: z.enum(['All', 'Watched', 'Favorites']).optional(),
+})
+
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
+  validateSearch: searchSchema
 })
 
 function RouteComponent() {

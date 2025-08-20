@@ -6,16 +6,22 @@ import { VideoSkeleton } from '../common/videos-skeleton'
 import type { IVideo } from '@/lib/types'
 import { Card, CardContent } from '../ui/card'
 import LikeVideoWidget from '../common/like video-widget'
+import { useNavigate } from '@tanstack/react-router'
 
 interface IProps {
     title: string
+    filter: string
     error: Error | null
     isLoading: boolean
     videos: IVideo[] | undefined | null
-    handleWatch: (videoId: string) => void
 }
 
-const FilteredVideosWidget: FC<IProps> = (props) => {
+const FilteredVideosTemplate: FC<IProps> = (props) => {
+    const navigate = useNavigate()
+
+    const handleWatch = ({ vid, courseId }: { vid: string, courseId: string }) => {
+        navigate({ to: "/watch/$id/videos/$vid/watch", params: { id: courseId, vid: vid } })
+    }
     return (
         <div className="container h-fit mx-auto py-12 px-3 lg:px-0 max-w-4xl overflow-y-auto">
             <div>
@@ -42,7 +48,7 @@ const FilteredVideosWidget: FC<IProps> = (props) => {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                            {!props?.videos || props?.videos?.length === 0 ? (
+                        {!props?.videos || props?.videos?.length === 0 ? (
                             <Card className="bg-card border-border">
                                 <CardContent className="p-12 text-center">
                                     <div className="flex flex-col items-center gap-4">
@@ -50,9 +56,11 @@ const FilteredVideosWidget: FC<IProps> = (props) => {
                                             <BookOpen className="h-8 w-8 text-muted-foreground" />
                                         </div>
                                         <div className="space-y-2">
-                                            <h3 className="text-lg font-semibold text-foreground">No Lessons Available</h3>
-                                            <p className="text-muted-foreground max-w-md">
-                                                This course doesn't have any lessons.
+                                            <h3 className="text-lg font-semibold text-foreground">
+                                                    {props.filter === "Favorites" ? "You haven't liked any lesson" : "You haven't watched any lesson yet."}
+                                                </h3>
+                                            <p className="text-sm lg:text-base text-muted-foreground max-w-md">
+                                                    {props.filter === "Favorites" ? "Every lesson you like will appear here." : "Your watch history will appear here."}
                                             </p>
                                         </div>
                                     </div>
@@ -62,7 +70,7 @@ const FilteredVideosWidget: FC<IProps> = (props) => {
                             props?.videos?.map?.((video, index) => (
                                 <Card
                                     key={index}
-                                    onClick={() => props.handleWatch(video?.id)}
+                                    onClick={() => handleWatch({ courseId: video?.courseId, vid: video?.id })}
                                     className="bg-card border-border hover:shadow-lg hover:border-primary/20 transition-all duration-300 group cursor-pointer"
                                 >
                                     <CardContent className="p-5">
@@ -98,4 +106,4 @@ const FilteredVideosWidget: FC<IProps> = (props) => {
     )
 }
 
-export default FilteredVideosWidget
+export default FilteredVideosTemplate
