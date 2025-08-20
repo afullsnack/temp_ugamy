@@ -75,7 +75,7 @@ const DashboardTemp = () => {
     })
 
     // Get Videos API query
-    const { data: videos, isLoading: loadingVideos, error: errorGettingVideos } = useQuery({
+    const { data: videos, isLoading: loadingVideos, error: videosError } = useQuery({
         queryKey: ["videos", activeFilter],
         queryFn: getVideos,
     })
@@ -104,8 +104,8 @@ const DashboardTemp = () => {
                             title={activeFilter === "Favorites" ? "Favourite Lessons" : "Watch History"}
                             filter={activeFilter}
                             videos={videos?.data}
-                            isLoading={isLoading}
-                            error={error}
+                            isLoading={loadingVideos}
+                            error={videosError}
                         />
                     }
 
