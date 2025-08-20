@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+import axios from "axios"
 import CourseEpisodesTemplate from "@/components/common/course-episodes-templates"
 import { StreamVideoPlayer } from "@/components/common/stream-video-player"
 import Topbar from "@/components/common/topbar"
@@ -7,12 +9,10 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { env } from "@/env"
 import { useSession } from "@/lib/auth-hooks"
-import type { ICourseDetails, IGetCourseResponse, IGetVideoByIdResponse } from "@/lib/types"
+import type { ICourseDetails, IGetVideoByIdResponse } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router"
-import axios from "axios"
 import { ChevronLeft, Clock, Globe } from "lucide-react"
-import { useState } from "react"
 
 export const Route = createFileRoute("/watch/$id/videos/$vid/watch")({
   component: RouteComponent,
@@ -31,7 +31,7 @@ function RouteComponent() {
   const { user, isPending } = useSession()
 
   const getVideoById = async (): Promise<IGetVideoByIdResponse> => {
-    const response = await axios.get(`${env.VITE_API_URL}/videos/${videoId}`, {
+    const response = await axios.get(`${env.VITE_API_URL}/videos/${videoId}/`, {
       withCredentials: true
     })
     return response.data
@@ -39,7 +39,7 @@ function RouteComponent() {
 
 
   const getCourseDetails = async (): Promise<ICourseDetails> => {
-    const response = await axios.get(`${env.VITE_API_URL}/courses/${id}`, {
+    const response = await axios.get(`${env.VITE_API_URL}/courses/${id}/`, {
       withCredentials: true
     })
     return response.data
