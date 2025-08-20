@@ -37,8 +37,8 @@ const DashboardTemp = () => {
             withCredentials: true,
             params: {
                 limit: 10000,
-                page: 1,
-                filter: activeFilter.toLowerCase(),
+                page:  1,
+                filter: activeFilter.toLowerCase() === "favourites" ? "liked" : activeFilter.toLowerCase(),
             },
         })
         return response?.data
@@ -106,6 +106,7 @@ const DashboardTemp = () => {
                             videos={videos?.data}
                             isLoading={loadingVideos}
                             error={videosError}
+                            canLike={activeFilter === "Watched" ? true : false}
                         />
                     }
 

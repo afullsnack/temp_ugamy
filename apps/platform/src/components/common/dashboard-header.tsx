@@ -2,6 +2,7 @@ import { Grid3X3, List } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { Dispatch, FC, SetStateAction } from 'react'
+import { cn } from '@/lib/utils'
 
 interface IProps {
     viewMode: "grid" | "list"
@@ -22,7 +23,7 @@ export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters }) 
                 filter,
             }),
         })
-      }
+    }
 
     return (
         <div className="bg-white bg-gradient-to-br from-primary/20 via-background to-accent/5 p-4 lg:p-6 pt-[90px] lg:pt-[100px] border-b z-30">
@@ -50,7 +51,7 @@ export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters }) 
                     ))}
                 </div>
 
-                <div className="hidden lg:visible lg:flex gap-1">
+                <div className={cn("hidden lg:visible lg:flex gap-1", activeFilter !== "All" ? "!hidden" : "lg:visible")}>
                     <Button
                         variant={viewMode === "list" ? "default" : "outline"}
                         size="icon"
