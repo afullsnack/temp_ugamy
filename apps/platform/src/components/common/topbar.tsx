@@ -128,19 +128,19 @@ const Topbar = () => {
             {/* Bottom Actions */}
             <div className="space-y-[50px] mt-auto">
                 <div className="flex gap-3">
-                    <Button
+                    {/* <Button
                         variant="outline"
                         onClick={handleEditProfile}
                         className="flex-1 border-[hsla(160,84%,39%,1)] text-teal-400 hover:bg-[hsla(160,84%,39%,1)] hover:text-white bg-transparent"
                     >
                         Edit Profile
-                    </Button>
+                    </Button> */}
                     <Button
                         variant="outline"
                         onClick={handlePasswordReset}
                         className="flex-1 border-[hsla(160,84%,39%,1)] text-teal-400 hover:bg-[hsla(160,84%,39%,1)] hover:text-white bg-transparent"
                     >
-                        Password Reset
+                        Reset Password
                     </Button>
                 </div>
                 <Button
@@ -208,7 +208,7 @@ const Topbar = () => {
                                         Edit Profile
                                     </DropdownMenuItem>
                                     <DropdownMenuItem className="cursor-pointer" onClick={handlePasswordReset}>
-                                        Password Reset
+                                        Reset Password
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         className="cursor-pointer text-red-600 focus:text-red-600"

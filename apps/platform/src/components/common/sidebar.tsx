@@ -148,18 +148,18 @@ const Sidebar = () => {
                 className={`space-y-[50px] mt-auto transition-all duration-300 ${collapsed ? "opacity-0 scale-0" : "opacity-100 scale-100"}`}
             >
                 <div className="flex gap-3">
-                    <Button
+                    {/* <Button
                         variant="outline"
                         className="flex-1 border-[hsla(160,84%,39%,1)] text-teal-400 hover:bg-[hsla(160,84%,39%,1)] hover:text-white bg-transparent"
                     >
                         Edit Profile
-                    </Button>
+                    </Button> */}
                     <Button
                         variant="outline"
                         onClick={() => navigate({ to: "/reset-password" })}
                         className="flex-1 border-[hsla(160,84%,39%,1)] text-teal-400 hover:bg-[hsla(160,84%,39%,1)] hover:text-white bg-transparent"
                     >
-                        Password Reset
+                        Reset Password
                     </Button>
                 </div>
                 <Button
