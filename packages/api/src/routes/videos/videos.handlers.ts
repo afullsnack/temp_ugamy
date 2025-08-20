@@ -8,7 +8,7 @@ import env from "@/env";
 import { TigrisClient } from "@/lib/asset-storage";
 
 import type { CreateVideoRoute, GetOneVideoRoute, ListVideosRoute, StreamVideoRoute, LikeVideoRoute, WatchedVideoRoute } from "./videos.routes";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
   const body = await c.req.parseBody();
@@ -223,7 +223,11 @@ export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
 
     if (likeExist) {
       // Toggle like if video already exists
-      await db.delete(videoLikes).where(eq(videoLikes.videoId, body.videoId));
+      await db.delete(videoLikes).where(
+        and(
+          eq(videoLikes.videoId, body.videoId),
+          eq(videoLikes.userId, session.userId)
+        ));
       return c.json({
         success: true,
         message: "Video unliked"
