@@ -151,6 +151,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         },
     })
 
+    // Get Video progress
     const { data: progressData, isLoading: progressLoading } = useQuery({
         queryKey: ["video-progress", videoId, userId],
         queryFn: async () => {
@@ -165,6 +166,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         },
     })
 
+    // Update video progress
     const updateProgressMutation = useMutation({
         mutationFn: async (progressUpdate: Partial<VideoProgress>) => {
             const response = await fetch(`/api/videos/${videoId}/progress`, {
@@ -318,6 +320,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                 (event.metaKey && event.altKey && event.key === "r") ||
                 // macOS shortcuts
                 (event.metaKey && event.shiftKey && ["3", "4", "5", "6"].includes(event.key)) ||
+                (event.shiftKey && event.metaKey && ["3", "4", "5", "6"].includes(event.key)) ||
                 (event.metaKey && event.ctrlKey && event.key === "Escape") ||
                 // Developer tools
                 event.key === "F12" ||
