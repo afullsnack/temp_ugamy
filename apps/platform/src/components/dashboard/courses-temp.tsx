@@ -128,7 +128,7 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                                 {course?.difficulty ?? "N/A"}
                                             </Badge>
                                         </div>
-                                        
+
                                         <div className="p-4">
                                             {/* Title */}
                                             <h3 className="font-medium text-gray-900 text-lg leading-tight mb-2">{course?.title ?? "N/A"}</h3>
@@ -144,15 +144,17 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                                 </div>
 
                                                 {/* Enroll */}
-                                                <Button
-                                                    disabled={isPending && variables?.courseId === course.id}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handlEnroll({ courseId: course.id })
-                                                    }}
-                                                >
-                                                    {(isPending && variables?.courseId === course.id) ? "Enrolling..." : "Enroll"}
-                                                </Button>
+                                                {!course?.isEnrolled ?
+                                                    <Button
+                                                        disabled={isPending && variables?.courseId === course.id}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handlEnroll({ courseId: course.id })
+                                                        }}
+                                                    >
+                                                        {(isPending && variables?.courseId === course.id) ? "Enrolling..." : "Enroll"}
+                                                    </Button>
+                                                    : ""}
                                             </div>
                                         </div>
                                     </div>
