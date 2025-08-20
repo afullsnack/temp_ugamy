@@ -12,6 +12,7 @@ interface IProps {
     title: string
     filter: string
     error: Error | null
+    canLike?: boolean
     isLoading: boolean
     videos: IVideo[] | undefined | null
 }
@@ -92,7 +93,7 @@ const FilteredVideosTemplate: FC<IProps> = (props) => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <LikeVideoWidget vid={video?.id} isFavourite={video?.isFavourite} />
+                                                {props.canLike ? <LikeVideoWidget vid={video?.id} isFavourite={video?.isFavourite} /> : ""}
                                             </div>
                                         </div>
                                     </CardContent>

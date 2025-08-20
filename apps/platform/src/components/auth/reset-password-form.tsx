@@ -61,7 +61,7 @@ const ResetPasswordForm = () => {
                 <div className="flex flex-col items-center gap-y-12">
                     <BrandLogoDark />
                     <div className="space-y-[24px]">
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900">Reset Your Password</h2>
+                        <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900">Reset Your Password</h2>
                         <p className="mt-2 text-sm text-gray-600">
                             Enter Your Registered Email And We&apos;ll Send You A Link To Reset It.
                         </p>
