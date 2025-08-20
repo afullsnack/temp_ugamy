@@ -84,9 +84,9 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
     const previousPage = page > 1 ? page - 1 : null;
 
     const filteredVideos = filter === 'liked'
-      ? videoList.filter((video) => video.likes.some(({ userId }) => userId === session.userId))
+      ? videoList.filter((video) => video.likes.some(({ userId, videoId }) => userId === session.userId && video.id === videoId))
       : filter === 'watched'
-        ? videoList.filter((video) => video.watchProgress.some(({ userId }) => userId === session.userId))
+        ? videoList.filter((video) => video.watchProgress.some(({ userId, videoId }) => userId === session.userId && video.id === videoId))
         : videoList
 
     return c.json({
