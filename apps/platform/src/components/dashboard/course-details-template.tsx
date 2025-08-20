@@ -21,7 +21,7 @@ export const CourseDetailsTemplate = () => {
 
 
     const getCourseDetails = async (): Promise<ICourseDetails> => {
-        const response = await axios.get(`${env.VITE_API_URL}/courses/${id}`, {
+        const response = await axios.get(`${env.VITE_API_URL}/courses/${id}/`, {
             withCredentials: true
         })
         return response.data

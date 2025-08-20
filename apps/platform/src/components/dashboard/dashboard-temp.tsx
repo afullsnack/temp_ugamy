@@ -14,7 +14,7 @@ import type { ICourseDetails, IGetCourseResponse } from "@/lib/types"
 import { DashboardHeader } from "../common/dashboard-header"
 
 const getCourses = async (): Promise<IGetCourseResponse> => {
-    const response = await axios.get(`${env.VITE_API_URL}/courses`, {
+    const response = await axios.get(`${env.VITE_API_URL}/courses/`, {
         withCredentials: true
     })
     return response?.data
