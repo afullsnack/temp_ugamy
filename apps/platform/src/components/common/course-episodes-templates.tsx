@@ -2,11 +2,12 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Play, Heart, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2 } from "lucide-react"
+// import { Progress } from "@/components/ui/progress"
+import { Play, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { ICourseDetails } from "@/lib/types"
+import LikeVideoWidget from "./like video-widget"
+import { VideoSkeleton } from "./videos-skeleton"
 
 interface CourseEpisodesTemplateProps {
     title: string
@@ -17,43 +18,26 @@ interface CourseEpisodesTemplateProps {
     watchedVideos: Set<string>
     progressPercentage: number
     handleWatch: (videoId: string) => void
-    toggleLiked: (videoId: string) => void
 }
-
-const VideoSkeleton = () => (
-    <Card className="bg-card border-border">
-        <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-                <Skeleton className="h-4 w-3/4" />
-                <div className="flex items-center gap-2">
-                    <Skeleton className="h-6 w-6 rounded" />
-                    <Skeleton className="h-6 w-6 rounded" />
-                </div>
-            </div>
-            <Skeleton className="h-3 w-1/2" />
-        </CardContent>
-    </Card>
-)
 
 // Add to component definition
 export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
     return (
         <div className="container h-fit mx-auto py-12 px-3 lg:px-0 max-w-4xl overflow-y-auto">
             <div className="space-y-8">
-                {/* Course Curriculum */}
                 <div>
                     <h2 className="text-xl lg:text-2xl font-bold text-foreground mb-6">{props.title}</h2>
 
                     {props.error && (
-                        <Alert variant="destructive" className="mb-6">
-                            <AlertCircle className="h-4 w-4" />
+                        <Alert variant="destructive" className="mb-6 w-full h-fit flex items-center justify-between">
                             <AlertDescription className="flex items-center justify-between">
+                                <AlertCircle className="h-4 w-4" />
                                 <span>{props.error?.message || "An error occurred"}</span>
-                                <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="ml-2">
-                                    <RefreshCw className="h-4 w-4 mr-1" />
-                                    Retry
-                                </Button>
                             </AlertDescription>
+                            <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="ml-2">
+                                <RefreshCw className="h-4 w-4 mr-1" />
+                                Retry
+                            </Button>
                         </Alert>
                     )}
 
@@ -65,7 +49,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {!props.course?.videos || props.course.videos.length === 0 ? (
+                            {!props.error && !props.course?.videos || props?.course?.videos.length === 0 ? (
                                 <Card className="bg-card border-border">
                                     <CardContent className="p-12 text-center">
                                         <div className="flex flex-col items-center gap-4">
@@ -75,7 +59,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                             <div className="space-y-2">
                                                 <h3 className="text-lg font-semibold text-foreground">No Lessons Available</h3>
                                                 <p className="text-muted-foreground max-w-md">
-                                                    This course doesn't have any lessons.
+                                                    This course doesn't have any lesson.
                                                 </p>
                                             </div>
                                         </div>
@@ -113,17 +97,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => props.toggleLiked(video?.id)}
-                                                        className="h-9 w-9 p-0 hover:bg-red-50 rounded-xl"
-                                                    >
-                                                        <Heart
-                                                            className={`h-7 w-7 ${props.likedVideos?.has(video.id) ? "text-red-500 fill-current" : "text-muted-foreground"
-                                                                }`}
-                                                        />
-                                                    </Button>
+                                                    <LikeVideoWidget vid={video?.id} isFavourite={video?.isFavourite} />
                                                 </div>
                                             </div>
                                         </CardContent>
@@ -135,7 +109,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                 </div>
 
                 {/* Progress Section */}
-                {!props.isLoading && !props.error && (props.course?.videos?.length ?? 0) > 0 && (
+                {/* {!props.isLoading && !props.error && (props.course?.videos?.length ?? 0) > 0 && (
                     <Card className="bg-card border-border">
                         <CardContent className="p-6">
                             <h3 className="text-lg font-semibold text-foreground mb-4">Your Progress</h3>
@@ -150,7 +124,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                             </div>
                         </CardContent>
                     </Card>
-                )}
+                )} */}
 
                 {/* Course Details */}
                 <Card className="bg-card border-border shadow-sm">
@@ -171,7 +145,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                         </div>
                                         <span className="font-medium text-foreground text-sm lg:text-base">Skill Level</span>
                                     </div>
-                                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 capitalize border-blue-200">
                                         {props.course?.difficulty}
                                     </Badge>
                                 </div>

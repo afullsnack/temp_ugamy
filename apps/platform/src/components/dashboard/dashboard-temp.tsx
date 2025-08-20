@@ -10,28 +10,41 @@ import { VideoPlayerModal } from "../common/video-player-modal"
 import axios from "axios"
 import { useQuery } from "@tanstack/react-query"
 import { env } from '@/env'
-import type { ICourseDetails, IGetCourseResponse } from "@/lib/types"
+import type { ICourseDetails, IGetCourseResponse, IGetVideosResponse } from "@/lib/types"
 import { DashboardHeader } from "../common/dashboard-header"
+import { useNavigate, useSearch } from "@tanstack/react-router"
+import FilteredVideosTemplate from "./filtered-videos-template"
 
 const getCourses = async (): Promise<IGetCourseResponse> => {
     const response = await axios.get(`${env.VITE_API_URL}/courses/`, {
-        withCredentials: true
+        withCredentials: true,
     })
     return response?.data
 }
 
-// TODO: Refactor component
-const DashboardTemp = () => {
-    const [activeFilter, setActiveFilter] = useState("All")
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-    const filters = ["All", "Watched", "Favorites"]
+const filters = ["All", "Watched", "Favourites"]
 
-    // Get user session
-    const {
-        user,
-        session,
-        isPending: loading
-    } = useSession()
+const DashboardTemp = () => {
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+
+    const search = useSearch({ from: "/dashboard" })
+
+    // if filter param missing, default to "All"
+    const activeFilter = (search as { filter?: string }).filter ?? "All"
+
+    const getVideos = async (): Promise<IGetVideosResponse> => {
+        const response = await axios.get(`${env.VITE_API_URL}/videos/`, {
+            withCredentials: true,
+            params: {
+                limit: 10000,
+                page: 1,
+                filter: activeFilter.toLowerCase(),
+            },
+        })
+        return response?.data
+    }
+
+    const { user, session, isPending: loading } = useSession()
 
     const showIntroVideo = () => {
         show(VideoPlayerModal, {
@@ -57,25 +70,48 @@ const DashboardTemp = () => {
 
     // Get Courses API query
     const { data: courses, isLoading, error } = useQuery({
-        queryKey: ['courses'],
-        queryFn: getCourses
+        queryKey: ["courses"],
+        queryFn: getCourses,
     })
 
-    console.log("COURSES DATA: ", courses?.data)
+    // Get Videos API query
+    const { data: videos, isLoading: loadingVideos, error: videosError } = useQuery({
+        queryKey: ["videos", activeFilter],
+        queryFn: getVideos,
+    })
 
     return (
         <div className="bg-gray-100 min-h-screen h-fit overflow-x-hidden">
             <div className="w-full h-full flex-1 flex flex-col overflow-y-auto">
-                <DashboardHeader viewMode={viewMode} setViewMode={setViewMode} filters={filters} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+                <DashboardHeader
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
+                    filters={filters}
+                />
 
                 <div className="relative w-full h-fit overflow-y-auto">
-                    {!loading && session !== null && user?.isSubscribed && user?.emailVerified ?
-                        <CoursesTemp data={courses?.data as ICourseDetails[]} isLoading={isLoading} error={error} viewMode={viewMode} /> : ""
+                    {activeFilter.toLocaleLowerCase() === "all" ?
+                        <> {!loading && session !== null && user?.isSubscribed && user?.emailVerified ? (
+                            <CoursesTemp
+                                data={courses?.data as ICourseDetails[]}
+                                isLoading={isLoading}
+                                error={error}
+                                viewMode={viewMode}
+                            />
+                        ) : null}
+                        </> :
+                        <FilteredVideosTemplate
+                            title={activeFilter === "Favourites" ? "Favourite Lessons" : "Watch History"}
+                            filter={activeFilter}
+                            videos={videos?.data}
+                            isLoading={loadingVideos}
+                            error={videosError}
+                        />
                     }
 
-                    {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ?
-                        <DashboardFallback /> : ""
-                    }
+                    {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ? (
+                        <DashboardFallback />
+                    ) : null}
                 </div>
             </div>
         </div>
