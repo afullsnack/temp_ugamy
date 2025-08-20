@@ -30,7 +30,9 @@ interface ISubscribePayload {
 }
 
 export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeResponse> => {
-    const response = await axios.post('https://ugamy-api.fly.dev/payments/subscribe', payload)
+    const response = await axios.post('https://ugamy-api.fly.dev/payments/subscribe', payload, {
+        withCredentials: true
+    })
     return response.data
 }
 

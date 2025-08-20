@@ -16,7 +16,7 @@ export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters, ac
     return (
         <div className="bg-white bg-gradient-to-br from-primary/20 via-background to-accent/5 p-4 lg:p-6 pt-[90px] lg:pt-[100px] border-b z-30">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
-                <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Courses</h1>
+                <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Lessons</h1>
                 <Button variant="outline" size="icon">
                     <Search className="w-4 h-4" />
                 </Button>
