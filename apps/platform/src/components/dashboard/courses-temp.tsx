@@ -40,7 +40,8 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
     const queryClient = useQueryClient()
 
     // Course Enroll API mutation
-    const { mutateAsync, isPending } = useMutation({
+    // Update mutation to track course ID
+    const { mutateAsync, isPending, variables } = useMutation({
         mutationFn: enrollCourse,
         onError: (error) => {
             toast.error(error.message || 'Error enrolling for this course, kindly try again ')
@@ -109,9 +110,9 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                     }
                                 `}
                             >
-                                {data?.map((course) => (
+                                {data?.map((course, idx) => (
                                     <div
-                                        key={course?.id}
+                                        key={idx}
                                         className={cn("bg-white rounded-[8px] overflow-hidden shadow-sm border", !course?.isEnrolled ? "cursor-default" : "cursor-pointer pointer-events-auto")}
                                         onClick={() => { course?.isEnrolled && showDetails(course?.id) }}
                                     >
@@ -127,6 +128,7 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                                 {course?.difficulty ?? "N/A"}
                                             </Badge>
                                         </div>
+                                        
                                         <div className="p-4">
                                             {/* Title */}
                                             <h3 className="font-medium text-gray-900 text-lg leading-tight mb-2">{course?.title ?? "N/A"}</h3>
@@ -143,16 +145,13 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
 
                                                 {/* Enroll */}
                                                 <Button
-                                                    variant="default"
-                                                    size="sm"
-                                                    disabled={isPending}
+                                                    disabled={isPending && variables?.courseId === course.id}
                                                     onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        handlEnroll({ courseId: course?.id as string })
+                                                        e.stopPropagation();
+                                                        handlEnroll({ courseId: course.id })
                                                     }}
-                                                    className="font-medium font-mono text-normal text-white shadow-sm cursor-pointer"
                                                 >
-                                                    {!isPending ? "Enroll" : "Enrolling..."}
+                                                    {(isPending && variables?.courseId === course.id) ? "Enrolling..." : "Enroll"}
                                                 </Button>
                                             </div>
                                         </div>

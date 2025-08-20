@@ -1,8 +1,6 @@
 import { Grid3X3, List, Search } from 'lucide-react'
 import { Button } from '../ui/button'
 import type { Dispatch, FC, SetStateAction } from 'react'
-import { show } from '@ebay/nice-modal-react'
-import MobileMenu from './mobile-menu'
 
 interface IProps {
     viewMode: "grid" | "list"

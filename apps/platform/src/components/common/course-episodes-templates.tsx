@@ -3,16 +3,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 // import { Progress } from "@/components/ui/progress"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Play, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { ICourseDetails } from "@/lib/types"
 import LikeVideoWidget from "./like video-widget"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import axios from "axios"
-import { env } from "@/env"
-import { cn } from "@/lib/utils"
+import { VideoSkeleton } from "./videos-skeleton"
 
 interface CourseEpisodesTemplateProps {
     title: string
@@ -25,27 +20,11 @@ interface CourseEpisodesTemplateProps {
     handleWatch: (videoId: string) => void
 }
 
-const VideoSkeleton = () => (
-    <Card className="bg-card border-border">
-        <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-                <Skeleton className="h-4 w-3/4" />
-                <div className="flex items-center gap-2">
-                    <Skeleton className="h-6 w-6 rounded" />
-                    <Skeleton className="h-6 w-6 rounded" />
-                </div>
-            </div>
-            <Skeleton className="h-3 w-1/2" />
-        </CardContent>
-    </Card>
-)
-
 // Add to component definition
 export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
     return (
         <div className="container h-fit mx-auto py-12 px-3 lg:px-0 max-w-4xl overflow-y-auto">
             <div className="space-y-8">
-                {/* Course Curriculum */}
                 <div>
                     <h2 className="text-xl lg:text-2xl font-bold text-foreground mb-6">{props.title}</h2>
 

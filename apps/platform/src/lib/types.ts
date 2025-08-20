@@ -35,6 +35,10 @@ export interface IVideo {
     updatedAt: string | Date
 }
 
+export interface IGetVideosResponse {
+    success: boolean,
+    data: IVideo[]
+}
 export interface IGetVideoByIdResponse {
     id: string,
     key: string,

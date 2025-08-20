@@ -10,7 +10,7 @@ import { VideoPlayerModal } from "../common/video-player-modal"
 import axios from "axios"
 import { useQuery } from "@tanstack/react-query"
 import { env } from '@/env'
-import type { ICourseDetails, IGetCourseResponse } from "@/lib/types"
+import type { ICourseDetails, IGetCourseResponse, IGetVideosResponse } from "@/lib/types"
 import { DashboardHeader } from "../common/dashboard-header"
 
 const getCourses = async (): Promise<IGetCourseResponse> => {
@@ -20,11 +20,24 @@ const getCourses = async (): Promise<IGetCourseResponse> => {
     return response?.data
 }
 
+const filters = ["All", "Watched", "Favorites"]
+
 // TODO: Refactor component
 const DashboardTemp = () => {
-    const [activeFilter, setActiveFilter] = useState("All")
+    const [activeFilter, setActiveFilter] = useState<string>("All")
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-    const filters = ["All", "Watched", "Favorites"]
+
+    const getVideos = async (): Promise<IGetVideosResponse> => {
+        const response = await axios.get(`${env.VITE_API_URL}/videos/`, {
+            withCredentials: true,
+            params: {
+                limit: 10,
+                page: 1,
+                filter: activeFilter.toLocaleLowerCase()
+            }
+        })
+        return response?.data
+    }
 
     // Get user session
     const {
@@ -61,7 +74,12 @@ const DashboardTemp = () => {
         queryFn: getCourses
     })
 
-    console.log("COURSES DATA: ", courses?.data)
+    // Get Videos API query
+    const { data: videos, isLoading: loadingVideos, error: errorGettingVideos } = useQuery({
+        queryKey: ['videos'],
+        queryFn: getVideos
+    })
+    console.log("WATCHED VIDEOS: ", videos)
 
     return (
         <div className="bg-gray-100 min-h-screen h-fit overflow-x-hidden">
