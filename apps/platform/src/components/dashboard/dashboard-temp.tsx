@@ -24,7 +24,7 @@ const getCourses = async (): Promise<IGetCourseResponse> => {
 const DashboardTemp = () => {
     const [activeFilter, setActiveFilter] = useState("All")
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-    const filters = ["All", "Watched", "Not Watched", "Favorite"]
+    const filters = ["All", "Watched", "Favorites"]
 
     // Get user session
     const {

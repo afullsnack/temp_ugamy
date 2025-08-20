@@ -101,7 +101,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                                         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground font-medium">
                                                             <span className="flex items-center gap-1.5">
                                                                 <Clock className="h-3.5 w-3.5" />
-                                                                {Math.floor(video?.duration / 60)} min
+                                                                {Math.floor(video?.duration / 60)} minutes
                                                             </span>
                                                             {props.watchedVideos.has(video.id) && (
                                                                 <span className="flex items-center gap-1.5 text-green-600 font-semibold">

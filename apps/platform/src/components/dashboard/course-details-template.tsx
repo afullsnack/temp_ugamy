@@ -58,7 +58,7 @@ export const CourseDetailsTemplate = () => {
                         to="/dashboard"
                         className=" flex items-center txt-base lg:text-lg text-muted-foreground hover:text-foreground mb-6"
                     >
-                        <ChevronLeft /> Back to Courses
+                        <ChevronLeft /> Back to Lessons
                     </Link>
                     <div className="max-w-4xl mx-auto space-y-6">
                         <div className="space-y-4">
@@ -78,9 +78,9 @@ export const CourseDetailsTemplate = () => {
                             </div> */}
                             <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4" />
-                                <span>{Math.floor(course?.totalWatchTime ?? 0 / 60)} min</span>
+                                <span>{Math.floor(course?.totalWatchTime ?? 0 / 60)} minutes</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 capitalize">
                                 <BookOpen className="h-4 w-4" />
                                 <span>{course?.difficulty}</span>
                             </div>
