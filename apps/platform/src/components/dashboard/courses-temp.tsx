@@ -1,16 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react"
+import { ChevronLeft, ChevronRight, Clock } from "lucide-react"
 import { Button } from "../ui/button"
 import type { FC } from "react"
 import { Badge } from "@/components/ui/badge"
 import ProfileImagePlaceholder from "/profile-image-placeholder.png"
-import type { ICourseDetails, IGetCourseResponse } from "@/lib/types"
+import type { ICourseDetails } from "@/lib/types"
 import { CoursesSkeleton } from "./courses-skeleton"
 import { CoursesEmptyStateWidget } from "./courses-empty-state-widget"
 import { CoursesErrorStateWidget } from "./courses-error-state-widget"
 import { useNavigate } from "@tanstack/react-router"
+import axios from "axios"
+import { env } from "@/env"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface IProps {
     viewMode: "grid" | "list"
@@ -19,24 +24,40 @@ interface IProps {
     error: Error | null
 }
 
+const enrollCourse = async (payload: Record<string, string>): Promise<{
+    success: boolean,
+    message: string
+}> => {
+    const response = await axios.post(`${env.VITE_API_URL}/courses/enroll/`, payload, {
+        withCredentials: true
+    })
+    return response.data
+}
+
 
 const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
-    const [favorites, setFavorites] = useState(new Set<string>())
+    // Course Enroll API mutation
+    const { mutateAsync, isPending } = useMutation({
+        mutationFn: enrollCourse,
+        onError: (error) => {
+            toast.error(error.message || 'Error enrolling for this course, kindly try again ')
+        },
+    })
 
     const showDetails = (id: string | number) => {
         navigate({ to: `/courses/${id}` })
     }
 
-    const toggleFavorite = (courseId: string) => {
-        const newFavorites = new Set(favorites)
-        if (newFavorites.has(courseId)) {
-            newFavorites.delete(courseId)
-        } else {
-            newFavorites.add(courseId)
-        }
-        setFavorites(newFavorites)
+    const handlEnroll = async ({ courseId }: { courseId: string }) => {
+        await mutateAsync({
+            courseId: courseId
+        }).then(() => {
+            queryClient.invalidateQueries({ queryKey: ["courses"] });
+            navigate({ to: `/courses/${courseId}` })
+        })
     }
 
     const getDifficultyColor = (difficulty: string) => {
@@ -91,8 +112,8 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                 {data?.map((course) => (
                                     <div
                                         key={course?.id}
-                                        className="bg-white rounded-lg overflow-hidden shadow-sm border cursor-pointer"
-                                        onClick={() => showDetails(course?.id)}
+                                        className={cn("bg-white rounded-[8px] overflow-hidden shadow-sm border", !course?.isEnrolled ? "cursor-default" : "cursor-pointer pointer-events-auto")}
+                                        onClick={() => { course?.isEnrolled && showDetails(course?.id) }}
                                     >
                                         <div className="relative">
                                             <img
@@ -102,19 +123,6 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                                 height={120}
                                                 className="w-full h-32 object-cover bg-gray-200"
                                             />
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    toggleFavorite(course?.id)
-                                                }}
-                                            >
-                                                <Heart
-                                                    className={`w-4 h-4 ${favorites?.has(course?.id) ? "fill-red-500 text-red-500" : "text-gray-400"}`}
-                                                />
-                                            </Button>
                                             <Badge className={`absolute bottom-2 left-2 text-sm capitalize ${getDifficultyColor(course?.difficulty)}`}>
                                                 {course?.difficulty ?? "N/A"}
                                             </Badge>
@@ -127,16 +135,25 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                             <p className="text-base text-gray-600 line-clamp-2 mb-2">{course?.description ?? "N/A"}</p>
 
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-1 text-sm text-gray-500">
+                                                <div className="flex items-center gap-1 text-xs md:text-sm text-gray-500">
                                                     <Clock className="w-3 h-3" />
                                                     last updated:
                                                     <span>{new Date(course?.createdAt)?.toLocaleDateString()}</span>
                                                 </div>
-                                                {course?.isPublished && (
-                                                    <Badge variant="secondary" className="text-xs">
-                                                        Published
-                                                    </Badge>
-                                                )}
+
+                                                {/* Enroll */}
+                                                <Button
+                                                    variant="default"
+                                                    size="sm"
+                                                    disabled={isPending}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handlEnroll({ courseId: course?.id as string })
+                                                    }}
+                                                    className="font-medium font-mono text-normal text-white shadow-sm cursor-pointer"
+                                                >
+                                                    {!isPending ? "Enroll" : "Enrolling..."}
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>

@@ -2,11 +2,17 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+// import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Play, Heart, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2 } from "lucide-react"
+import { Play, AlertCircle, RefreshCw, Clock, BookOpen, Globe, CheckCircle2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { ICourseDetails } from "@/lib/types"
+import LikeVideoWidget from "./like video-widget"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+import axios from "axios"
+import { env } from "@/env"
+import { cn } from "@/lib/utils"
 
 interface CourseEpisodesTemplateProps {
     title: string
@@ -17,7 +23,6 @@ interface CourseEpisodesTemplateProps {
     watchedVideos: Set<string>
     progressPercentage: number
     handleWatch: (videoId: string) => void
-    toggleLiked: (videoId: string) => void
 }
 
 const VideoSkeleton = () => (
@@ -113,17 +118,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => props.toggleLiked(video?.id)}
-                                                        className="h-9 w-9 p-0 hover:bg-red-50 rounded-xl"
-                                                    >
-                                                        <Heart
-                                                            className={`h-7 w-7 ${props.likedVideos?.has(video.id) ? "text-red-500 fill-current" : "text-muted-foreground"
-                                                                }`}
-                                                        />
-                                                    </Button>
+                                                    <LikeVideoWidget vid={video?.id} isFavourite={video?.isFavourite} />
                                                 </div>
                                             </div>
                                         </CardContent>
@@ -135,7 +130,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                 </div>
 
                 {/* Progress Section */}
-                {!props.isLoading && !props.error && (props.course?.videos?.length ?? 0) > 0 && (
+                {/* {!props.isLoading && !props.error && (props.course?.videos?.length ?? 0) > 0 && (
                     <Card className="bg-card border-border">
                         <CardContent className="p-6">
                             <h3 className="text-lg font-semibold text-foreground mb-4">Your Progress</h3>
@@ -150,7 +145,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                             </div>
                         </CardContent>
                     </Card>
-                )}
+                )} */}
 
                 {/* Course Details */}
                 <Card className="bg-card border-border shadow-sm">
@@ -171,7 +166,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                         </div>
                                         <span className="font-medium text-foreground text-sm lg:text-base">Skill Level</span>
                                     </div>
-                                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 capitalize border-blue-200">
                                         {props.course?.difficulty}
                                     </Badge>
                                 </div>
