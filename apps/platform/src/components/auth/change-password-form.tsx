@@ -91,16 +91,7 @@ const ChangePasswordForm = () => {
             toast.error("Invalid email parameter")
             return
         }
-
         try {
-            // Step 1: Verify OTP first
-            await authClient.emailOtp.checkVerificationOtp({
-                email: search.email,
-                type: "forget-password",
-                otp: values.otp,
-            })
-
-            // Step 2: Proceed with password reset
             await changePwd({ otp: values.otp, password: values.password })
         } catch (err: any) {
             toast.error(err?.message || "Invalid OTP")
