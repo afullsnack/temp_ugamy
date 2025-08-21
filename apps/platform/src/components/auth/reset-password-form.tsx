@@ -44,7 +44,6 @@ const ResetPasswordForm = () => {
         mutationFn: ResetPassword,
         onSuccess: () => {
             queryClient.resetQueries()
-            navigate({ to: "/signin" })
         },
         onError: (error) => {
             toast.error(error.message || "Error resetting your password. Try again")
@@ -52,7 +51,12 @@ const ResetPasswordForm = () => {
     })
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        await mutateAsync(values)
+        await mutateAsync(values).then(() => {
+            navigate({
+                to: "/change-password",
+                search: (prev) => ({ ...prev, email: `${values.email}` }),
+            })
+        })
     }
 
     return (
