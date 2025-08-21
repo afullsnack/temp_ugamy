@@ -30,7 +30,7 @@ export interface IVideo {
     order: number
     courseId: string
     isPublished: boolean
-    isFavourite: boolean;
+    isFavorite: boolean;
     createdAt: string | Date
     updatedAt: string | Date
 }

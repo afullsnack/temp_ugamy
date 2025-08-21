@@ -20,18 +20,17 @@ const likeVideo = async (payload: Record<string, string>): Promise<{
 
 interface IProps {
     vid: string;
-    isFavourite?: boolean
+    isFavourite: boolean
 }
 
 const LikeVideoWidget: FC<IProps> = ({ vid, isFavourite }) => {
     const [favourite, setFavourite] = useState<boolean>(false)
 
+    console.log(isFavourite)
     const queryClient = useQueryClient()
 
     useEffect(() => {
-        if (isFavourite) {
-            setFavourite(isFavourite)
-        }
+        setFavourite(isFavourite)
     }, [isFavourite])
 
 
@@ -49,7 +48,7 @@ const LikeVideoWidget: FC<IProps> = ({ vid, isFavourite }) => {
             videoId: videoId
         }).then(() => {
             setFavourite((prev) => !prev)
-            queryClient.invalidateQueries({ queryKey: ["courses"] })
+            queryClient.invalidateQueries({ queryKey: ["courses-details"] })
         }).catch(() => {
             setFavourite((prev) => !prev)
         })
