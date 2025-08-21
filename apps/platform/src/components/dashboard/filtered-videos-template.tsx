@@ -93,7 +93,7 @@ const FilteredVideosTemplate: FC<IProps> = (props) => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                {props.canLike ? <LikeVideoWidget vid={video?.id} isFavourite={video?.isFavourite} /> : ""}
+                                                {props.canLike ? <LikeVideoWidget vid={video?.id} isFavourite={video?.isFavorite} /> : ""}
                                             </div>
                                         </div>
                                     </CardContent>
