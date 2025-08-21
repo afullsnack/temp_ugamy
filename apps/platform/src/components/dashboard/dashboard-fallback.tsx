@@ -17,7 +17,7 @@ const DashboardFallback = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-white mt-8 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-white text-center">
             <div className="max-w-[370px] space-y-6 px-4 py-12">
                 <img
                     src={FallbackIllust}
