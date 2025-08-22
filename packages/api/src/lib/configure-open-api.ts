@@ -1,4 +1,5 @@
 import { Scalar } from "@scalar/hono-api-reference";
+import { onError } from "stoker/middlewares";
 
 import type { AppOpenAPI } from "./types";
 
@@ -11,6 +12,9 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       version: packageJSON.version,
       title: "Ugamy API",
     },
+  }).onError((error, c) => {
+    console.error("Doc error", error);
+    return onError(error, c);
   });
 
   app.get(
@@ -19,7 +23,12 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       url: "/doc",
       theme: "kepler",
       layout: "classic",
-      servers: [{ url: "http://localhost:9000", description: "Local server" }, { url: "https://api.ugamy.com", description: "Production server" }],
+      servers: [
+        { url: "http://localhost:9001", description: "Local server" },
+        { url: "https://api.ugamy.io", description: "Production server"},
+        { url: "https://api-staging.ugamy.io", description: "Staging server"},
+        { url: "https://ugamy-api.fly.dev", description: "Staging server" }
+      ],
       defaultHttpClient: {
         targetKey: "js",
         clientKey: "fetch",

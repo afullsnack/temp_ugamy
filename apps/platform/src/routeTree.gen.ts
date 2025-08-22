@@ -11,16 +11,86 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PaymentSuccessfulRouteImport } from './routes/payment-successful'
+import { Route as PayRouteImport } from './routes/pay'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ChangePasswordRouteImport } from './routes/change-password'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
+import { Route as CoursesIdRouteImport } from './routes/courses/$id'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
+import { Route as AdminCoursesIndexRouteImport } from './routes/admin/courses/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api-request'
 import { Route as DemoSentryTestingRouteImport } from './routes/demo.sentry.testing'
+import { Route as AdminCoursesNewRouteImport } from './routes/admin/courses/new'
+import { Route as AdminCoursesIdVideosRouteImport } from './routes/admin/courses/$id.videos'
+import { Route as AdminCoursesIdVideosIndexRouteImport } from './routes/admin/courses/$id.videos.index'
+import { Route as WatchIdVideosVidWatchRouteImport } from './routes/watch.$id.videos.$vid.watch'
+import { Route as AdminCoursesIdVideosNewRouteImport } from './routes/admin/courses/$id.videos.new'
+import { Route as AdminCoursesIdVideosVidWatchRouteImport } from './routes/admin/courses/$id.videos.$vid.watch'
 import { ServerRoute as ApiDemoNamesServerRouteImport } from './routes/api.demo-names'
 
 const rootServerRouteImport = createServerRootRoute()
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentSuccessfulRoute = PaymentSuccessfulRouteImport.update({
+  id: '/payment-successful',
+  path: '/payment-successful',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayRoute = PayRouteImport.update({
+  id: '/pay',
+  path: '/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangePasswordRoute = ChangePasswordRouteImport.update({
+  id: '/change-password',
+  path: '/change-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,9 +101,29 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursesIdRoute = CoursesIdRouteImport.update({
+  id: '/courses/$id',
+  path: '/courses/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/_auth/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCoursesIndexRoute = AdminCoursesIndexRouteImport.update({
+  id: '/admin/courses/',
+  path: '/admin/courses/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -51,6 +141,38 @@ const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
   path: '/demo/sentry/testing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCoursesNewRoute = AdminCoursesNewRouteImport.update({
+  id: '/admin/courses/new',
+  path: '/admin/courses/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCoursesIdVideosRoute = AdminCoursesIdVideosRouteImport.update({
+  id: '/admin/courses/$id/videos',
+  path: '/admin/courses/$id/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCoursesIdVideosIndexRoute =
+  AdminCoursesIdVideosIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminCoursesIdVideosRoute,
+  } as any)
+const WatchIdVideosVidWatchRoute = WatchIdVideosVidWatchRouteImport.update({
+  id: '/watch/$id/videos/$vid/watch',
+  path: '/watch/$id/videos/$vid/watch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCoursesIdVideosNewRoute = AdminCoursesIdVideosNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminCoursesIdVideosRoute,
+} as any)
+const AdminCoursesIdVideosVidWatchRoute =
+  AdminCoursesIdVideosVidWatchRouteImport.update({
+    id: '/$vid/watch',
+    path: '/$vid/watch',
+    getParentRoute: () => AdminCoursesIdVideosRoute,
+  } as any)
 const ApiDemoNamesServerRoute = ApiDemoNamesServerRouteImport.update({
   id: '/api/demo-names',
   path: '/api/demo-names',
@@ -59,63 +181,198 @@ const ApiDemoNamesServerRoute = ApiDemoNamesServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/change-password': typeof ChangePasswordRoute
+  '/dashboard': typeof DashboardRoute
+  '/pay': typeof PayRoute
+  '/payment-successful': typeof PaymentSuccessfulRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/courses/$id': typeof CoursesIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/admin/courses/new': typeof AdminCoursesNewRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/admin/courses': typeof AdminCoursesIndexRoute
+  '/admin/courses/$id/videos': typeof AdminCoursesIdVideosRouteWithChildren
+  '/admin/courses/$id/videos/new': typeof AdminCoursesIdVideosNewRoute
+  '/watch/$id/videos/$vid/watch': typeof WatchIdVideosVidWatchRoute
+  '/admin/courses/$id/videos/': typeof AdminCoursesIdVideosIndexRoute
+  '/admin/courses/$id/videos/$vid/watch': typeof AdminCoursesIdVideosVidWatchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/change-password': typeof ChangePasswordRoute
+  '/dashboard': typeof DashboardRoute
+  '/pay': typeof PayRoute
+  '/payment-successful': typeof PaymentSuccessfulRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/signup': typeof AuthSignupRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/courses/$id': typeof CoursesIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/admin/courses/new': typeof AdminCoursesNewRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/admin/courses': typeof AdminCoursesIndexRoute
+  '/admin/courses/$id/videos/new': typeof AdminCoursesIdVideosNewRoute
+  '/watch/$id/videos/$vid/watch': typeof WatchIdVideosVidWatchRoute
+  '/admin/courses/$id/videos': typeof AdminCoursesIdVideosIndexRoute
+  '/admin/courses/$id/videos/$vid/watch': typeof AdminCoursesIdVideosVidWatchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/change-password': typeof ChangePasswordRoute
+  '/dashboard': typeof DashboardRoute
+  '/pay': typeof PayRoute
+  '/payment-successful': typeof PaymentSuccessfulRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/courses/$id': typeof CoursesIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/admin/courses/new': typeof AdminCoursesNewRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/admin/courses/': typeof AdminCoursesIndexRoute
+  '/admin/courses/$id/videos': typeof AdminCoursesIdVideosRouteWithChildren
+  '/admin/courses/$id/videos/new': typeof AdminCoursesIdVideosNewRoute
+  '/watch/$id/videos/$vid/watch': typeof WatchIdVideosVidWatchRoute
+  '/admin/courses/$id/videos/': typeof AdminCoursesIdVideosIndexRoute
+  '/admin/courses/$id/videos/$vid/watch': typeof AdminCoursesIdVideosVidWatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/change-password'
+    | '/dashboard'
+    | '/pay'
+    | '/payment-successful'
+    | '/privacy'
+    | '/register'
+    | '/reset-password'
+    | '/signin'
+    | '/terms'
+    | '/verify-email'
     | '/signup'
+    | '/admin/dashboard'
+    | '/admin/login'
+    | '/courses/$id'
     | '/demo/tanstack-query'
+    | '/admin/courses/new'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/admin/courses'
+    | '/admin/courses/$id/videos'
+    | '/admin/courses/$id/videos/new'
+    | '/watch/$id/videos/$vid/watch'
+    | '/admin/courses/$id/videos/'
+    | '/admin/courses/$id/videos/$vid/watch'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/change-password'
+    | '/dashboard'
+    | '/pay'
+    | '/payment-successful'
+    | '/privacy'
+    | '/register'
+    | '/reset-password'
+    | '/signin'
+    | '/terms'
+    | '/verify-email'
     | '/signup'
+    | '/admin/dashboard'
+    | '/admin/login'
+    | '/courses/$id'
     | '/demo/tanstack-query'
+    | '/admin/courses/new'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/admin/courses'
+    | '/admin/courses/$id/videos/new'
+    | '/watch/$id/videos/$vid/watch'
+    | '/admin/courses/$id/videos'
+    | '/admin/courses/$id/videos/$vid/watch'
   id:
     | '__root__'
     | '/'
+    | '/change-password'
+    | '/dashboard'
+    | '/pay'
+    | '/payment-successful'
+    | '/privacy'
+    | '/register'
+    | '/reset-password'
+    | '/signin'
+    | '/terms'
+    | '/verify-email'
     | '/_auth/signup'
+    | '/admin/dashboard'
+    | '/admin/login'
+    | '/courses/$id'
     | '/demo/tanstack-query'
+    | '/admin/courses/new'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/admin/courses/'
+    | '/admin/courses/$id/videos'
+    | '/admin/courses/$id/videos/new'
+    | '/watch/$id/videos/$vid/watch'
+    | '/admin/courses/$id/videos/'
+    | '/admin/courses/$id/videos/$vid/watch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChangePasswordRoute: typeof ChangePasswordRoute
+  DashboardRoute: typeof DashboardRoute
+  PayRoute: typeof PayRoute
+  PaymentSuccessfulRoute: typeof PaymentSuccessfulRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SigninRoute: typeof SigninRoute
+  TermsRoute: typeof TermsRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  CoursesIdRoute: typeof CoursesIdRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  AdminCoursesNewRoute: typeof AdminCoursesNewRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  AdminCoursesIndexRoute: typeof AdminCoursesIndexRoute
+  AdminCoursesIdVideosRoute: typeof AdminCoursesIdVideosRouteWithChildren
+  WatchIdVideosVidWatchRoute: typeof WatchIdVideosVidWatchRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/demo-names': typeof ApiDemoNamesServerRoute
@@ -141,6 +398,76 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-successful': {
+      id: '/payment-successful'
+      path: '/payment-successful'
+      fullPath: '/payment-successful'
+      preLoaderRoute: typeof PaymentSuccessfulRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay': {
+      id: '/pay'
+      path: '/pay'
+      fullPath: '/pay'
+      preLoaderRoute: typeof PayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/change-password': {
+      id: '/change-password'
+      path: '/change-password'
+      fullPath: '/change-password'
+      preLoaderRoute: typeof ChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -155,11 +482,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courses/$id': {
+      id: '/courses/$id'
+      path: '/courses/$id'
+      fullPath: '/courses/$id'
+      preLoaderRoute: typeof CoursesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_auth/signup': {
       id: '/_auth/signup'
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/courses/': {
+      id: '/admin/courses/'
+      path: '/admin/courses'
+      fullPath: '/admin/courses'
+      preLoaderRoute: typeof AdminCoursesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -183,6 +538,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoSentryTestingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/courses/new': {
+      id: '/admin/courses/new'
+      path: '/admin/courses/new'
+      fullPath: '/admin/courses/new'
+      preLoaderRoute: typeof AdminCoursesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/courses/$id/videos': {
+      id: '/admin/courses/$id/videos'
+      path: '/admin/courses/$id/videos'
+      fullPath: '/admin/courses/$id/videos'
+      preLoaderRoute: typeof AdminCoursesIdVideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/courses/$id/videos/': {
+      id: '/admin/courses/$id/videos/'
+      path: '/'
+      fullPath: '/admin/courses/$id/videos/'
+      preLoaderRoute: typeof AdminCoursesIdVideosIndexRouteImport
+      parentRoute: typeof AdminCoursesIdVideosRoute
+    }
+    '/watch/$id/videos/$vid/watch': {
+      id: '/watch/$id/videos/$vid/watch'
+      path: '/watch/$id/videos/$vid/watch'
+      fullPath: '/watch/$id/videos/$vid/watch'
+      preLoaderRoute: typeof WatchIdVideosVidWatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/courses/$id/videos/new': {
+      id: '/admin/courses/$id/videos/new'
+      path: '/new'
+      fullPath: '/admin/courses/$id/videos/new'
+      preLoaderRoute: typeof AdminCoursesIdVideosNewRouteImport
+      parentRoute: typeof AdminCoursesIdVideosRoute
+    }
+    '/admin/courses/$id/videos/$vid/watch': {
+      id: '/admin/courses/$id/videos/$vid/watch'
+      path: '/$vid/watch'
+      fullPath: '/admin/courses/$id/videos/$vid/watch'
+      preLoaderRoute: typeof AdminCoursesIdVideosVidWatchRouteImport
+      parentRoute: typeof AdminCoursesIdVideosRoute
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -197,13 +594,45 @@ declare module '@tanstack/react-start/server' {
   }
 }
 
+interface AdminCoursesIdVideosRouteChildren {
+  AdminCoursesIdVideosNewRoute: typeof AdminCoursesIdVideosNewRoute
+  AdminCoursesIdVideosIndexRoute: typeof AdminCoursesIdVideosIndexRoute
+  AdminCoursesIdVideosVidWatchRoute: typeof AdminCoursesIdVideosVidWatchRoute
+}
+
+const AdminCoursesIdVideosRouteChildren: AdminCoursesIdVideosRouteChildren = {
+  AdminCoursesIdVideosNewRoute: AdminCoursesIdVideosNewRoute,
+  AdminCoursesIdVideosIndexRoute: AdminCoursesIdVideosIndexRoute,
+  AdminCoursesIdVideosVidWatchRoute: AdminCoursesIdVideosVidWatchRoute,
+}
+
+const AdminCoursesIdVideosRouteWithChildren =
+  AdminCoursesIdVideosRoute._addFileChildren(AdminCoursesIdVideosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChangePasswordRoute: ChangePasswordRoute,
+  DashboardRoute: DashboardRoute,
+  PayRoute: PayRoute,
+  PaymentSuccessfulRoute: PaymentSuccessfulRoute,
+  PrivacyRoute: PrivacyRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SigninRoute: SigninRoute,
+  TermsRoute: TermsRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   AuthSignupRoute: AuthSignupRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  CoursesIdRoute: CoursesIdRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  AdminCoursesNewRoute: AdminCoursesNewRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  AdminCoursesIndexRoute: AdminCoursesIndexRoute,
+  AdminCoursesIdVideosRoute: AdminCoursesIdVideosRouteWithChildren,
+  WatchIdVideosVidWatchRoute: WatchIdVideosVidWatchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

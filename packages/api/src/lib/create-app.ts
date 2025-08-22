@@ -23,18 +23,16 @@ export default function createApp() {
     .use(serveEmojiFavicon("📝"))
     .use(pinoLogger())
     .use(cors({
-      origin: ["*", "http://localhost:3000"],
+      origin: ["*", "http://localhost:3000", "https://ugamy-backend-platform.vercel.app", "https://ugamy.io"],
       credentials: true,
     }));
 
   app.notFound(notFound);
-  app.onError(onError);
-  app.use(async (c, next) => {
-    await next();
-    if(c.res.status >= 400) {
-      console.log("Catch all 4xx error", JSON.stringify(c.res, null, 4));
-    }
-  })
+  app.onError((err, c) => {
+    console.log("error on app", err);
+    return onError(err, c);
+  });
+
   return app;
 }
 

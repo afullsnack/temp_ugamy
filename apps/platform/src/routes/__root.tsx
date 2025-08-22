@@ -3,16 +3,21 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useNavigate,
+  useRouterState,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import Header from '../components/Header'
-
+import { useEffect } from 'react'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { Toaster } from '@/components/ui/sonner'
+import { useSession } from '@/lib/auth-hooks.ts'
+import GlobalLoadingWidget from '@/components/common/global-loading-widget.tsx'
+import NiceModal from '@ebay/nice-modal-react'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -29,7 +34,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Ugamy application',
       },
     ],
     links: [
@@ -40,16 +45,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
 
-  component: () => (
-    <RootDocument>
-      <Header />
-
-      <Outlet />
-      <TanStackRouterDevtools />
-
-      <TanStackQueryLayout />
-    </RootDocument>
-  ),
+  component: RootComponent,
   notFoundComponent: () => (
     <div>
       <h1>Not Found</h1>
@@ -58,14 +54,51 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   ),
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootComponent() {
+  const { session, isPending: loading } = useSession()
+
+  const navigate = useNavigate()
+  const location = useRouterState({ select: (s) => s.location })
+
+  useEffect(() => {
+    if (loading) return
+
+    const unauthenticatedRoutes = [
+      '/signin',
+      '/register',
+      '/reset-password',
+      '/verify-email',
+      '/pay',
+      '/terms',
+      '/privacy',
+      '/payment-successful',
+    ]
+
+    const isUnauthRoute = unauthenticatedRoutes.includes(location.pathname)
+
+    if (!loading && session === null && !isUnauthRoute) {
+      navigate({ to: '/signin' })
+    }
+  }, [loading, session, location.pathname, navigate])
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
-        {children}
+        <Toaster position="top-center" richColors />
+        {loading ? (
+          <GlobalLoadingWidget />
+        ) : (
+          <>
+            <NiceModal.Provider>
+              <Outlet />
+              <TanStackRouterDevtools />
+              <TanStackQueryLayout />
+            </NiceModal.Provider>
+          </>
+        )}
         <Scripts />
       </body>
     </html>

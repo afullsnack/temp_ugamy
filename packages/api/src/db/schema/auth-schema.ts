@@ -1,4 +1,7 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+import { courseEnrollments, plans, videoLikes, videoWatchProgress } from "./schema";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -10,9 +13,19 @@ export const user = sqliteTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: integer("email_verified", { mode: "boolean" }).$defaultFn(() => false).notNull(),
   image: text("image"),
+  planId: text("plan_id").references(() => plans.id, { onDelete: "no action" }),
+  isSubscribed: integer("is_subscribed", { mode: "boolean" }).$defaultFn(() => false),
+  paymentReference: text("payment_reference"),
+  role: text("role").default("user"),
+  banned: integer("banned", { mode: "boolean" }).default(false),
+  banReason: text("ban_reason"),
+  banExpires: integer("ban_expires", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
-});
+}, table => ({
+  emailIdx: index("users_email_idx").on(table.email),
+  usernameIdx: index("users_username_idx").on(table.username),
+}));
 
 export const session = sqliteTable("session", {
   id: text("id").primaryKey(),
@@ -22,6 +35,7 @@ export const session = sqliteTable("session", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
+  impersonatedBy: text("impersonated_by").references(() => user.id, { onDelete: "set null" }),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
 });
 
@@ -49,3 +63,10 @@ export const verification = sqliteTable("verification", {
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
 });
+
+// Define relations
+export const usersRelations = relations(user, ({ many }) => ({
+  enrollments: many(courseEnrollments),
+  watchProgress: many(videoWatchProgress),
+  videoLikes: many(videoLikes),
+}));
