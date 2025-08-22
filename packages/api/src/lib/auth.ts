@@ -35,7 +35,7 @@ const options = {
       }
     },
   },
-  trustedOrigins: ["*", "http://localhost:3000", "https://ugamy-backend-platform.vercel.app", "https://ugamy.io"],
+  trustedOrigins: ["*", "http://localhost:3000", "https://dashboard.ugamy.io", "https://staging.ugamy.io", "https://ugamy.io"],
   advanced: {
     cookies: {
       session_token: {
