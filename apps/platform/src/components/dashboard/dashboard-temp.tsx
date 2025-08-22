@@ -37,7 +37,7 @@ const DashboardTemp = () => {
             withCredentials: true,
             params: {
                 limit: 10000,
-                page:  1,
+                page: 1,
                 filter: activeFilter.toLowerCase() === "favourites" ? "liked" : activeFilter.toLowerCase(),
             },
         })
@@ -100,14 +100,17 @@ const DashboardTemp = () => {
                             />
                         ) : null}
                         </> :
-                        <FilteredVideosTemplate
-                            title={activeFilter === "Favourites" ? "Favourite Lessons" : "Watch History"}
-                            filter={activeFilter}
-                            videos={videos?.data}
-                            isLoading={loadingVideos}
-                            error={videosError}
-                            canLike={activeFilter === "Watched" ? true : false}
-                        />
+                        <> {!loading && session !== null && user?.isSubscribed && user?.emailVerified ? (
+                            <FilteredVideosTemplate
+                                title={activeFilter === "Favourites" ? "Favourite Lessons" : "Watch History"}
+                                filter={activeFilter}
+                                videos={videos?.data}
+                                isLoading={loadingVideos}
+                                error={videosError}
+                                canLike={activeFilter === "Watched" ? true : false}
+                            />
+                        ) : null}
+                        </>
                     }
 
                     {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ? (

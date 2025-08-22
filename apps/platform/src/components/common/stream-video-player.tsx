@@ -25,6 +25,8 @@ import {
 } from "lucide-react"
 import { env } from "@/env"
 import LikeVideoWidget from "./like video-widget"
+import VideoWatermark from "./video-watermark"
+import type { IGetVideoByIdResponse } from "@/lib/types"
 
 interface VideoPlayerProps {
     courseId: string
@@ -140,7 +142,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         error: videoError,
     } = useQuery({
         queryKey: ["video", videoId],
-        queryFn: async () => {
+        queryFn: async (): Promise<IGetVideoByIdResponse> => {
             const response = await fetch(`${apiUrl}/videos/${videoId}`, {
                 credentials: "include",
             })
@@ -921,8 +923,8 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                                 onClick={handleContinueWatching}
                                 disabled={!canContinueWatching}
                                 className={`px-6 py-3 rounded-lg transition-all duration-200 font-medium ${canContinueWatching
-                                        ? "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
-                                        : "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
+                                    ? "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                                    : "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
                                     }`}
                             >
                                 {canContinueWatching ? "Continue Watching" : "Verifying Environment..."}
@@ -965,6 +967,9 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
+
+                {/* Watermark */}
+                <VideoWatermark />
 
                 {(bufferingState.isBuffering || bufferingState.isLoading) && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -1074,7 +1079,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                             {/* Row 3: Secondary controls */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <LikeVideoWidget vid={videoId} />
+                                    <LikeVideoWidget vid={videoId} isFavourite={video?.isFavorite} />
                                 </div>
 
                                 <div className="flex items-center gap-1">
@@ -1197,7 +1202,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                                 </Button>
 
                                 {/* Like button */}
-                                <LikeVideoWidget vid={videoId} />
+                                <LikeVideoWidget vid={videoId} isFavourite={video?.isFavorite} />
                             </div>
 
                             <div className="flex items-center gap-2">

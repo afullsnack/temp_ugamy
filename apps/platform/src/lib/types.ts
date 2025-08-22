@@ -52,5 +52,6 @@ export interface IGetVideoByIdResponse {
     isPublished: true,
     createdAt: string,
     updatedAt: string,
+    isFavorite: boolean
     // likes: []
 }

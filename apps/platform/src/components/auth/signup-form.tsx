@@ -23,7 +23,9 @@ const SignupSchema = z
         username: z.string().min(1, "Username is required"),
         email: z.string().min(1, "Email is required").email("Invalid email address"),
         phone: z.string().min(1, "Phone number is required"),
-        password: z.string().min(8, "Password must be at least 8 characters long"),
+        password: z.string()
+            .min(8, "Password must be at least 8 characters long")
+            .regex(/^(?=.*[0-9!@#$%^&*])/, "Password must include at least one number or symbol"),
         confirmPassword: z.string().min(1, "Confirm password is required"),
     })
     .refine((data) => data.password === data.confirmPassword, {
