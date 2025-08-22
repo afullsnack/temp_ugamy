@@ -10,6 +10,7 @@ import { BrandLogoDark } from "./brand-logo-dark"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "@tanstack/react-router"
 import { useSession } from "@/lib/auth-hooks"
+import { env } from "@/env"
 
 
 // TODO: Improve API integration implementation
@@ -29,8 +30,10 @@ interface ISubscribePayload {
     callbackUrl: string
 }
 
+const apiUrl = env.VITE_API_URL
+
 export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeResponse> => {
-    const response = await axios.post('https://ugamy-api.fly.dev/payments/subscribe/', payload, {
+    const response = await axios.post(`${apiUrl}/payments/subscribe/`, payload, {
         withCredentials: true
     })
     return response.data
