@@ -23,7 +23,12 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       url: "/doc",
       theme: "kepler",
       layout: "classic",
-      servers: [{ url: "http://localhost:9001", description: "Local server" }, { url: "https://ugamy-api.fly.dev", description: "Staging server" }],
+      servers: [
+        { url: "http://localhost:9001", description: "Local server" },
+        { url: "https://api.ugamy.io", description: "Production server"},
+        { url: "https://api-staging.ugamy.io", description: "Staging server"},
+        { url: "https://ugamy-api.fly.dev", description: "Staging server" }
+      ],
       defaultHttpClient: {
         targetKey: "js",
         clientKey: "fetch",
