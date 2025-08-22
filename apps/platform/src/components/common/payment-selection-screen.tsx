@@ -75,7 +75,7 @@ export default function PaymentSelectionScreen() {
             email: `${user?.email}`,
             amount: "1000000",
             // Create a constant for this
-            callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'
+            callbackUrl: `${env.VITE_DASHBOARD_URL}/payment-successful`
         })
     }
 
