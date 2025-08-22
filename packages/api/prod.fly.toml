@@ -1,12 +1,15 @@
-# fly.toml app configuration file generated for ugamy-staging-api on 2025-08-22T08:45:46+01:00
+# fly.toml app configuration file generated for ugamy-api on 2025-07-29T15:30:38+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'ugamy-staging-api'
+app = 'ugamy-prod-api'
 primary_region = 'lhr'
 
 [build]
+
+# [deploy]
+#   release_command = 'pnpm run db'
 
 [http_service]
   internal_port = 9999
