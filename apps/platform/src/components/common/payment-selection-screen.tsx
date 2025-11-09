@@ -70,7 +70,7 @@ export default function PaymentSelectionScreen() {
 
         SubscribeMutation.mutate({
             email: `${user?.email}`,
-            amount: "100000",
+            amount: "4000000",
             // Create a constant for this
             callbackUrl: 'https://dashboard.ugamy.io/payment-successful'
         })
@@ -121,7 +121,7 @@ export default function PaymentSelectionScreen() {
 
                             <div className="mb-3">
                                 <span className="text-sm text-gray-700">
-                                    Amount: <span className="font-semibold text-green-600">₦1,000 NGN</span>
+                                    Amount: <span className="font-semibold text-green-600">₦40,000 NGN</span>
                                 </span>
                             </div>
 
