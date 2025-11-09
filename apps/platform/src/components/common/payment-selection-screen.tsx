@@ -70,7 +70,7 @@ export default function PaymentSelectionScreen() {
 
         SubscribeMutation.mutate({
             email: `${user?.email}`,
-            amount: "10000",
+            amount: "1000000",
             // Create a constant for this
             callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'
         })
@@ -86,7 +86,7 @@ export default function PaymentSelectionScreen() {
                 <div className="max-w-[484px] text-center mb-8 space-y-[24px]">
                     <h1 className="text-2xl font-bold text-gray-900">Secure Your Access</h1>
                     <p className="text-[hsla(221,39%,11%,1)] text-sm">
-                        Choose Your Preferred Payment Method To Unlock All Tutorials In The EAFC26 Series.
+                        Choose Your Preferred Payment Method To Unlock All Tutorials In The FIFA 24 Series.
                     </p>
                 </div>
 
@@ -121,7 +121,7 @@ export default function PaymentSelectionScreen() {
 
                             <div className="mb-3">
                                 <span className="text-sm text-gray-700">
-                                    Amount: <span className="font-semibold text-green-600">₦1,000 NGN</span>
+                                    Amount: <span className="font-semibold text-green-600">₦10,000 NGN</span>
                                 </span>
                             </div>
 
