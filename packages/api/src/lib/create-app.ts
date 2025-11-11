@@ -23,7 +23,7 @@ export default function createApp() {
     .use(serveEmojiFavicon("📝"))
     .use(pinoLogger())
     .use(cors({
-      origin: ["*", "http://localhost:3000", "https://ugamy-backend-platform.vercel.app", "https://ugamy.io"],
+      origin: ["*", "http://localhost:3000", "https://dashboard.ugamy.io", "https://staging.ugamy.io", "https://ugamy.io"],
       credentials: true,
     }));
 

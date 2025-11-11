@@ -37,7 +37,7 @@ COPY --from=builder /app/packages/api/package.json ./packages/api/package.json
 ARG DATABASE_AUTH_TOKEN
 ARG DATABASE_URL
 # Set production environment
-ENV NODE_ENV="staging"
+ENV NODE_ENV=$NODE_ENV
 ENV DATABASE_AUTH_TOKEN=$DATABASE_AUTH_TOKEN
 ENV DATABASE_URL=$DATABASE_URL
 
