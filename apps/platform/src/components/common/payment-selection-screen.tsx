@@ -74,7 +74,6 @@ export default function PaymentSelectionScreen() {
         SubscribeMutation.mutate({
             email: `${user?.email}`,
             amount: "4000000",
-            // Create a constant for this
             callbackUrl: `${env.VITE_DASHBOARD_URL}/payment-successful`
         })
     }
