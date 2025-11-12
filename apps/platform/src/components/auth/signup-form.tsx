@@ -25,7 +25,7 @@ const SignupSchema = z
         phone: z.string().min(1, "Phone number is required"),
         password: z.string()
             .min(8, "Password must be at least 8 characters long")
-            .regex(/^(?=.*[0-9!@#$%^&*])/, "Password must include at least one number or symbol"),
+            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/, "Password must include uppercase, lowercase, number, and special character"),
         confirmPassword: z.string().min(1, "Confirm password is required"),
     })
     .refine((data) => data.password === data.confirmPassword, {
