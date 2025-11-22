@@ -18,9 +18,6 @@ const SEMI_PROTECTED_ROUTES = [
   '/payment-successful',
 ] as const
 
-type PublicRoute = (typeof PUBLIC_ROUTES)[number]
-type SemiProtectedRoute = (typeof SEMI_PROTECTED_ROUTES)[number]
-
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
 }
@@ -34,31 +31,30 @@ interface AuthGuardProps {
 }
 
 export function AuthGuard({ children }: AuthGuardProps) {
-  const { session, isPending: loading } = useSession()
+  const { user, isPending: loading } = useSession()
   const navigate = useNavigate()
   const location = useRouterState({ select: (s) => s.location })
+
+  const pathname = location.pathname
+  const isPublic = isPublicRoute(pathname)
+  const isSemiProtected = isSemiProtectedRoute(pathname)
+  const isAuthenticated = !!user
 
   useEffect(() => {
     if (loading) return
 
-    const pathname = location.pathname
-    const isPublic = isPublicRoute(pathname)
-    const isSemiProtected = isSemiProtectedRoute(pathname)
-
     // If user is not authenticated and trying to access a protected route
-    if (session === null && !isPublic && !isSemiProtected) {
+    if (!isAuthenticated && !isPublic && !isSemiProtected) {
       navigate({ to: '/signin' })
-      return
     }
-
-    // Optional: Redirect authenticated users away from auth pages (signin, register)
-    // Uncomment if you want this behavior:
-    // if (session && (pathname === '/signin' || pathname === '/register')) {
-    //   navigate({ to: '/dashboard' })
-    // }
-  }, [loading, session, location.pathname, navigate])
+  }, [loading, isAuthenticated, isPublic, isSemiProtected, navigate])
 
   if (loading) {
+    return <GlobalLoadingWidget />
+  }
+
+  // Don't render protected content if not authenticated
+  if (!isAuthenticated && !isPublic && !isSemiProtected) {
     return <GlobalLoadingWidget />
   }
 
