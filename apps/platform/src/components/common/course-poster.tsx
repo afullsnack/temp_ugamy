@@ -45,13 +45,13 @@ export const CoursePoster = () => {
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 md:px-12 lg:px-20">
+            <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 md:px-12! lg:px-20!">
                 <div className="max-w-2xl space-y-6">
                     {/* Title */}
-                    <h1 className="text-6xl font-black tracking-tight md:text-7xl lg:text-8xl">EA FC Complete Tutorial</h1>
+                    <h1 className="text-3xl! font-black tracking-tight md:text-6xl! lg:text-7xl!">EA FC Complete Tutorial</h1>
 
                     {/* Meta Info */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm font-medium md:text-base">
+                    <div className="flex flex-wrap items-center gap-4 text-sm! font-medium md:text-base!">
                         <div className="flex items-center gap-1 text-yellow-500">
                             <Star className="h-5 w-5 fill-current" />
                             <span className="text-white">4.9</span>
@@ -75,7 +75,7 @@ export const CoursePoster = () => {
                     </div>
 
                     {/* Buttons */}
-                    <div className="mt-8 flex w-full max-w-xs flex-col gap-4">
+                    <div className="mt-8 flex w-full max-w-xs flex-col max-md:items-center md:items-start gap-4">
                         {!loading && session !== null && !user?.isSubscribed && user?.emailVerified ?
                             <Button
                                 className="h-14 w-full rounded-lg bg-green-600 text-lg font-semibold hover:bg-green-700"
