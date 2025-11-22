@@ -102,7 +102,7 @@ export const CoursePoster = () => {
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="secondary"
-                                    className="group h-14 w-full justify-between rounded-lg bg-white/20 text-lg font-semibold text-white backdrop-blur-sm hover:bg-white/30"
+                                    className="group h-14 w-full justify-center rounded-lg bg-white/20 text-lg font-semibold text-white backdrop-blur-sm hover:bg-white/30"
                                 >
                                     Modules
                                     <ChevronDown className="ml-2 h-5 w-5 transition-transform group-data-[state=open]:rotate-180" />

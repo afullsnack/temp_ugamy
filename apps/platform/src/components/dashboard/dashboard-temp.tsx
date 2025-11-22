@@ -57,11 +57,13 @@ const DashboardTemp = () => {
     const hasSeenIntro = localStorage.getItem("seenIntroVideo") === "true"
 
     useEffect(() => {
-        if (!loading && user?.isSubscribed && !hasSeenIntro) {
-            showIntroVideo()
-            localStorage.setItem("seenIntroVideo", "true")
-        } else if (!loading && !user?.isSubscribed) {
-            showIntroVideo()
+        if (!loading && user) {
+            if (user.isSubscribed && !hasSeenIntro) {
+                showIntroVideo()
+                localStorage.setItem("seenIntroVideo", "true")
+            } else if (!user.isSubscribed) {
+                showIntroVideo()
+            }
         }
     }, [loading, user])
 
