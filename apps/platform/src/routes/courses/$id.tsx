@@ -1,6 +1,7 @@
 "use client"
 
 import AppLoadingSkeleton from '@/components/common/app-loading-skeleton'
+import { CoursePoster } from '@/components/common/course-poster'
 import Topbar from '@/components/common/topbar'
 import { CourseDetailsTemplate } from '@/components/dashboard/course-details-template'
 import DashboardFallback from '@/components/dashboard/dashboard-fallback'
@@ -34,7 +35,8 @@ function RouteComponent() {
                 }
 
                 {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ?
-                    <DashboardFallback /> : ""
+                    <CoursePoster /> : ""
+                    // <DashboardFallback /> : ""
                 }
             </div>
         </div>

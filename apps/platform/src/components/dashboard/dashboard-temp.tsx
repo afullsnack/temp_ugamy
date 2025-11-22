@@ -14,6 +14,7 @@ import type { ICourseDetails, IGetCourseResponse, IGetVideosResponse } from "@/l
 import { DashboardHeader } from "../common/dashboard-header"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import FilteredVideosTemplate from "./filtered-videos-template"
+import { CoursePoster } from "../common/course-poster"
 
 const getCourses = async (): Promise<IGetCourseResponse> => {
     const response = await axios.get(`${env.VITE_API_URL}/courses/`, {
@@ -114,7 +115,8 @@ const DashboardTemp = () => {
                     }
 
                     {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ? (
-                        <DashboardFallback />
+                        <CoursePoster />
+                        // <DashboardFallback />
                     ) : null}
                 </div>
             </div>
