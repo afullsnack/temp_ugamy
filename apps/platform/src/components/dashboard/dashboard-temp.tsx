@@ -125,7 +125,6 @@ const DashboardTemp = () => {
                 ) : null}
             </div>
         </div>
-        </div >
     )
 }
 
