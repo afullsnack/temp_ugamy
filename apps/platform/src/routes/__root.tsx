@@ -3,20 +3,16 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
-  useNavigate,
-  useRouterState,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import { useEffect } from 'react'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
-import { useSession } from '@/lib/auth-hooks.ts'
-import GlobalLoadingWidget from '@/components/common/global-loading-widget.tsx'
+import { AuthGuard } from '@/components/auth/auth-guard'
 import NiceModal from '@ebay/nice-modal-react'
 
 interface MyRouterContext {
@@ -55,32 +51,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootComponent() {
-  const { session, isPending: loading } = useSession()
-
-  const navigate = useNavigate()
-  const location = useRouterState({ select: (s) => s.location })
-
-  useEffect(() => {
-    if (loading) return
-
-    const unauthenticatedRoutes = [
-      '/signin',
-      '/register',
-      '/reset-password',
-      '/verify-email',
-      '/pay',
-      '/terms',
-      '/privacy',
-      '/payment-successful',
-    ]
-
-    const isUnauthRoute = unauthenticatedRoutes.includes(location.pathname)
-
-    if (!loading && session === null && !isUnauthRoute) {
-      navigate({ to: '/signin' })
-    }
-  }, [loading, session, location.pathname, navigate])
-
   return (
     <html lang="en">
       <head>
@@ -88,17 +58,13 @@ function RootComponent() {
       </head>
       <body>
         <Toaster position="top-center" richColors />
-        {loading ? (
-          <GlobalLoadingWidget />
-        ) : (
-          <>
-            <NiceModal.Provider>
-              <Outlet />
-              <TanStackRouterDevtools />
-              <TanStackQueryLayout />
-            </NiceModal.Provider>
-          </>
-        )}
+        <AuthGuard>
+          <NiceModal.Provider>
+            <Outlet />
+            <TanStackRouterDevtools />
+            <TanStackQueryLayout />
+          </NiceModal.Provider>
+        </AuthGuard>
         <Scripts />
       </body>
     </html>

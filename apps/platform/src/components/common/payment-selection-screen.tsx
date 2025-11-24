@@ -10,6 +10,7 @@ import { BrandLogoDark } from "./brand-logo-dark"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "@tanstack/react-router"
 import { useSession } from "@/lib/auth-hooks"
+import { env } from "@/env"
 
 
 // TODO: Improve API integration implementation
@@ -29,8 +30,10 @@ interface ISubscribePayload {
     callbackUrl: string
 }
 
+const apiUrl = env.VITE_API_URL
+
 export const subscribe = async (payload: ISubscribePayload): Promise<ISubscribeResponse> => {
-    const response = await axios.post('https://ugamy-api.fly.dev/payments/subscribe/', payload, {
+    const response = await axios.post(`${apiUrl}/payments/subscribe/`, payload, {
         withCredentials: true
     })
     return response.data
@@ -70,9 +73,8 @@ export default function PaymentSelectionScreen() {
 
         SubscribeMutation.mutate({
             email: `${user?.email}`,
-            amount: "1000000",
-            // Create a constant for this
-            callbackUrl: 'https://ugamy-backend-platform.vercel.app/payment-successful'
+            amount: "4000000",
+            callbackUrl: `${env.VITE_DASHBOARD_URL}/payment-successful`
         })
     }
 
@@ -86,7 +88,7 @@ export default function PaymentSelectionScreen() {
                 <div className="max-w-[484px] text-center mb-8 space-y-[24px]">
                     <h1 className="text-2xl font-bold text-gray-900">Secure Your Access</h1>
                     <p className="text-[hsla(221,39%,11%,1)] text-sm">
-                        Choose Your Preferred Payment Method To Unlock All Tutorials In The FIFA 24 Series.
+                        Choose Your Preferred Payment Method To Unlock All Tutorials In The EAFC26 Series.
                     </p>
                 </div>
 
@@ -121,7 +123,7 @@ export default function PaymentSelectionScreen() {
 
                             <div className="mb-3">
                                 <span className="text-sm text-gray-700">
-                                    Amount: <span className="font-semibold text-green-600">₦10,000 NGN</span>
+                                    Amount: <span className="font-semibold text-green-600">₦40,000 NGN</span>
                                 </span>
                             </div>
 

@@ -3,6 +3,7 @@ import { Button } from '../ui/button'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { Dispatch, FC, SetStateAction } from 'react'
 import { cn } from '@/lib/utils'
+import { useSession } from '@/lib/auth-hooks'
 
 interface IProps {
     viewMode: "grid" | "list"
@@ -13,6 +14,7 @@ interface IProps {
 export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters }) => {
     const navigate = useNavigate({ from: "/dashboard" })
     const search = useSearch({ from: "/dashboard" })
+    const { data: session } = useSession()
 
     const activeFilter = (search?.filter as string) ?? "All"
 
@@ -28,7 +30,10 @@ export const DashboardHeader: FC<IProps> = ({ viewMode, setViewMode, filters }) 
     return (
         <div className="bg-white bg-gradient-to-br from-primary/20 via-background to-accent/5 p-4 lg:p-6 pt-[90px] lg:pt-[100px] border-b z-30">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
-                <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Courses & Lessons</h1>
+                <div>
+                    <h1 className="text-xl lg:text-4xl font-bold text-gray-900">Courses & Lessons</h1>
+                    <p className="text-sm lg:text-base text-gray-600 mt-2">Hello {session?.user?.username}</p>
+                </div>
             </div>
 
             {/* Filters and View Toggle */}

@@ -14,6 +14,7 @@ import type { ICourseDetails, IGetCourseResponse, IGetVideosResponse } from "@/l
 import { DashboardHeader } from "../common/dashboard-header"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import FilteredVideosTemplate from "./filtered-videos-template"
+import { CoursePoster } from "../common/course-poster"
 
 const getCourses = async (): Promise<IGetCourseResponse> => {
     const response = await axios.get(`${env.VITE_API_URL}/courses/`, {
@@ -56,11 +57,13 @@ const DashboardTemp = () => {
     const hasSeenIntro = localStorage.getItem("seenIntroVideo") === "true"
 
     useEffect(() => {
-        if (!loading && user?.isSubscribed && !hasSeenIntro) {
-            showIntroVideo()
-            localStorage.setItem("seenIntroVideo", "true")
-        } else if (!loading && !user?.isSubscribed) {
-            showIntroVideo()
+        if (!loading && user) {
+            if (user.isSubscribed && !hasSeenIntro) {
+                showIntroVideo()
+                localStorage.setItem("seenIntroVideo", "true")
+            } else if (!user.isSubscribed) {
+                showIntroVideo()
+            }
         }
     }, [loading, user])
 
@@ -82,41 +85,44 @@ const DashboardTemp = () => {
 
     return (
         <div className="bg-gray-100 min-h-screen h-fit overflow-x-hidden">
-            <div className="w-full h-full flex-1 flex flex-col overflow-y-auto">
-                <DashboardHeader
-                    viewMode={viewMode}
-                    setViewMode={setViewMode}
-                    filters={filters}
-                />
-
-                <div className="relative w-full h-fit overflow-y-auto">
-                    {activeFilter.toLocaleLowerCase() === "all" ?
-                        <> {!loading && session !== null && user?.isSubscribed && user?.emailVerified ? (
-                            <CoursesTemp
-                                data={courses?.data as ICourseDetails[]}
-                                isLoading={isLoading}
-                                error={error}
-                                viewMode={viewMode}
-                            />
-                        ) : null}
-                        </> :
-                        <> {!loading && session !== null && user?.isSubscribed && user?.emailVerified ? (
-                            <FilteredVideosTemplate
-                                title={activeFilter === "Favourites" ? "Favourite Lessons" : "Watch History"}
-                                filter={activeFilter}
-                                videos={videos?.data}
-                                isLoading={loadingVideos}
-                                error={videosError}
-                                canLike={activeFilter === "Watched" ? true : false}
-                            />
-                        ) : null}
-                        </>
-                    }
-
-                    {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ? (
-                        <DashboardFallback />
-                    ) : null}
+            {!loading && user?.isSubscribed && user?.emailVerified ? (
+                <div className="w-full h-full flex-1 flex flex-col overflow-y-auto">
+                    <DashboardHeader
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                        filters={filters}
+                    />
                 </div>
+            ) : null}
+
+            <div className="relative w-full h-fit overflow-y-auto">
+                {activeFilter.toLocaleLowerCase() === "all" ?
+                    <> {!loading && session !== null && user?.isSubscribed && user?.emailVerified ? (
+                        <CoursesTemp
+                            data={courses?.data as ICourseDetails[]}
+                            isLoading={isLoading}
+                            error={error}
+                            viewMode={viewMode}
+                        />
+                    ) : null}
+                    </> :
+                    <> {!loading && session !== null && user?.isSubscribed && user?.emailVerified ? (
+                        <FilteredVideosTemplate
+                            title={activeFilter === "Favourites" ? "Favourite Lessons" : "Watch History"}
+                            filter={activeFilter}
+                            videos={videos?.data}
+                            isLoading={loadingVideos}
+                            error={videosError}
+                            canLike={activeFilter === "Watched" ? true : false}
+                        />
+                    ) : null}
+                    </>
+                }
+
+                {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ? (
+                    <CoursePoster />
+                    // <DashboardFallback />
+                ) : null}
             </div>
         </div>
     )
