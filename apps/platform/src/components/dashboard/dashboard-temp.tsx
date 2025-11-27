@@ -120,7 +120,7 @@ const DashboardTemp = () => {
                 }
 
                 {!loading && session !== null && (!user?.isSubscribed || !user?.emailVerified) ? (
-                    <div className="pt-[100px]">
+                    <div className="bg-black pt-[100px]">
                         <CoursePoster />
                     </div>
                     // <DashboardFallback />
