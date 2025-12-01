@@ -16,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
+import { WEBSITE_URL } from "@/lib/constants"
 
 const SignupSchema = z
     .object({
@@ -306,13 +307,14 @@ export default function SignupForm() {
                 {/* Terms */}
                 <div className="text-center text-xs text-gray-500">
                     By signing up, you agree to our{" "}
-                    <Link to="/terms" className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700">
+                    <a
+                        href={`${WEBSITE_URL}/terms-and-conditions`} className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700">
                         Terms of Service
-                    </Link>{" "}
+                    </a>{" "}
                     and{" "}
-                    <Link to="/privacy" className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700">
+                    <a href={`${WEBSITE_URL}/privacy-policy`} className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700">
                         Privacy Policy
-                    </Link>
+                    </a>
                 </div>
             </div>
         </div>
