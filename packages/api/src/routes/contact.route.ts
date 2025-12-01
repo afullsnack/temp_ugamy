@@ -39,7 +39,7 @@ const router = createRouter()
 
       try {
         await sendEmail({
-          to: `q.lifeee@gmail.com`, //'info@ugamy.io',
+          to: 'info@ugamy.io',
           subject: body.subject,
           body: `
             Contact enquiry sent by <b> ${body.name} with email address: ${body.email} </b> <br/><br/>
