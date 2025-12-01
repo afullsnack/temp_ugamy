@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { authClient } from '@/lib/auth-client'
 import { useSession } from '@/lib/auth-hooks'
+import { WEBSITE_URL } from '@/lib/constants'
 
 export const loginSchema = z.object({
   email: z
@@ -251,19 +252,17 @@ export default function SigninForm() {
         {/* Terms */}
         <div className="text-center text-xs text-gray-500">
           By signing in, you agree to our{' '}
-          <Link
-            to="/terms"
+          <a href={`${WEBSITE_URL}/terms-and-conditions`} 
             className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700"
           >
             Terms of Service
-          </Link>{' '}
+          </a>{' '}
           and{' '}
-          <Link
-            to="/privacy"
+          <a href={`${WEBSITE_URL}/privacy-policy`}
             className="text-[hsla(160,84%,39%,1)] hover:text-cyan-700"
           >
             Privacy Policy
-          </Link>
+          </a>
           .
         </div>
       </div>
