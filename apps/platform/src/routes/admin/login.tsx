@@ -37,7 +37,7 @@ function RouteComponent() {
       case 'admin-3':
         return 'adiejoel14@gmail.com';
       default:
-        return 'jesudara.j@gmail.com'
+        return 'miraclef60@gmail.com'
     }
   }
 
