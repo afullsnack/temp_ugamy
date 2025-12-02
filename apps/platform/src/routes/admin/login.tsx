@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/input-otp'
 import { useSession } from '@/lib/auth-hooks'
 import { authClient } from '@/lib/auth-client'
+import { setAdminToken } from '@/components/auth/admin-auth-guard'
 
 export const Route = createFileRoute('/admin/login')({
   component: RouteComponent,
@@ -43,23 +44,45 @@ function RouteComponent() {
 
   useEffect(() => {
     const verifyOTP = async (otp: string) => {
-      const { data, error } = await authClient.signIn.emailOtp({
-        email: getAdminEmail(selectedValue),
-        otp: otp,
-      })
-      if (error) {
-        return toast.error(error.message || 'Failed to verify OTP try again')
-      }
+      try {
+        const { data, error } = await authClient.signIn.emailOtp({
+          email: getAdminEmail(selectedValue),
+          otp: otp,
+        })
 
-      console.log(data, 'Data of user')
-      router.navigate({ to: '/admin/dashboard' })
+        if (error) {
+          setOTPValue(undefined)
+          toast.error(error.message || 'Failed to verify OTP. Please try again.')
+          return
+        }
+
+        // Check if user has admin role
+        if (data?.user?.role !== 'admin') {
+          setOTPValue(undefined)
+          toast.error('Unauthorized: Admin access required')
+          return
+        }
+
+        // Store the admin token
+        if (data?.token) {
+          setAdminToken(data.token)
+          toast.success(`Welcome back, ${data.user.name}!`)
+          router.navigate({ to: '/admin/dashboard' })
+        } else {
+          setOTPValue(undefined)
+          toast.error('Authentication failed: No token received')
+        }
+      } catch (err) {
+        setOTPValue(undefined)
+        toast.error('An unexpected error occurred. Please try again.')
+        console.error('Admin login error:', err)
+      }
     }
+
     if (otpValue && otpValue.length >= 6) {
-      // TODO: submit otp for verification
-      console.log('OTP Value', otpValue)
       verifyOTP(otpValue)
     }
-  }, [otpValue])
+  }, [otpValue, selectedValue, router])
 
   const { session, user, isPending: loading } = useSession()
   console.log('Loading, user, session', loading, user, session)
