@@ -23,7 +23,6 @@ import type { CheckedState } from '@radix-ui/react-checkbox'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { authClient } from '@/lib/auth-client'
-import { useSession } from '@/lib/auth-hooks'
 import { WEBSITE_URL } from '@/lib/constants'
 
 export const loginSchema = z.object({

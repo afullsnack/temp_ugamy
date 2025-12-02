@@ -21,6 +21,7 @@ import { Route as PaymentSuccessfulRouteImport } from './routes/payment-successf
 import { Route as PayRouteImport } from './routes/pay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChangePasswordRouteImport } from './routes/change-password'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
 import { Route as CoursesIdRouteImport } from './routes/courses/$id'
@@ -91,6 +92,11 @@ const ChangePasswordRoute = ChangePasswordRouteImport.update({
   path: '/change-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -107,14 +113,14 @@ const CoursesIdRoute = CoursesIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/_auth/signup',
@@ -122,9 +128,9 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCoursesIndexRoute = AdminCoursesIndexRouteImport.update({
-  id: '/admin/courses/',
-  path: '/admin/courses/',
-  getParentRoute: () => rootRouteImport,
+  id: '/courses/',
+  path: '/courses/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
@@ -142,14 +148,14 @@ const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCoursesNewRoute = AdminCoursesNewRouteImport.update({
-  id: '/admin/courses/new',
-  path: '/admin/courses/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/courses/new',
+  path: '/courses/new',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminCoursesIdVideosRoute = AdminCoursesIdVideosRouteImport.update({
-  id: '/admin/courses/$id/videos',
-  path: '/admin/courses/$id/videos',
-  getParentRoute: () => rootRouteImport,
+  id: '/courses/$id/videos',
+  path: '/courses/$id/videos',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminCoursesIdVideosIndexRoute =
   AdminCoursesIdVideosIndexRouteImport.update({
@@ -181,6 +187,7 @@ const ApiDemoNamesServerRoute = ApiDemoNamesServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/change-password': typeof ChangePasswordRoute
   '/dashboard': typeof DashboardRoute
   '/pay': typeof PayRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/change-password': typeof ChangePasswordRoute
   '/dashboard': typeof DashboardRoute
   '/pay': typeof PayRoute
@@ -237,6 +245,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/change-password': typeof ChangePasswordRoute
   '/dashboard': typeof DashboardRoute
   '/pay': typeof PayRoute
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/change-password'
     | '/dashboard'
     | '/pay'
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/change-password'
     | '/dashboard'
     | '/pay'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/change-password'
     | '/dashboard'
     | '/pay'
@@ -351,6 +363,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ChangePasswordRoute: typeof ChangePasswordRoute
   DashboardRoute: typeof DashboardRoute
   PayRoute: typeof PayRoute
@@ -362,16 +375,11 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   AuthSignupRoute: typeof AuthSignupRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminLoginRoute: typeof AdminLoginRoute
   CoursesIdRoute: typeof CoursesIdRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  AdminCoursesNewRoute: typeof AdminCoursesNewRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
-  AdminCoursesIndexRoute: typeof AdminCoursesIndexRoute
-  AdminCoursesIdVideosRoute: typeof AdminCoursesIdVideosRouteWithChildren
   WatchIdVideosVidWatchRoute: typeof WatchIdVideosVidWatchRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -468,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChangePasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -491,17 +506,17 @@ declare module '@tanstack/react-router' {
     }
     '/admin/login': {
       id: '/admin/login'
-      path: '/admin/login'
+      path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
       id: '/admin/dashboard'
-      path: '/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_auth/signup': {
       id: '/_auth/signup'
@@ -512,10 +527,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/courses/': {
       id: '/admin/courses/'
-      path: '/admin/courses'
+      path: '/courses'
       fullPath: '/admin/courses'
       preLoaderRoute: typeof AdminCoursesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
@@ -540,17 +555,17 @@ declare module '@tanstack/react-router' {
     }
     '/admin/courses/new': {
       id: '/admin/courses/new'
-      path: '/admin/courses/new'
+      path: '/courses/new'
       fullPath: '/admin/courses/new'
       preLoaderRoute: typeof AdminCoursesNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/courses/$id/videos': {
       id: '/admin/courses/$id/videos'
-      path: '/admin/courses/$id/videos'
+      path: '/courses/$id/videos'
       fullPath: '/admin/courses/$id/videos'
       preLoaderRoute: typeof AdminCoursesIdVideosRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/courses/$id/videos/': {
       id: '/admin/courses/$id/videos/'
@@ -609,8 +624,27 @@ const AdminCoursesIdVideosRouteChildren: AdminCoursesIdVideosRouteChildren = {
 const AdminCoursesIdVideosRouteWithChildren =
   AdminCoursesIdVideosRoute._addFileChildren(AdminCoursesIdVideosRouteChildren)
 
+interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminCoursesNewRoute: typeof AdminCoursesNewRoute
+  AdminCoursesIndexRoute: typeof AdminCoursesIndexRoute
+  AdminCoursesIdVideosRoute: typeof AdminCoursesIdVideosRouteWithChildren
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminCoursesNewRoute: AdminCoursesNewRoute,
+  AdminCoursesIndexRoute: AdminCoursesIndexRoute,
+  AdminCoursesIdVideosRoute: AdminCoursesIdVideosRouteWithChildren,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   ChangePasswordRoute: ChangePasswordRoute,
   DashboardRoute: DashboardRoute,
   PayRoute: PayRoute,
@@ -622,16 +656,11 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   AuthSignupRoute: AuthSignupRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
-  AdminLoginRoute: AdminLoginRoute,
   CoursesIdRoute: CoursesIdRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  AdminCoursesNewRoute: AdminCoursesNewRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
-  AdminCoursesIndexRoute: AdminCoursesIndexRoute,
-  AdminCoursesIdVideosRoute: AdminCoursesIdVideosRouteWithChildren,
   WatchIdVideosVidWatchRoute: WatchIdVideosVidWatchRoute,
 }
 export const routeTree = rootRouteImport

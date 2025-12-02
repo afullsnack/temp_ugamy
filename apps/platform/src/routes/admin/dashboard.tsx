@@ -6,28 +6,46 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import {
   BarChart3,
   BookOpen,
   FileText,
+  LogOut,
   TrendingUp,
   Users,
   Video,
 } from 'lucide-react'
+import { clearAdminToken } from '@/components/auth/admin-auth-guard'
+import { authClient } from '@/lib/auth-client'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/admin/dashboard')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut()
+      clearAdminToken()
+      toast.success('Successfully logged out')
+      router.navigate({ to: '/admin/login' })
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error('Failed to logout. Please try again.')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Course Admin Dashboard</h1>
-            <nav className="flex gap-4">
+            <nav className="flex gap-4 items-center">
               <Link to="/admin/courses">
                 <Button variant="ghost">Courses</Button>
               </Link>
@@ -40,6 +58,14 @@ function RouteComponent() {
               <Link to="/users/user123/progress">
                 <Button variant="ghost">My Progress</Button>
               </Link>*/}
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
             </nav>
           </div>
         </div>
