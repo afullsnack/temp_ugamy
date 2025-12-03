@@ -36,7 +36,7 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
         return
       }
     }
-  }, [loading, user, isAdminRoute, isAdminLoginRoute, adminToken, navigate])
+  }, [loading, user, isAdminRoute, isAdminLoginRoute, adminToken, navigate, pathname])
 
   if (loading) {
     return <GlobalLoadingWidget />
