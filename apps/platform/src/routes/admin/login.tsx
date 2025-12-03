@@ -84,18 +84,6 @@ function RouteComponent() {
     }
   }, [otpValue, selectedValue, router])
 
-  const { session, user, isPending: loading } = useSession()
-  console.log('Loading, user, session', loading, user, session)
-
-  useEffect(() => {
-    console.log('Admin', user)
-    if (user) {
-      if (user.role === 'admin') {
-        router.navigate({ to: '/admin/dashboard' })
-      }
-    }
-  }, [session, user])
-
   useEffect(() => {
     if (isLoading) {
       ; (async () => {
