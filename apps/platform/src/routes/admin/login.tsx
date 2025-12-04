@@ -56,6 +56,8 @@ function RouteComponent() {
           return
         }
 
+        console.log("User data", data);
+
         // Check if user has admin role
         if (data?.user?.role !== 'admin') {
           setOTPValue(undefined)
