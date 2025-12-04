@@ -59,11 +59,11 @@ function RouteComponent() {
         console.log("User data", data);
 
         // Check if user has admin role
-        if (data?.user?.role !== 'admin') {
-          setOTPValue(undefined)
-          toast.error('Unauthorized: Admin access required')
-          return
-        }
+        // if (data?.user?.role !== 'admin') {
+        //   setOTPValue(undefined)
+        //   toast.error('Unauthorized: Admin access required')
+        //   return
+        // }
 
         // Store the admin token
         if (data?.token) {
