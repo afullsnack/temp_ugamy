@@ -159,6 +159,7 @@ export function CourseForm({ courseId }: CourseFormProps) {
               // Call submit
               const response = await fetch(`${env.VITE_API_URL}/courses`, {
                 method: 'POST',
+                credentials: "include",
                 body: JSON.stringify({
                   ...values,
                   slug: watchedTitle.toLowerCase().split(' ').join('-'),
@@ -166,7 +167,7 @@ export function CourseForm({ courseId }: CourseFormProps) {
               })
               if (response.ok) {
                 const result = await response.json()
-                console.log('New course submitted')
+                console.log('New course submitted', result)
               }
             })}
             className="space-y-6"

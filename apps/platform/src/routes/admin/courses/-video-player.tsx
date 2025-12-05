@@ -89,7 +89,9 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
 
   const fetchVideo = async () => {
     try {
-      const response = await fetch(`${env.VITE_API_URL}/videos/${videoId}`)
+      const response = await fetch(`${env.VITE_API_URL}/videos/${videoId}`, {
+        credentials: "include"
+      })
       if (response.ok) {
         const videoData = await response.json()
         setVideo(videoData)
@@ -107,6 +109,7 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
     try {
       const response = await fetch(
         `/api/videos/${videoId}/progress?userId=${userId}`,
+        {credentials: "include"}
       )
       if (response.ok) {
         const progressData = await response.json()
@@ -129,6 +132,7 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
     try {
       await fetch(`/api/videos/${videoId}/progress`, {
         method: 'POST',
+        credentials: "include",
         headers: {
           'Content-Type': 'application/json',
         },
@@ -155,6 +159,7 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
       const newLikedState = !progress.liked
       await fetch(`/api/videos/${videoId}/progress`, {
         method: 'POST',
+        credentials: "include",
         headers: {
           'Content-Type': 'application/json',
         },
