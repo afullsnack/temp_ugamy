@@ -67,9 +67,12 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
 
   const fetchVideoData = async (id: string) => {
     try {
-      const response = await fetch(`${env.VITE_API_URL}/videos/${id}`)
+      const response = await fetch(`${env.VITE_API_URL}/videos/${id}`, {
+        credentials: 'include'
+      })
       if (response.ok) {
         const video = await response.json()
+        return video?.data;
       }
     } catch (error) {
       console.log('Failed video fetch', error)

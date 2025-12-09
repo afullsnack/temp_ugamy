@@ -48,15 +48,16 @@ export function VideoList({ courseId }: VideoListProps) {
       const response = await fetch(
         `${env.VITE_API_URL}/videos?id=${courseId}`,
         {
+          credentials: "include",
           headers: {
             'Content-Type': 'application/json',
           },
         },
       )
       if (response.ok) {
-        const data = await response.json()
-        console.log('Videos:', data)
-        return data
+        const result = await response.json()
+        console.log('Videos:', result)
+        return result?.data as any[];
       }
     } catch (error) {
       toast.error('Error', {
@@ -67,7 +68,9 @@ export function VideoList({ courseId }: VideoListProps) {
 
   const fetchCourseInfo = async () => {
     try {
-      const response = await fetch(`${env.VITE_API_URL}/courses/${courseId}`)
+      const response = await fetch(`${env.VITE_API_URL}/courses/${courseId}`, {
+        credentials: "include",
+      })
       if (response.ok) {
         const course = await response.json()
         return course.title

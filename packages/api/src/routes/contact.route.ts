@@ -34,25 +34,30 @@ const router = createRouter()
         )
       },
     }),
-    (c) => {
+    async (c) => {
       const body = c.req.valid("json")
 
-      sendEmail({
-        to: 'info@ugamy.io',
-        subject: body.subject,
-        body: body.message,
-        name: `${body.name}<${body.email}>`
-      })
-        .catch((error) => {
-          console.log("Failed to send email", error)
-          return c.json({
-            message: 'Failed to send email'
-          }, HttpStatusCodes.BAD_REQUEST)
+      try {
+        await sendEmail({
+          to: 'info@ugamy.io',
+          subject: body.subject,
+          body: `
+            Contact enquiry sent by <b> ${body.name} with email address: ${body.email} </b> <br/><br/>
+            ${body.message}
+          `,
         })
 
-      return c.json({
-        message: "Email sent",
-      }, HttpStatusCodes.OK);
+        return c.json({
+          message: "Email sent",
+        }, HttpStatusCodes.OK);
+
+      }
+      catch (error: any) {
+        console.log("Failed to send email", error)
+        return c.json({
+          message: 'Failed to send email'
+        }, HttpStatusCodes.BAD_REQUEST)
+      }
     },
   );
 

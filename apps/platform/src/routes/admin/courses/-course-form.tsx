@@ -156,38 +156,18 @@ export function CourseForm({ courseId }: CourseFormProps) {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(async (values) => {
-              setLoading(true)
-              try {
-                // Call submit
-                const response = await fetch(`${env.VITE_API_URL}/courses`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    ...values,
-                    slug: watchedTitle.toLowerCase().split(' ').join('-'),
-                    thumbnailUrl: '/course-poster.png',
-                  }),
-                })
-                if (response.ok) {
-                  const result = await response.json()
-                  toast.success('Success', {
-                    description: 'Course created successfully',
-                  })
-                  router.navigate({ to: '/admin/courses' })
-                } else {
-                  const error = await response.json()
-                  toast.error('Error', {
-                    description: error.message || 'Failed to create course',
-                  })
-                }
-              } catch (error) {
-                toast.error('Error', {
-                  description: 'Failed to create course',
-                })
-              } finally {
-                setLoading(false)
+              // Call submit
+              const response = await fetch(`${env.VITE_API_URL}/courses`, {
+                method: 'POST',
+                credentials: "include",
+                body: JSON.stringify({
+                  ...values,
+                  slug: watchedTitle.toLowerCase().split(' ').join('-'),
+                }),
+              })
+              if (response.ok) {
+                const result = await response.json()
+                console.log('New course submitted')
               }
             })}
             className="space-y-6"

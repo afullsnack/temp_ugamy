@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -26,11 +25,13 @@ export function CourseList() {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch(`${env.VITE_API_URL}/courses`)
+      const response = await fetch(`${env.VITE_API_URL}/courses`, {
+        credentials: "include"
+      })
       if (response.ok) {
-        const data = await response.json()
-        console.log('Courses data')
-        return data
+        const result = await response.json()
+        console.log('Courses data', result)
+        return result?.data as any[];
       }
     } catch (error) {
       toast.error('Error', {
