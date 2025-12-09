@@ -167,7 +167,7 @@ export function CourseForm({ courseId }: CourseFormProps) {
               })
               if (response.ok) {
                 const result = await response.json()
-                console.log('New course submitted', result)
+                console.log('New course submitted')
               }
             })}
             className="space-y-6"
