@@ -6,6 +6,7 @@ import { Button } from "../ui/button"
 import type { FC } from "react"
 import { Badge } from "@/components/ui/badge"
 import ProfileImagePlaceholder from "/profile-image-placeholder.png"
+import CoursePosterPlaceholder from "/course-poster.png"
 import type { ICourseDetails } from "@/lib/types"
 import { CoursesSkeleton } from "./courses-skeleton"
 import { CoursesEmptyStateWidget } from "./courses-empty-state-widget"
@@ -118,7 +119,7 @@ const CoursesTemp: FC<IProps> = ({ viewMode, data = [], isLoading, error }) => {
                                     >
                                         <div className="relative">
                                             <img
-                                                src={course?.thumbnailUrl || ProfileImagePlaceholder}
+                                                src={course?.thumbnailUrl || CoursePosterPlaceholder}
                                                 alt={course?.title || "Course thumbnail"}
                                                 width={200}
                                                 height={120}
