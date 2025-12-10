@@ -87,7 +87,7 @@ const FilteredVideosTemplate: FC<IProps> = (props) => {
                                                     <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground font-medium">
                                                         <span className="flex items-center gap-1.5">
                                                             <Clock className="h-3.5 w-3.5" />
-                                                            {Math.floor(video?.duration / 60)} minutes
+                                                            {video?.duration} minutes
                                                         </span>
                                                     </div>
                                                 </div>
