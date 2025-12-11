@@ -100,7 +100,8 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
     formData.append('title', values.title)
     formData.append('slug', slug)
     formData.append('description', values.description)
-    formData.append('duration', values.duration.toString())
+    // Convert minutes to seconds
+    formData.append('duration', (values.duration * 60).toString())
 
     try {
       const url = videoId ? `/videos/${videoId}` : '/videos'
@@ -226,7 +227,7 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-gray-700">
-                    Duration (seconds)
+                    Duration (minutes)
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -238,7 +239,7 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
                   </FormControl>
                   {field.value > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      Duration: {formatDuration(field.value)} min(s)
+                      Duration: {field.value} minute(s)
                     </p>
                   )}
                   <FormMessage />

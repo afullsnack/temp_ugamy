@@ -85,7 +85,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                                         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground font-medium">
                                                             <span className="flex items-center gap-1.5">
                                                                 <Clock className="h-3.5 w-3.5" />
-                                                                {Math.floor(video?.duration / 60)} minutes
+                                                                {Math.floor((video?.duration ?? 0) / 60)} minutes
                                                             </span>
                                                             {props.watchedVideos.has(video.id) && (
                                                                 <span className="flex items-center gap-1.5 text-green-600 font-semibold">
@@ -157,7 +157,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                         </div>
                                         <span className="font-medium text-foreground text-sm lg:text-base">Total Duration</span>
                                     </div>
-                                    <span className="font-semibold text-foreground text-sm lg:text-base">{Math.floor(props.course?.totalWatchTime ?? 0 / 60) ?? 0} min</span>
+                                    <span className="font-semibold text-foreground text-sm lg:text-base">{Math.floor((props.course?.totalWatchTime ?? 0) / 60)} min</span>
                                 </div>
 
                                 <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
