@@ -35,7 +35,7 @@ const options = {
       }
     },
   },
-  trustedOrigins: ["*", "http://localhost:3000", "http://localhost:3001","http://localhost:3002", "https://dashboard.ugamy.io", "https://staging.ugamy.io", "https://ugamy.io", "https://www.ugamy.io"],
+  trustedOrigins: ["*", "http://localhost:3000", "https://dashboard.ugamy.io", "https://staging.ugamy.io", "https://ugamy.io", "https://www.ugamy.io"],
   advanced: {
     cookies: {
       session_token: {
