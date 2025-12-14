@@ -66,7 +66,7 @@ export function CourseList() {
               <img
                 src={
                   course.thumbnail_url ||
-                  '/placeholder.svg?height=200&width=300'
+                  '/course-poster.png'
                 }
                 alt={course.title}
                 className="w-full h-full object-cover"

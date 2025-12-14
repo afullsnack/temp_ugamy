@@ -56,7 +56,7 @@ export const CoursePoster = () => {
                             <Star className="h-5 w-5 fill-current" />
                             <span className="text-white">4.9</span>
                         </div>
-                        <span>EA FC 25</span>
+                        <span>EA FC 26</span>
                         <span className="h-4 w-px bg-gray-500"></span>
                         <span>Beginner to Pro</span>
                         <span className="h-4 w-px bg-gray-500"></span>

@@ -4,7 +4,6 @@ import AppLoadingSkeleton from '@/components/common/app-loading-skeleton'
 import { CoursePoster } from '@/components/common/course-poster'
 import Topbar from '@/components/common/topbar'
 import { CourseDetailsTemplate } from '@/components/dashboard/course-details-template'
-import DashboardFallback from '@/components/dashboard/dashboard-fallback'
 import { useSession } from '@/lib/auth-hooks'
 import { createFileRoute } from '@tanstack/react-router'
 
