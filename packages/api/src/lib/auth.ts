@@ -11,6 +11,7 @@ import env from "@/env";
 
 const options = {
   basePath: "/api/auth",
+  secret: env.BETTER_AUTH_SERCRET,
   database: drizzleAdapter(db, {
     provider: "sqlite",
     schema: { ...authSchema },
