@@ -45,24 +45,16 @@ function RouteComponent() {
   useEffect(() => {
     const verifyOTP = async (otp: string) => {
       try {
-        await authClient.signIn.emailOtp({
+        const { data, error } = await authClient.signIn.emailOtp({
           email: getAdminEmail(selectedValue),
           otp: otp,
-        }).then((data) => {
-          if (data?.token) {
-            setAdminToken(data?.token)
-            toast.success(`Welcome back, ${data?.user?.name}!`)
-            router.navigate({ to: '/admin/dashboard' })
-            window.location.reload()
-          } else {
-            setOTPValue(undefined)
-            toast.error('Authentication failed: No token received')
-          }
-        }).catch((error) => {
+        })
+
+        if (error) {
           setOTPValue(undefined)
           toast.error(error.message || 'Failed to verify OTP. Please try again.')
           return
-        })
+        }
 
         console.log("User data", data);
 
@@ -72,6 +64,16 @@ function RouteComponent() {
         //   toast.error('Unauthorized: Admin access required')
         //   return
         // }
+
+        // Store the admin token
+        if (data?.token) {
+          setAdminToken(data.token)
+          toast.success(`Welcome back, ${data.user.name}!`)
+          router.navigate({ to: '/admin/dashboard' })
+        } else {
+          setOTPValue(undefined)
+          toast.error('Authentication failed: No token received')
+        }
       } catch (err) {
         setOTPValue(undefined)
         toast.error('An unexpected error occurred. Please try again.')
