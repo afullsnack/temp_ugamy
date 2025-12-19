@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { ICourseDetails } from "@/lib/types"
 import LikeVideoWidget from "./like video-widget"
 import { VideoSkeleton } from "./videos-skeleton"
+import { formatDuration } from "@/lib/utils"
 
 interface CourseEpisodesTemplateProps {
     title: string
@@ -85,7 +86,7 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                                         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground font-medium">
                                                             <span className="flex items-center gap-1.5">
                                                                 <Clock className="h-3.5 w-3.5" />
-                                                                {Math.floor((video?.duration ?? 0) / 60)} minutes
+                                                                {formatDuration(video?.duration ?? 0)}
                                                             </span>
                                                             {props.watchedVideos.has(video.id) && (
                                                                 <span className="flex items-center gap-1.5 text-green-600 font-semibold">

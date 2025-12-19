@@ -14,6 +14,7 @@ import { Slider } from '@/components/ui/slider'
 import { toast } from 'sonner'
 import { Play, Pause, Volume2, VolumeX, Heart, Clock, Eye } from 'lucide-react'
 import { env } from '@/env'
+import { formatDuration } from '@/lib/utils'
 
 interface VideoPlayerProps {
   courseId: string
@@ -231,12 +232,6 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
     setIsMuted(newVolume === 0)
   }
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = Math.floor(seconds % 60)
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-  }
-
   if (loading) {
     return <div className="text-center py-8">Loading video...</div>
   }
@@ -318,8 +313,8 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
                   </div>
 
                   <div className="text-white text-sm">
-                    {formatTime(currentTime)} /{' '}
-                    {formatTime(videoRef.current?.duration ?? duration)}
+                    {formatDuration(currentTime)} /{' '}
+                    {formatDuration(videoRef.current?.duration ?? duration)}
                   </div>
                 </div>
               </div>
@@ -374,8 +369,8 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  Watched: {formatTime(progress.watch_time)} /{' '}
-                  {formatTime(video.duration)}
+                  Watched: {formatDuration(progress.watch_time)} /{' '}
+                  {formatDuration(video.duration)}
                 </span>
               </div>
 

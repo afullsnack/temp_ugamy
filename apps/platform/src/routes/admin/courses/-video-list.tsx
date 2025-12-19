@@ -10,6 +10,7 @@ import { Link, useRouter } from '@tanstack/react-router'
 import { env } from '@/env'
 import { useQuery } from '@tanstack/react-query'
 import { id } from 'zod/v4/locales'
+import { formatDuration } from '@/lib/utils'
 
 interface Video {
   id: number
@@ -98,12 +99,6 @@ export function VideoList({ courseId }: VideoListProps) {
         description: 'Failed to delete video',
       })
     }
-  }
-
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
   if (videosLoading || courseInfoLoading) {

@@ -29,6 +29,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { formatDuration } from '@/lib/utils'
 
 interface VideoFormProps {
   courseId: string
@@ -100,8 +101,8 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
     formData.append('title', values.title)
     formData.append('slug', slug)
     formData.append('description', values.description)
-    // Convert minutes to seconds
-    formData.append('duration', (values.duration * 60).toString())
+    // Duration is already in seconds
+    formData.append('duration', values.duration.toString())
 
     try {
       const url = videoId ? `/videos/${videoId}` : '/videos'
@@ -132,12 +133,6 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
         description: `Failed to ${videoId ? 'update' : 'create'} video`,
       })
     }
-  }
-
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
   return (
@@ -227,7 +222,7 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-gray-700">
-                    Duration (minutes)
+                    Duration (seconds)
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -239,7 +234,7 @@ export function VideoForm({ courseId, videoId }: VideoFormProps) {
                   </FormControl>
                   {field.value > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      Duration: {field.value} minute(s)
+                      Formatted: {formatDuration(field.value)}
                     </p>
                   )}
                   <FormMessage />

@@ -13,6 +13,7 @@ import type { ICourseDetails, IGetVideoByIdResponse } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router"
 import { ChevronLeft, Clock, Globe } from "lucide-react"
+import { formatDuration } from "@/lib/utils"
 
 export const Route = createFileRoute("/watch/$id/videos/$vid/watch")({
   component: RouteComponent,
@@ -132,7 +133,7 @@ function RouteComponent() {
               <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground font-medium">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  <span>{video?.duration ? `${Math.floor(video.duration / 60)} min` : "N/A"}</span>
+                  <span>{video?.duration ? formatDuration(video.duration) : "N/A"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
