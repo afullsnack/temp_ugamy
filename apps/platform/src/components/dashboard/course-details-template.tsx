@@ -10,6 +10,7 @@ import type { ICourseDetails } from "@/lib/types"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import CourseEpisodesTemplate from "../common/course-episodes-templates"
+import { formatDuration } from "@/lib/utils"
 
 
 export const CourseDetailsTemplate = () => {
@@ -68,7 +69,8 @@ export const CourseDetailsTemplate = () => {
                             </div> */}
                             <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4" />
-                                <span>{Math.floor(course?.totalWatchTime ?? 0 / 60)} minutes</span>
+                                <span>                                     {formatDuration(course?.totalWatchTime ?? 0)}
+                                </span>
                             </div>
                             <div className="flex items-center gap-2 capitalize">
                                 <BookOpen className="h-4 w-4" />
