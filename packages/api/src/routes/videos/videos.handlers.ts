@@ -1,3 +1,4 @@
+import { and, eq } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
@@ -7,8 +8,7 @@ import { videoLikes, videos, videoWatchProgress } from "@/db/schema/schema";
 import env from "@/env";
 import { TigrisClient } from "@/lib/asset-storage";
 
-import type { CreateVideoRoute, GetOneVideoRoute, ListVideosRoute, StreamVideoRoute, LikeVideoRoute, WatchedVideoRoute } from "./videos.routes";
-import { and, eq } from "drizzle-orm";
+import type { CreateVideoRoute, GetOneVideoRoute, LikeVideoRoute, ListVideosRoute, StreamVideoRoute, WatchedVideoRoute } from "./videos.routes";
 
 export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
   const body = await c.req.parseBody();
@@ -62,7 +62,7 @@ export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
 
 export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
   const { id: courseId, limit, page, filter } = c.req.valid("query");
-  const session = c.get('session');
+  const session = c.get("session");
 
   if (limit && page && filter) {
     const offset = ((page || 1) - 1) * (limit || 10);
@@ -73,7 +73,7 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
       },
       with: {
         likes: true,
-        watchProgress: true
+        watchProgress: true,
       },
       limit,
       offset,
@@ -83,20 +83,20 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
     const nextPage = isLastPage ? null : page + 1;
     const previousPage = page > 1 ? page - 1 : null;
 
-    const filteredVideos = filter === 'liked'
-      ? videoList.filter((video) => video.likes.some(({ userId, videoId }) => userId === session.userId && video.id === videoId))
-      : filter === 'watched'
-        ? videoList.filter((video) => video.watchProgress.some(({ userId, videoId }) => userId === session.userId && video.id === videoId))
-        : videoList
+    const filteredVideos = filter === "liked"
+      ? videoList.filter(video => video.likes.some(({ userId, videoId }) => userId === session.userId && video.id === videoId))
+      : filter === "watched"
+        ? videoList.filter(video => video.watchProgress.some(({ userId, videoId }) => userId === session.userId && video.id === videoId))
+        : videoList;
 
-    console.log("Filtered Videos", filteredVideos)
+    console.log("Filtered Videos", filteredVideos);
 
     return c.json({
       success: true,
       message: "Video list gotten",
-      data: filteredVideos.map((vid) => ({
+      data: filteredVideos.map(vid => ({
         ...vid,
-        isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
+        isFavorite: vid.likes.some(like => like.userId === session.userId && like.videoId === vid.id),
       })),
       ...(limit && page && {
         pagination: {
@@ -106,8 +106,8 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
           nextPage,
           previousPage,
           isLastPage,
-        }
-      })
+        },
+      }),
     }, HttpStatusCodes.OK);
   }
 
@@ -117,23 +117,22 @@ export const list: AppRouteHandler<ListVideosRoute> = async (c) => {
     },
     with: {
       likes: true,
-      watchProgress: true
+      watchProgress: true,
     },
   });
 
   return c.json({
     success: true,
-    data: videoList.map((vid) => ({
+    data: videoList.map(vid => ({
       ...vid,
-      isFavorite: vid.likes.some((like) => like.userId === session.userId && like.videoId === vid.id)
-    }))
-  })
-
+      isFavorite: vid.likes.some(like => like.userId === session.userId && like.videoId === vid.id),
+    })),
+  });
 };
 
 export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const session = c.get('session');
+  const session = c.get("session");
 
   const video = await db.query.videos.findFirst({
     where(fields, ops) {
@@ -141,7 +140,7 @@ export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
     },
     with: {
       likes: true,
-      watchProgress: true
+      watchProgress: true,
     },
   });
 
@@ -156,8 +155,8 @@ export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
     ...video,
     isFavorite: video.likes.some(({
       videoId,
-      userId
-    }) => videoId === id && userId === session.userId)
+      userId,
+    }) => videoId === id && userId === session.userId),
   }, HttpStatusCodes.OK);
 };
 
@@ -172,117 +171,158 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
     }, HttpStatusCodes.BAD_REQUEST);
   }
 
-  const isDownload = false;
   const tigrisClient = new TigrisClient({
     endpoint: env.AWS_ENDPOINT_URL_S3 || "",
     accessKeyId: env.AWS_ACCESS_KEY_ID || "",
     secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "",
     region: env.AWS_REGION,
   });
-  const { body: response, metadata } = await tigrisClient.downloadFile({
-    bucket: env.BUCKET_NAME || "",
-    key: `videos/${key}` || "",
-  });
 
-  if (isDownload) {
-    c.header("Content-Type", "application/pdf");
-    c.header("Content-Length", metadata.size?.toString() || "0");
-    c.header("Content-Disposition", `attachment; filename=${key}.pdf`);
-  }
-  else {
-    c.header("Content-Type", metadata.contentType || "application/octet-stream");
-    c.header("Content-Length", metadata.size?.toString() || "0");
-    c.header("Content-Disposition", `inline; filename=${key}`);
-  }
+  // Get file metadata first to determine file size
+  const metadata = await tigrisClient.getFileMetadata(
+    env.BUCKET_NAME || "",
+    `videos/${key}` || "",
+  );
+
+  const fileSize = metadata.size || 0;
+  const rangeHeader = c.req.header("range");
+
+  // Set CORS and security headers
   c.header("Access-Control-Allow-Origin", `http://localhost:3000, https://ugamy.com, https://www.ugamy.com`);
-  c.header("Access-Control-Allow-Methods", "GET, OPTIONS");
-  c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  c.header("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
+  c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
+  c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
   c.header("Cache-Control", "public, max-age=3600");
   c.header("X-Content-Type-Options", "nosniff");
   c.header("X-Frame-Options", "DENY");
   c.header("Content-Security-Policy", "default-src 'self'");
-  c.header("Cross-Origin-Embedder-Policy", "require-corp");
   c.header("Cross-Origin-Resource-Policy", "cross-origin");
-  c.status(200);
+  c.header("Content-Type", metadata.contentType || "video/mp4");
+  c.header("Content-Disposition", `inline; filename=${key}`);
+  c.header("Accept-Ranges", "bytes");
 
-  return c.body(response as ReadableStream, 200);
+  // Handle Range requests for video streaming
+  if (rangeHeader) {
+    const parts = rangeHeader.replace(/bytes=/, "").split("-");
+    const start = Number.parseInt(parts[0], 10);
+    const end = parts[1] ? Number.parseInt(parts[1], 10) : fileSize - 1;
+    const chunkSize = end - start + 1;
+
+    // Validate range
+    if (start >= fileSize || end >= fileSize) {
+      c.status(HttpStatusCodes.REQUESTED_RANGE_NOT_SATISFIABLE);
+      c.header("Content-Range", `bytes */${fileSize}`);
+      return c.body(null);
+    }
+
+    // Download the specified range
+    const { body: response } = await tigrisClient.downloadFile({
+      bucket: env.BUCKET_NAME || "",
+      key: `videos/${key}` || "",
+      range: `bytes=${start}-${end}`,
+    });
+
+    // Set partial content headers
+    c.header("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+    c.header("Content-Length", chunkSize.toString());
+    c.status(HttpStatusCodes.PARTIAL_CONTENT);
+
+    return c.body(response as ReadableStream, HttpStatusCodes.PARTIAL_CONTENT);
+  }
+
+  // No range request - send full file
+  const { body: response } = await tigrisClient.downloadFile({
+    bucket: env.BUCKET_NAME || "",
+    key: `videos/${key}` || "",
+  });
+
+  c.header("Content-Length", fileSize.toString());
+  c.status(HttpStatusCodes.OK);
+
+  return c.body(response as ReadableStream, HttpStatusCodes.OK);
 };
 
-
 export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
-  const body = c.req.valid("json")
-  const session = c.get("session")
+  const body = c.req.valid("json");
+  const session = c.get("session");
 
   try {
     const likeExist = await db.query.videoLikes.findFirst({
       where(fields, ops) {
         return ops.and(
           ops.eq(fields.userId, session.userId),
-          ops.eq(fields.videoId, body.videoId)
-        )
-      }
-    })
+          ops.eq(fields.videoId, body.videoId),
+        );
+      },
+    });
 
     if (likeExist) {
       // Toggle like if video already exists
       await db.delete(videoLikes).where(
         and(
-          eq(videoLikes.videoId, body.videoId),
-          eq(videoLikes.userId, session.userId)
-        ));
+          eq(
+            videoLikes.videoId,
+            body.videoId,
+          ),
+          eq(
+            videoLikes.userId,
+            session.userId,
+          ),
+        ),
+      );
       return c.json({
         success: true,
-        message: "Video unliked"
-      })
+        message: "Video unliked",
+      });
     }
 
     await db.insert(videoLikes)
       .values({
         userId: session.userId,
-        videoId: body.videoId
-      })
+        videoId: body.videoId,
+      });
 
     return c.json({
       success: true,
-      message: 'Video like has been updated'
-    }, HttpStatusCodes.OK)
+      message: "Video like has been updated",
+    }, HttpStatusCodes.OK);
   }
   catch (likeErr) {
-    console.log('Like error', likeErr);
+    console.error("Like error", likeErr);
     return c.json({
       success: false,
-      message: 'Something went wrong making the request'
-    }, HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      message: "Something went wrong making the request",
+    }, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
-}
+};
 
 export const trackWatched: AppRouteHandler<WatchedVideoRoute> = async (c) => {
-  const body = c.req.valid("json")
-  const session = c.get('session')
+  const body = c.req.valid("json");
+  const session = c.get("session");
 
   try {
     const watchExist = await db.query.videoWatchProgress.findFirst({
       where(fields, ops) {
         return ops.and(
           ops.eq(fields.userId, session.userId),
-          ops.eq(fields.videoId, body.videoId)
-        )
-      }
-    })
+          ops.eq(fields.videoId, body.videoId),
+        );
+      },
+    });
 
     if (watchExist) {
       await db.update(videoWatchProgress)
         .set({
           watchedSeconds: body.watchedSeconds,
           watchPercentage: body.watchPercentage,
-          isCompleted: body.isCompleted
+          isCompleted: body.isCompleted,
         })
         .where(eq(videoWatchProgress.videoId, body.videoId));
 
       return c.json({
         success: true,
-        message: "Video updated successfully"
-      }, HttpStatusCodes.OK)
+        message: "Video updated successfully",
+      }, HttpStatusCodes.OK);
     }
 
     await db.insert(videoWatchProgress)
@@ -291,19 +331,19 @@ export const trackWatched: AppRouteHandler<WatchedVideoRoute> = async (c) => {
         videoId: body.videoId,
         watchedSeconds: body.watchedSeconds,
         watchPercentage: body.watchPercentage,
-        isCompleted: body.isCompleted
+        isCompleted: body.isCompleted,
       });
 
     return c.json({
       success: true,
-      message: "Video watch progress tracked"
-    }, HttpStatusCodes.OK)
+      message: "Video watch progress tracked",
+    }, HttpStatusCodes.OK);
   }
   catch (watchErr) {
-    console.log('Failed to track watched', watchErr)
+    console.error("Failed to track watched", watchErr);
     return c.json({
       success: false,
-      message: 'Failed to track video watched'
-    }, HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      message: "Failed to track video watched",
+    }, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
-}
+};
