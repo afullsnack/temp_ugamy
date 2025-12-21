@@ -158,7 +158,9 @@ export const CourseEpisodesTemplate = (props: CourseEpisodesTemplateProps) => {
                                         </div>
                                         <span className="font-medium text-foreground text-sm lg:text-base">Total Duration</span>
                                     </div>
-                                    <span className="font-semibold text-foreground text-sm lg:text-base">{Math.floor((props.course?.totalWatchTime ?? 0) / 60)} min</span>
+                                    <span className="font-semibold text-foreground text-sm lg:text-base">
+                                        {formatDuration(props.course?.totalWatchTime ?? 0)}
+                                        </span>
                                 </div>
 
                                 <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
