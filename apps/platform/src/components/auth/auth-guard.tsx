@@ -10,6 +10,7 @@ const PUBLIC_ROUTES = [
   '/verify-email',
   '/terms',
   '/privacy',
+  '/change-password',
 ] as const
 
 const ADMIN_ROUTES = [
