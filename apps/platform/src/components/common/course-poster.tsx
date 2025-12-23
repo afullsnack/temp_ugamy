@@ -22,8 +22,8 @@ const courseModules = [
     { id: 8, title: "Finishing" },
     { id: 9, title: "Play Locks" },
     { id: 10, title: "Best Playstyles" },
-    { id: 9, title: "Skills Revisit" },
-    { id: 9, title: "The End" },
+    { id: 11, title: "Skills Revisit" },
+    { id: 12, title: "The End" },
 
 ]
 
