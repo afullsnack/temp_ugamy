@@ -12,15 +12,19 @@ import { useSession } from "@/lib/auth-hooks"
 import DashboardFallbackSkeleton from "../ui/skeletons/dashboard-fallback-skeleton"
 
 const courseModules = [
-    { id: 1, title: "Getting Started with EA FC" },
-    { id: 2, title: "Basic Controls & Mechanics" },
-    { id: 3, title: "Skill Moves Fundamentals" },
-    { id: 4, title: "Advanced Skill Moves" },
-    { id: 5, title: "Formations & Tactics" },
-    { id: 6, title: "Attacking Strategies" },
-    { id: 7, title: "Defensive Mastery" },
-    { id: 8, title: "Set Pieces & Dead Balls" },
-    { id: 9, title: "Pro-Level Gameplay" },
+    { id: 1, title: "Introduction" },
+    { id: 2, title: "Basics" },
+    { id: 3, title: "Mentality" },
+    { id: 4, title: "Game Settings" },
+    { id: 5, title: "Formation" },
+    { id: 6, title: "Defending" },
+    { id: 7, title: "Attacking" },
+    { id: 8, title: "Finishing" },
+    { id: 9, title: "Play Locks" },
+    { id: 10, title: "Best Playstyles" },
+    { id: 9, title: "Skills Revisit" },
+    { id: 9, title: "The End" },
+
 ]
 
 export const CoursePoster = () => {
@@ -60,7 +64,7 @@ export const CoursePoster = () => {
                         <span className="h-4 w-px bg-gray-500"></span>
                         <span>Beginner to Pro</span>
                         <span className="h-4 w-px bg-gray-500"></span>
-                        <span>9 Modules</span>
+                        <span>12 Modules</span>
                     </div>
 
                     {/* Description */}
