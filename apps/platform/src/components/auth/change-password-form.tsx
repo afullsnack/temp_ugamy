@@ -143,7 +143,7 @@ const ChangePasswordForm = () => {
                                         </button>
                                     </div>
                                     <p className="mt-1 text-xs text-gray-500 text-start">
-                                        (Min. 8 characters, include a number or symbol)
+                                        
                                     </p>
                                     <FormMessage />
                                 </FormItem>
