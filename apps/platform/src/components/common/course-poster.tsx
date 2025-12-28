@@ -12,18 +12,18 @@ import { useSession } from "@/lib/auth-hooks"
 import DashboardFallbackSkeleton from "../ui/skeletons/dashboard-fallback-skeleton"
 
 const courseModules = [
-    { id: 1, title: "Introduction" },
-    { id: 2, title: "Basics" },
-    { id: 3, title: "Mentality" },
-    { id: 4, title: "Game Settings" },
-    { id: 5, title: "Formation" },
-    { id: 6, title: "Defending" },
-    { id: 7, title: "Attacking" },
-    { id: 8, title: "Finishing" },
-    { id: 9, title: "Play Locks" },
-    { id: 10, title: "Best Playstyles" },
-    { id: 11, title: "Skills Revisit" },
-    { id: 12, title: "The End" },
+    { id: 1, title: "Introduction - 2:34" },
+    { id: 2, title: "Basics - 9:58" },
+    { id: 3, title: "Mentality - 10:03" },
+    { id: 4, title: "Game Settings - 12:40" },
+    { id: 5, title: "Formation - 12:56" },
+    { id: 6, title: "Defending - 28:00" },
+    { id: 7, title: "Attacking - 18:19" },
+    { id: 8, title: "Finishing - 10:14" },
+    { id: 9, title: "Play Locks - 11:29" },
+    { id: 10, title: "Best Playstyles - 4:46" },
+    { id: 11, title: "Skills Revisit - 11:45" },
+    { id: 12, title: "The End - 0:27" },
 
 ]
 
