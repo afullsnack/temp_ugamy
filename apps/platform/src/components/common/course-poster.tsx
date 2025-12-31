@@ -52,7 +52,7 @@ export const CoursePoster = () => {
             <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 md:px-12! lg:px-20!">
                 <div className="max-w-2xl space-y-6">
                     {/* Title */}
-                    <h1 className="text-3xl! font-black tracking-tight md:text-6xl! lg:text-7xl!">EA FC Complete Tutorial</h1>
+                    <h1 className="text-3xl! font-black tracking-tight md:text-6xl! lg:text-7xl!">Faruk's EAFC 26 Masterclass 1.0</h1>
 
                     {/* Meta Info */}
                     <div className="flex flex-wrap items-center gap-4 text-sm! font-medium md:text-base!">
