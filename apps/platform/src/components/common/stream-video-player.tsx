@@ -13,7 +13,6 @@ import {
     Pause,
     Volume2,
     VolumeX,
-    Heart,
     Eye,
     SkipBack,
     SkipForward,
@@ -112,23 +111,10 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         bufferingPercentage: 0,
     })
 
-    const [isProtectionActive, setIsProtectionActive] = useState(false)
-    const [canContinueWatching, setCanContinueWatching] = useState(false)
-    const [protectionReason, setProtectionReason] = useState("")
-    const [visibilityState, setVisibilityState] = useState<"visible" | "hidden">("visible")
-    const [suspiciousActivityCount, setSuspiciousActivityCount] = useState(0)
-    const [lastActivityTime, setLastActivityTime] = useState<number>(0)
-    const [isKeyPressed, setIsKeyPressed] = useState(false)
-    const [focusStableTime, setFocusStableTime] = useState<number>(0)
-    const [screenShareDetected, setScreenShareDetected] = useState(false)
-
     const videoRef = useRef<HTMLVideoElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const progressUpdateRef = useRef<NodeJS.Timeout>(null)
     const controlsTimeoutRef = useRef<NodeJS.Timeout>(null)
-    const activityVerificationRef = useRef<NodeJS.Timeout>(null)
-    const focusStabilityRef = useRef<NodeJS.Timeout>(null)
-    const keyReleaseRef = useRef<NodeJS.Timeout>(null)
 
     const apiUrl = env.VITE_API_URL
     const playbackSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
@@ -188,7 +174,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
             }
             return response.json()
         },
-        onSuccess: (data, variables) => {
+        onSuccess: (_data, variables) => {
             setProgress((prev) => ({ ...prev, ...variables }))
             queryClient.invalidateQueries({ queryKey: ["video-progress", videoId, userId] })
         },
@@ -312,49 +298,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
 
             if (isInputFocused) return
 
-            const isBlocked =
-                // Print Screen variations
-                event.key === "PrintScreen" ||
-                // Windows shortcuts
-                (event.metaKey && event.shiftKey && (event.key === "S" || event.key === "s")) ||
-                (event.ctrlKey && event.shiftKey && (event.key === "S" || event.key === "s")) ||
-                (event.metaKey && event.key === "g") ||
-                (event.metaKey && event.altKey && event.key === "r") ||
-                // macOS shortcuts
-                (event.metaKey && event.shiftKey && ["3", "4", "5", "6"].includes(event.key)) ||
-                (event.shiftKey && event.metaKey && ["3", "4", "5", "6"].includes(event.key)) ||
-                (event.metaKey && event.ctrlKey && event.key === "Escape") ||
-                // Developer tools
-                event.key === "F12" ||
-                (event.ctrlKey && event.shiftKey && event.key === "I") ||
-                (event.ctrlKey && event.shiftKey && event.key === "J") ||
-                (event.ctrlKey && event.key === "u") ||
-                (event.metaKey && event.altKey && event.key === "i") ||
-                (event.metaKey && event.altKey && event.key === "j") ||
-                (event.metaKey && event.altKey && event.key === "u")
-
-            if (isBlocked) {
-                event.preventDefault()
-                event.stopPropagation()
-                setIsKeyPressed(true)
-                setLastActivityTime(Date.now())
-                setSuspiciousActivityCount((prev) => prev + 1)
-                setIsProtectionActive(true)
-                setCanContinueWatching(false)
-                setProtectionReason("Screenshot or recording shortcut detected")
-
-                if (videoRef.current && !videoRef.current.paused) {
-                    videoRef.current.pause()
-                }
-
-                // Clear any existing key release timer
-                if (keyReleaseRef.current) {
-                    clearTimeout(keyReleaseRef.current)
-                }
-
-                return false
-            }
-
             switch (event.code) {
                 case "Space":
                     event.preventDefault()
@@ -425,52 +368,12 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         [isPlaying, volume, playbackRate, duration, playbackSpeeds, videoRef],
     )
 
-    const handleKeyUp = useCallback(
-        (event: KeyboardEvent) => {
-            // Start timer to detect when suspicious keys are no longer being pressed
-            if (keyReleaseRef.current) {
-                clearTimeout(keyReleaseRef.current)
-            }
-
-            keyReleaseRef.current = setTimeout(() => {
-                setIsKeyPressed(false)
-                checkIfActivityStopped()
-            }, 1000) // Wait 1 second after key release
-        },
-        [videoRef],
-    )
-
-    const checkIfActivityStopped = useCallback(() => {
-        const now = Date.now()
-        const timeSinceLastActivity = now - lastActivityTime
-        const isTabVisible = document.visibilityState === "visible"
-        const isWindowFocused = document.hasFocus()
-        const isStableEnvironment = timeSinceLastActivity > 3000 && isTabVisible && isWindowFocused && !isKeyPressed
-
-        // Additional checks for screen sharing detection
-        const hasStableFocus = now - focusStableTime > 5000
-        const lowSuspiciousActivity = suspiciousActivityCount < 3
-
-        if (isStableEnvironment && hasStableFocus && !screenShareDetected) {
-            // Perform final verification checks
-            setTimeout(() => {
-                if (document.visibilityState === "visible" && document.hasFocus() && !isKeyPressed) {
-                    setCanContinueWatching(true)
-                    setScreenShareDetected(false)
-                    setSuspiciousActivityCount(0)
-                }
-            }, 2000) // Additional 2-second verification period
-        }
-    }, [lastActivityTime, focusStableTime, isKeyPressed, suspiciousActivityCount, screenShareDetected])
-
     useEffect(() => {
         document.addEventListener("keydown", handleKeyDown)
-        document.addEventListener("keyup", handleKeyUp)
         return () => {
             document.removeEventListener("keydown", handleKeyDown)
-            document.removeEventListener("keyup", handleKeyUp)
         }
-    }, [handleKeyDown, handleKeyUp])
+    }, [handleKeyDown])
 
     useEffect(() => {
         if (progressData) {
@@ -538,15 +441,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     setShowControls(false)
                 }, timeout)
             }
-        }
-
-        const handleUserActivity = (e: Event) => {
-            // Prevent showing controls when clicking on control elements themselves
-            const target = e.target as HTMLElement
-            if (target.closest("[data-controls]")) {
-                return
-            }
-            showControlsTemporarily()
         }
 
         const handleMouseMove = () => {
@@ -715,151 +609,16 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     }
 
     useEffect(() => {
-        const handleVisibilityChange = () => {
-            const newVisibilityState = document.visibilityState as "visible" | "hidden"
-            setVisibilityState(newVisibilityState)
-
-            if (newVisibilityState === "hidden") {
-                // Detect potential screen recording/sharing
-                setScreenShareDetected(true)
-                setLastActivityTime(Date.now())
-                setSuspiciousActivityCount((prev) => prev + 1)
-
-                if (videoRef.current && !videoRef.current.paused) {
-                    videoRef.current.pause()
-                }
-                setIsProtectionActive(true)
-                setCanContinueWatching(false)
-                setProtectionReason("Tab switched or screen sharing detected")
-            } else if (newVisibilityState === "visible") {
-                // Start tracking focus stability
-                setFocusStableTime(Date.now())
-                setScreenShareDetected(false)
-
-                // Clear any existing stability timer
-                if (focusStabilityRef.current) {
-                    clearTimeout(focusStabilityRef.current)
-                }
-
-                // Wait for stable focus before allowing continuation
-                focusStabilityRef.current = setTimeout(() => {
-                    if (isProtectionActive) {
-                        checkIfActivityStopped()
-                    }
-                }, 3000) // Wait 3 seconds for stable visibility
-            }
-        }
-
-        const handleBlur = () => {
-            setLastActivityTime(Date.now())
-            setSuspiciousActivityCount((prev) => prev + 1)
-            setIsProtectionActive(true)
-            setCanContinueWatching(false)
-            setProtectionReason("Window focus lost - possible screen recording")
-            if (videoRef.current && !videoRef.current.paused) {
-                videoRef.current.pause()
-            }
-        }
-
-        const handleFocus = () => {
-            setFocusStableTime(Date.now())
-
-            // Clear existing timer and start new stability check
-            if (focusStabilityRef.current) {
-                clearTimeout(focusStabilityRef.current)
-            }
-
-            focusStabilityRef.current = setTimeout(() => {
-                if (isProtectionActive) {
-                    checkIfActivityStopped()
-                }
-            }, 4000) // Wait 4 seconds for stable focus
-        }
-
-        const handleContextMenu = (e: Event) => {
-            e.preventDefault()
-        }
-
-        const handleBeforeUnload = () => {
-            setIsProtectionActive(true)
-            setScreenShareDetected(true)
-        }
-
         const handleFullscreenChange = () => {
-            // If exiting fullscreen unexpectedly, might indicate screen sharing
-            if (!document.fullscreenElement && isFullscreen) {
-                setIsProtectionActive(true)
-                setScreenShareDetected(true)
-                setLastActivityTime(Date.now())
-            }
+            setIsFullscreen(!!document.fullscreenElement)
         }
 
-        const handleMouseMove = () => {
-            if (isProtectionActive && document.visibilityState === "visible" && document.hasFocus()) {
-                // User is actively moving mouse while tab is visible and focused
-                setTimeout(() => {
-                    checkIfActivityStopped()
-                }, 1000)
-            }
-        }
-
-        document.addEventListener("visibilitychange", handleVisibilityChange)
-        window.addEventListener("blur", handleBlur)
-        window.addEventListener("focus", handleFocus)
-        document.addEventListener("contextmenu", handleContextMenu)
-        window.addEventListener("beforeunload", handleBeforeUnload)
         document.addEventListener("fullscreenchange", handleFullscreenChange)
-        document.addEventListener("mousemove", handleMouseMove)
 
         return () => {
-            document.removeEventListener("visibilitychange", handleVisibilityChange)
-            window.removeEventListener("blur", handleBlur)
-            window.removeEventListener("focus", handleFocus)
-            document.removeEventListener("contextmenu", handleContextMenu)
-            window.removeEventListener("beforeunload", handleBeforeUnload)
             document.removeEventListener("fullscreenchange", handleFullscreenChange)
-            document.removeEventListener("mousemove", handleMouseMove)
-
-            // Clean up timers
-            if (focusStabilityRef.current) {
-                clearTimeout(focusStabilityRef.current)
-            }
-            if (keyReleaseRef.current) {
-                clearTimeout(keyReleaseRef.current)
-            }
-            if (activityVerificationRef.current) {
-                clearTimeout(activityVerificationRef.current)
-            }
         }
-    }, [isFullscreen, isProtectionActive])
-
-    const handleContinueWatching = () => {
-        if (canContinueWatching) {
-            // Final verification before allowing continuation
-            const isEnvironmentSafe =
-                document.visibilityState === "visible" &&
-                document.hasFocus() &&
-                !isKeyPressed &&
-                !screenShareDetected &&
-                Date.now() - lastActivityTime > 5000
-
-            if (isEnvironmentSafe) {
-                setIsProtectionActive(false)
-                setCanContinueWatching(false)
-                setProtectionReason("")
-                setSuspiciousActivityCount(0)
-                setLastActivityTime(0)
-                setFocusStableTime(0)
-            } else {
-                // Reset verification if environment is not safe
-                setCanContinueWatching(false)
-                setProtectionReason("Please ensure you've stopped all recording/sharing activities")
-                setTimeout(() => {
-                    checkIfActivityStopped()
-                }, 3000)
-            }
-        }
-    }
+    }, [])
 
     if (videoLoading || progressLoading) {
         return <VideoPlayerSkeleton />
@@ -878,80 +637,17 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
             <div
                 ref={containerRef}
                 className="relative bg-black rounded-xl overflow-hidden shadow-2xl group mx-auto"
-                style={{
-                    userSelect: "none",
-                    WebkitUserSelect: "none",
-                    MozUserSelect: "none",
-                    msUserSelect: "none",
-                    WebkitTouchCallout: "none",
-                    // WebkitUserDrag: "none",
-                    KhtmlUserSelect: "none",
-                }}
             >
-                {isProtectionActive && (
-                    <div className="absolute inset-0 bg-black z-50 flex items-center justify-center">
-                        <div className="text-white text-center max-w-md px-6">
-                            <div className="text-3xl mb-4">🔒</div>
-                            <p className="text-xl mb-2 font-semibold">Content Protected</p>
-                            <p className="text-sm opacity-75 mb-2">{protectionReason}</p>
-                            <p className="text-xs opacity-60 mb-6">
-                                {canContinueWatching
-                                    ? "Environment verified - you may continue watching"
-                                    : "Please stop all recording/sharing activities and keep this tab active"}
-                            </p>
-                            <div className="text-xs opacity-50 mb-4 space-y-1">
-                                <div
-                                    className={`flex items-center justify-center ${document.visibilityState === "visible" ? "text-green-400" : "text-red-400"}`}
-                                >
-                                    <span className="mr-2">•</span>
-                                    Tab Visibility: {document.visibilityState}
-                                </div>
-                                <div
-                                    className={`flex items-center justify-center ${!isKeyPressed ? "text-green-400" : "text-red-400"}`}
-                                >
-                                    <span className="mr-2">•</span>
-                                    Restricted Keys: {isKeyPressed ? "Active" : "Released"}
-                                </div>
-                                <div
-                                    className={`flex items-center justify-center ${!screenShareDetected ? "text-green-400" : "text-red-400"}`}
-                                >
-                                    <span className="mr-2">•</span>
-                                    Screen Sharing: {screenShareDetected ? "Detected" : "Clear"}
-                                </div>
-                            </div>
-                            <button
-                                onClick={handleContinueWatching}
-                                disabled={!canContinueWatching}
-                                className={`px-6 py-3 rounded-lg transition-all duration-200 font-medium ${canContinueWatching
-                                    ? "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
-                                    : "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
-                                    }`}
-                            >
-                                {canContinueWatching ? "Continue Watching" : "Verifying Environment..."}
-                            </button>
-                            {!canContinueWatching && (
-                                <div className="mt-4 flex items-center justify-center">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white opacity-50"></div>
-                                    <span className="ml-2 text-xs opacity-50">Verification in progress</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-
                 <video
                     ref={videoRef}
                     className={`w-full min-h-[400px] aspect-video object-contain mx-auto block ${isFullscreen ? "h-screen w-screen object-contain" : ""
                         }`}
-                    style={{
-                        pointerEvents: isProtectionActive ? "none" : "auto",
-                    }}
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onPlay={handlePlaying}
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
-                    preload="metadata"
+                    preload="auto"
                     playsInline
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
@@ -961,8 +657,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onSeeking={handleSeeking}
                     onSeeked={handleSeeked}
                     onProgress={handleProgress}
-                    onContextMenu={(e) => e.preventDefault()}
-                    onDragStart={(e) => e.preventDefault()}
                 >
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
