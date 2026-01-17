@@ -111,10 +111,15 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         bufferingPercentage: 0,
     })
 
+    // Security protection state
+    const [isProtectionActive, setIsProtectionActive] = useState(false)
+    const [protectionReason, setProtectionReason] = useState("")
+
     const videoRef = useRef<HTMLVideoElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const progressUpdateRef = useRef<NodeJS.Timeout>(null)
     const controlsTimeoutRef = useRef<NodeJS.Timeout>(null)
+    const wasPlayingBeforeProtection = useRef(false)
 
     const apiUrl = env.VITE_API_URL
     const playbackSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
@@ -285,6 +290,28 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         }
     }
 
+    // Helper function to activate protection and pause video
+    const activateProtection = useCallback((reason: string) => {
+        // Store if video was playing before protection
+        if (videoRef.current && !videoRef.current.paused) {
+            wasPlayingBeforeProtection.current = true
+            videoRef.current.pause()
+        }
+        setIsProtectionActive(true)
+        setProtectionReason(reason)
+    }, [])
+
+    // Helper function to deactivate protection
+    const deactivateProtection = useCallback(() => {
+        setIsProtectionActive(false)
+        setProtectionReason("")
+        // Resume playback if it was playing before protection
+        if (wasPlayingBeforeProtection.current && videoRef.current) {
+            videoRef.current.play()
+            wasPlayingBeforeProtection.current = false
+        }
+    }, [])
+
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
             if (!videoRef.current) return
@@ -297,6 +324,26 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                 (activeElement as HTMLElement)?.isContentEditable === true
 
             if (isInputFocused) return
+
+            // Check for blocked screenshot/recording shortcuts
+            const isBlocked =
+                event.key === "PrintScreen" ||
+                (event.metaKey && event.shiftKey && (event.key === "S" || event.key === "s")) ||
+                (event.ctrlKey && event.shiftKey && (event.key === "S" || event.key === "s")) ||
+                (event.metaKey && event.shiftKey && ["3", "4", "5", "6"].includes(event.key)) ||
+                event.key === "F12" ||
+                (event.ctrlKey && event.shiftKey && (event.key === "I" || event.key === "i")) ||
+                (event.ctrlKey && event.shiftKey && (event.key === "J" || event.key === "j")) ||
+                (event.ctrlKey && (event.key === "u" || event.key === "U")) ||
+                (event.metaKey && event.altKey && (event.key === "i" || event.key === "I")) ||
+                (event.metaKey && event.altKey && (event.key === "j" || event.key === "J"))
+
+            if (isBlocked) {
+                event.preventDefault()
+                event.stopPropagation()
+                activateProtection("Screenshot or recording shortcut detected")
+                return
+            }
 
             switch (event.code) {
                 case "Space":
@@ -620,6 +667,33 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         }
     }, [])
 
+    // Security: Monitor visibility, focus, and context menu
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "hidden") {
+                activateProtection("Tab switched or screen sharing detected")
+            }
+        }
+
+        const handleBlur = () => {
+            activateProtection("Window focus lost - possible screen recording")
+        }
+
+        const handleContextMenu = (e: Event) => {
+            e.preventDefault()
+        }
+
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+        window.addEventListener("blur", handleBlur)
+        document.addEventListener("contextmenu", handleContextMenu)
+
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange)
+            window.removeEventListener("blur", handleBlur)
+            document.removeEventListener("contextmenu", handleContextMenu)
+        }
+    }, [activateProtection])
+
     if (videoLoading || progressLoading) {
         return <VideoPlayerSkeleton />
     }
@@ -637,11 +711,41 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
             <div
                 ref={containerRef}
                 className="relative bg-black rounded-xl overflow-hidden shadow-2xl group mx-auto"
+                style={{
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    WebkitTouchCallout: "none",
+                }}
             >
+                {/* Protection Overlay */}
+                {isProtectionActive && (
+                    <div className="absolute inset-0 bg-black z-50 flex items-center justify-center">
+                        <div className="text-white text-center max-w-md px-6">
+                            <div className="text-3xl mb-4">🔒</div>
+                            <p className="text-xl mb-2 font-semibold">Content Protected</p>
+                            <p className="text-sm opacity-75 mb-4">{protectionReason}</p>
+                            <p className="text-xs opacity-60 mb-6">
+                                Please return to this tab and click continue to resume watching.
+                            </p>
+                            <button
+                                onClick={deactivateProtection}
+                                className="px-6 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white cursor-pointer transition-all duration-200 font-medium"
+                            >
+                                Continue Watching
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <video
                     ref={videoRef}
                     className={`w-full min-h-[400px] aspect-video object-contain mx-auto block ${isFullscreen ? "h-screen w-screen object-contain" : ""
                         }`}
+                    style={{
+                        pointerEvents: isProtectionActive ? "none" : "auto",
+                    }}
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onPlay={handlePlaying}
@@ -657,6 +761,8 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onSeeking={handleSeeking}
                     onSeeked={handleSeeked}
                     onProgress={handleProgress}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
                 >
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
