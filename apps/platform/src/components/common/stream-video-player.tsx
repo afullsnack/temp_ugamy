@@ -558,15 +558,21 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     //     })
     // }
 
-    const togglePlay = () => {
+    const togglePlay = async () => {
         if (!videoRef.current) return
-
-        if (isPlaying) {
+      
+        try {
+          if (isPlaying) {
             videoRef.current.pause()
-        } else {
-            videoRef.current.play()
+          } else {
+            videoRef.current.muted = isMuted // ensure set before play
+            await videoRef.current.play()
+          }
+        } catch (err) {
+          console.error("iOS play failed:", err)
         }
-    }
+      }
+      
 
     const toggleMute = () => {
         if (!videoRef.current) return
@@ -741,6 +747,10 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
 
                 <video
                     ref={videoRef}
+                    muted={isMuted}
+                    playsInline
+                    {...({ "webkit-playsinline": "true" } as any)}
+                    preload="metadata"
                     className={`w-full min-h-[400px] aspect-video object-contain mx-auto block ${isFullscreen ? "h-screen w-screen object-contain" : ""
                         }`}
                     style={{
@@ -751,9 +761,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onPlay={handlePlaying}
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
-                    preload="metadata"
-                    playsInline
-                    muted
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
                     onCanPlay={handleCanPlay}

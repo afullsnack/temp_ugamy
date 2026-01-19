@@ -112,16 +112,21 @@ export const VideoPlayerModal = create(({ videoUrl, title }: VideoPlayerModalPro
         resetControlsTimeout()
     }
 
-    const togglePlay = () => {
-        if (videoRef.current) {
-            if (isPlaying) {
-                videoRef.current.pause()
-            } else {
-                videoRef.current.play()
-            }
-            setIsPlaying(!isPlaying)
+    const togglePlay = async () => {
+        if (!videoRef.current) return
+      
+        try {
+          if (isPlaying) {
+            videoRef.current.pause()
+          } else {
+            videoRef.current.muted = isMuted
+            await videoRef.current.play()
+          }
+        } catch (err) {
+          console.error("iOS modal play failed:", err)
         }
-    }
+      }
+      
 
     const handleTimeUpdate = () => {
         if (videoRef.current) {
@@ -195,19 +200,19 @@ export const VideoPlayerModal = create(({ videoUrl, title }: VideoPlayerModalPro
                     <div className="absolute inset-0 z-10 pointer-events-none" />
 
                     <video
-                        ref={videoRef}
-                        src={videoUrl}
-                        className="w-full aspect-video"
-                        onTimeUpdate={handleTimeUpdate}
-                        onLoadedMetadata={handleLoadedMetadata}
-                        onPlay={() => setIsPlaying(true)}
-                        onPause={() => setIsPlaying(false)}
-                        controlsList="nodownload nofullscreen noremoteplayback"
-                        disablePictureInPicture
-                        playsInline
-                        onDragStart={(e) => e.preventDefault()}
-                        style={{ pointerEvents: "none" }}
-                    />
+  ref={videoRef}
+  src={videoUrl}
+  muted={isMuted}
+  playsInline
+  {...({ "webkit-playsinline": "true" } as any)}
+  preload="metadata"
+  onTimeUpdate={handleTimeUpdate}
+  onLoadedMetadata={handleLoadedMetadata}
+  onPlay={() => setIsPlaying(true)}
+  onPause={() => setIsPlaying(false)}
+  onDragStart={(e) => e.preventDefault()}
+/>
+
 
                     <div
                         className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"
