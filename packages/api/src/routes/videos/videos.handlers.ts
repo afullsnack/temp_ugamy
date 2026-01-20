@@ -202,7 +202,7 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   // Extended cache for better performance on repeat views
   c.header("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
   c.header("Cross-Origin-Resource-Policy", "cross-origin");
-  c.header("Content-Type", metadata.contentType || "video/mp4");
+  c.header("Content-Type", "video/mp4");
   c.header("Content-Disposition", `inline; filename="${key}"`);
   c.header("Accept-Ranges", "bytes");
   // Timing headers to help with debugging
