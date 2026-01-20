@@ -66,7 +66,7 @@ const VideoPlayerSkeleton = () => (
         <div className="relative bg-card rounded-xl overflow-hidden shadow-2xl">
             <Skeleton className="w-full aspect-video" />
             <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
-                <Skeleton className="h-2 w-full" /> 
+                <Skeleton className="h-2 w-full" />
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Skeleton className="h-8 w-8 rounded" />
