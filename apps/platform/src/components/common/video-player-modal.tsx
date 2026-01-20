@@ -112,16 +112,21 @@ export const VideoPlayerModal = create(({ videoUrl, title }: VideoPlayerModalPro
         resetControlsTimeout()
     }
 
-    const togglePlay = () => {
-        if (videoRef.current) {
-            if (isPlaying) {
-                videoRef.current.pause()
-            } else {
-                videoRef.current.play()
-            }
-            setIsPlaying(!isPlaying)
+    const togglePlay = async () => {
+        if (!videoRef.current) return
+      
+        try {
+          if (isPlaying) {
+            videoRef.current.pause()
+          } else {
+            videoRef.current.muted = isMuted
+            await videoRef.current.play()
+          }
+        } catch (err) {
+          console.error("iOS modal play failed:", err)
         }
-    }
+      }
+      
 
     const handleTimeUpdate = () => {
         if (videoRef.current) {
@@ -197,16 +202,19 @@ export const VideoPlayerModal = create(({ videoUrl, title }: VideoPlayerModalPro
                     <video
                         ref={videoRef}
                         src={videoUrl}
-                        className="w-full aspect-video"
+                        muted={isMuted}
+                        playsInline
+                        {...({ "webkit-playsinline": "true" } as any)}
+                        preload="metadata"
                         onTimeUpdate={handleTimeUpdate}
                         onLoadedMetadata={handleLoadedMetadata}
                         onPlay={() => setIsPlaying(true)}
                         onPause={() => setIsPlaying(false)}
-                        controlsList="nodownload nofullscreen noremoteplayback"
-                        disablePictureInPicture
-                        playsInline
                         onDragStart={(e) => e.preventDefault()}
-                        style={{ pointerEvents: "none" }}
+                        className="w-full aspect-video"
+                        style={{ pointerEvents: "none" }}                        
+                        disablePictureInPicture
+                        controlsList="nodownload nofullscreen noremoteplayback"
                     />
 
                     <div
