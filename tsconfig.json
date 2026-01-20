@@ -4,7 +4,7 @@
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": true, 
     "forceConsistentCasingInFileNames": true,
     "typeRoots": [
       "./node_modules/@types"
