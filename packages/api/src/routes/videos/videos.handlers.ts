@@ -187,40 +187,29 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   const fileSize = metadata.size || 0;
   const rangeHeader = c.req.header("range");
 
-  // Detect mobile user agent for optimized chunk sizes
-  const userAgent = c.req.header("user-agent") || "";
-  const isMobile = /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-
-  // Optimized chunk size: 1MB for mobile, 2MB for desktop
-  const defaultChunkSize = isMobile ? 1 * 1024 * 1024 : 2 * 1024 * 1024;
-
-  // Set CORS and caching headers optimized for streaming
-  c.header("Access-Control-Allow-Origin", "*");
+  // Set CORS and security headers
+  c.header("Access-Control-Allow-Origin", `http://localhost:3000, https://ugamy.com, https://www.ugamy.com`);
   c.header("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
   c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
   c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
-  // Extended cache for better performance on repeat views
-  c.header("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+  c.header("Cache-Control", "public, max-age=3600");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("X-Frame-Options", "DENY");
+  c.header("Content-Security-Policy", "default-src 'self'");
   c.header("Cross-Origin-Resource-Policy", "cross-origin");
-  c.header("Content-Type", "video/mp4");
-  c.header("Content-Disposition", `inline; filename="${key}"`);
+  c.header("Content-Type", metadata.contentType || "video/mp4");
+  c.header("Content-Disposition", `inline; filename=${key}`);
   c.header("Accept-Ranges", "bytes");
-  // Timing headers to help with debugging
-  c.header("Timing-Allow-Origin", "*");
 
   // Handle Range requests for video streaming
   if (rangeHeader) {
     const parts = rangeHeader.replace(/bytes=/, "").split("-");
     const start = Number.parseInt(parts[0], 10);
-    // If no end specified, use optimized chunk size instead of entire remaining file
-    const requestedEnd = parts[1] ? Number.parseInt(parts[1], 10) : null;
-    const end = requestedEnd !== null
-      ? Math.min(requestedEnd, fileSize - 1)
-      : Math.min(start + defaultChunkSize - 1, fileSize - 1);
+    const end = parts[1] ? Number.parseInt(parts[1], 10) : fileSize - 1;
     const chunkSize = end - start + 1;
 
     // Validate range
-    if (start >= fileSize) {
+    if (start >= fileSize || end >= fileSize) {
       c.status(HttpStatusCodes.REQUESTED_RANGE_NOT_SATISFIABLE);
       c.header("Content-Range", `bytes */${fileSize}`);
       return c.body(null);
@@ -241,18 +230,14 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
     return c.body(response as ReadableStream, HttpStatusCodes.PARTIAL_CONTENT);
   }
 
-  // No range request - return first chunk with range headers to encourage range requests
-  // const end = Math.min(defaultChunkSize - 1, fileSize - 1);
-  // const chunkSize = end + 1;
-
+  // No range request - send full file
   const { body: response } = await tigrisClient.downloadFile({
     bucket: env.BUCKET_NAME || "",
     key: `videos/${key}` || "",
-    // range: `bytes=0-${end}`,
   });
 
-  c.header("Content-Length", fileSize.toString());  
-  
+  c.header("Content-Length", fileSize.toString());
+  c.status(HttpStatusCodes.OK);
 
   return c.body(response as ReadableStream, HttpStatusCodes.OK);
 };

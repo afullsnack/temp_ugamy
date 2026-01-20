@@ -66,7 +66,7 @@ const VideoPlayerSkeleton = () => (
         <div className="relative bg-card rounded-xl overflow-hidden shadow-2xl">
             <Skeleton className="w-full aspect-video" />
             <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
-                <Skeleton className="h-2 w-full" />
+                <Skeleton className="h-2 w-full" /> 
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Skeleton className="h-8 w-8 rounded" />
@@ -558,21 +558,15 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     //     })
     // }
 
-    const togglePlay = async () => {
+    const togglePlay = () => {
         if (!videoRef.current) return
-      
-        try {
-          if (isPlaying) {
+
+        if (isPlaying) {
             videoRef.current.pause()
-          } else {
-            videoRef.current.muted = isMuted // ensure set before play
-            await videoRef.current.play()
-          }
-        } catch (err) {
-          console.error("iOS play failed:", err)
+        } else {
+            videoRef.current.play()
         }
-      }
-      
+    }
 
     const toggleMute = () => {
         if (!videoRef.current) return
@@ -747,10 +741,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
 
                 <video
                     ref={videoRef}
-                    muted={isMuted}
-                    playsInline
-                    {...({ "webkit-playsinline": "true" } as any)}
-                    preload="metadata"
                     className={`w-full min-h-[400px] aspect-video object-contain mx-auto block ${isFullscreen ? "h-screen w-screen object-contain" : ""
                         }`}
                     style={{
@@ -761,6 +751,8 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onPlay={handlePlaying}
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
+                    preload="auto"
+                    playsInline
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
                     onCanPlay={handleCanPlay}
