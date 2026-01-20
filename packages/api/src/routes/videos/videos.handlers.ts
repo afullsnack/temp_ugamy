@@ -202,7 +202,7 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   // Extended cache for better performance on repeat views
   c.header("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
   c.header("Cross-Origin-Resource-Policy", "cross-origin");
-  c.header("Content-Type", metadata.contentType || "video/mp4");
+  c.header("Content-Type", "video/mp4");
   c.header("Content-Disposition", `inline; filename="${key}"`);
   c.header("Accept-Ranges", "bytes");
   // Timing headers to help with debugging
@@ -242,20 +242,19 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   }
 
   // No range request - return first chunk with range headers to encourage range requests
-  const end = Math.min(defaultChunkSize - 1, fileSize - 1);
-  const chunkSize = end + 1;
+  // const end = Math.min(defaultChunkSize - 1, fileSize - 1);
+  // const chunkSize = end + 1;
 
   const { body: response } = await tigrisClient.downloadFile({
     bucket: env.BUCKET_NAME || "",
     key: `videos/${key}` || "",
-    range: `bytes=0-${end}`,
+    // range: `bytes=0-${end}`,
   });
 
-  c.header("Content-Range", `bytes 0-${end}/${fileSize}`);
-  c.header("Content-Length", chunkSize.toString());
-  c.status(HttpStatusCodes.PARTIAL_CONTENT);
+  c.header("Content-Length", fileSize.toString());  
+  
 
-  return c.body(response as ReadableStream, HttpStatusCodes.PARTIAL_CONTENT);
+  return c.body(response as ReadableStream, HttpStatusCodes.OK);
 };
 
 export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
