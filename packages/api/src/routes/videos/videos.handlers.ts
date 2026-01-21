@@ -161,89 +161,95 @@ export const getOne: AppRouteHandler<GetOneVideoRoute> = async (c) => {
 };
 
 export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
-  const { key } = c.req.valid("param");
-  console.log("Key to video", key);
+  try {
+    const { key } = c.req.valid("param");
+    console.log("Key to video", key);
 
-  if (!key) {
-    return c.json({
-      success: false,
-      message: "Key not provided",
-    }, HttpStatusCodes.BAD_REQUEST);
-  }
-
-  const tigrisClient = new TigrisClient({
-    endpoint: env.AWS_ENDPOINT_URL_S3 || "",
-    accessKeyId: env.AWS_ACCESS_KEY_ID || "",
-    secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "",
-    region: env.AWS_REGION,
-  });
-
-  // Get file metadata first to determine file size
-  const metadata = await tigrisClient.getFileMetadata(
-    env.BUCKET_NAME || "",
-    `videos/${key}` || "",
-  );
-
-  const fileSize = metadata.size || 0;
-  const rangeHeader = c.req.header("range");
-
-  // Set CORS and security headers
-  c.header(
-    "Access-Control-Allow-Origin",
-    `https://staging.ugamy.io`
-    // `http://localhost:3000, https://staging.ugamy.io, https://ugamy.io, https://www.ugamy.io`
-  );
-  c.header("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
-  c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
-  c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
-  c.header("Cache-Control", "public, max-age=3600");
-  c.header("X-Content-Type-Options", "nosniff");
-  c.header("X-Frame-Options", "DENY");
-  c.header("Content-Security-Policy", "default-src 'self'");
-  c.header("Cross-Origin-Resource-Policy", "cross-origin");
-  c.header("Content-Type", metadata.contentType || "video/mp4");
-  c.header("Content-Disposition", `inline; filename=${key}`);
-  c.header("Accept-Ranges", "bytes");
-
-  // Handle Range requests for video streaming
-  if (rangeHeader) {
-    const parts = rangeHeader.replace(/bytes=/, "").split("-");
-    const start = Number.parseInt(parts[0], 10);
-    const end = parts[1] ? Number.parseInt(parts[1], 10) : fileSize - 1;
-    const chunkSize = end - start + 1;
-
-    // Validate range
-    if (start >= fileSize || end >= fileSize) {
-      c.status(HttpStatusCodes.REQUESTED_RANGE_NOT_SATISFIABLE);
-      c.header("Content-Range", `bytes */${fileSize}`);
-      return c.body(null);
+    if (!key) {
+      return c.json({
+        success: false,
+        message: "Key not provided",
+      }, HttpStatusCodes.BAD_REQUEST);
     }
 
-    // Download the specified range
+    const tigrisClient = new TigrisClient({
+      endpoint: env.AWS_ENDPOINT_URL_S3 || "",
+      accessKeyId: env.AWS_ACCESS_KEY_ID || "",
+      secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "",
+      region: env.AWS_REGION,
+    });
+
+    // Get file metadata first to determine file size
+    const metadata = await tigrisClient.getFileMetadata(
+      env.BUCKET_NAME || "",
+      `videos/${key}` || "",
+    );
+
+    const fileSize = metadata.size || 0;
+    const rangeHeader = c.req.header("range");
+
+    // Set CORS and security headers
+    c.header(
+      "Access-Control-Allow-Origin",
+      `https://staging.ugamy.io`
+      // `http://localhost:3000, https://staging.ugamy.io, https://ugamy.io, https://www.ugamy.io`
+    );
+    c.header("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
+    c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
+    c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
+    c.header("Cache-Control", "public, max-age=3600");
+    c.header("X-Content-Type-Options", "nosniff");
+    c.header("X-Frame-Options", "DENY");
+    c.header("Content-Security-Policy", "default-src 'self'");
+    c.header("Cross-Origin-Resource-Policy", "cross-origin");
+    c.header("Content-Type", metadata.contentType || "video/mp4");
+    c.header("Content-Disposition", `inline; filename=${key}`);
+    c.header("Accept-Ranges", "bytes");
+
+    // Handle Range requests for video streaming
+    if (rangeHeader) {
+      const parts = rangeHeader.replace(/bytes=/, "").split("-");
+      const start = Number.parseInt(parts[0], 10);
+      const end = parts[1] ? Number.parseInt(parts[1], 10) : fileSize - 1;
+      const chunkSize = end - start + 1;
+
+      // Validate range
+      if (start >= fileSize || end >= fileSize) {
+        c.status(HttpStatusCodes.REQUESTED_RANGE_NOT_SATISFIABLE);
+        c.header("Content-Range", `bytes */${fileSize}`);
+        return c.body(null);
+      }
+
+      // Download the specified range
+      const { body: response } = await tigrisClient.downloadFile({
+        bucket: env.BUCKET_NAME || "",
+        key: `videos/${key}` || "",
+        range: `bytes=${start}-${end}`,
+      });
+
+      // Set partial content headers
+      c.header("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+      c.header("Content-Length", chunkSize.toString());
+      c.status(HttpStatusCodes.PARTIAL_CONTENT);
+
+      return c.body(response as ReadableStream, HttpStatusCodes.PARTIAL_CONTENT);
+    }
+
+    // No range request - send full file
     const { body: response } = await tigrisClient.downloadFile({
       bucket: env.BUCKET_NAME || "",
       key: `videos/${key}` || "",
-      range: `bytes=${start}-${end}`,
     });
 
-    // Set partial content headers
-    c.header("Content-Range", `bytes ${start}-${end}/${fileSize}`);
-    c.header("Content-Length", chunkSize.toString());
-    c.status(HttpStatusCodes.PARTIAL_CONTENT);
+    c.header("Content-Length", fileSize.toString());
+    c.status(HttpStatusCodes.OK);
 
-    return c.body(response as ReadableStream, HttpStatusCodes.PARTIAL_CONTENT);
+    return c.body(response as ReadableStream, HttpStatusCodes.OK);
   }
-
-  // No range request - send full file
-  const { body: response } = await tigrisClient.downloadFile({
-    bucket: env.BUCKET_NAME || "",
-    key: `videos/${key}` || "",
-  });
-
-  c.header("Content-Length", fileSize.toString());
-  c.status(HttpStatusCodes.OK);
-
-  return c.body(response as ReadableStream, HttpStatusCodes.OK);
+  catch (error: any) {
+    console.log(`Failed to stream video: `, { error })
+    throw error;
+  }
 };
 
 export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
