@@ -188,7 +188,11 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   const rangeHeader = c.req.header("range");
 
   // Set CORS and security headers
-  c.header("Access-Control-Allow-Origin", `http://localhost:3000, https://staging.ugamy.io, https://ugamy.io, https://www.ugamy.io`);
+  c.header(
+    "Access-Control-Allow-Origin",
+    `https://staging.ugamy.io`
+    // `http://localhost:3000, https://staging.ugamy.io, https://ugamy.io, https://www.ugamy.io`
+  );
   c.header("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
   c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
   c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
