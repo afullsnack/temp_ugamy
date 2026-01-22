@@ -252,9 +252,10 @@ if (origin && ALLOWED_ORIGINS.includes(origin)) {
   c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
   c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
   c.header("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
-  c.header("Cross-Origin-Resource-Policy", "cross-origin");
   c.header("Content-Type", metadata.contentType || "video/mp4");
   c.header("Accept-Ranges", "bytes");
+  c.header("Content-Disposition", "inline");
+  c.header("X-Content-Type-Options", "nosniff");
 
   // Handle Range requests for video streaming
   if (rangeHeader) {
@@ -299,20 +300,20 @@ if (origin && ALLOWED_ORIGINS.includes(origin)) {
   }
 
   if (!rangeHeader) {
-    const { body } = await tigrisClient.downloadFile({
+    const { body: response } = await tigrisClient.downloadFile({
       bucket: env.BUCKET_NAME || "",
       key: `videos/${key}`,
-      range: `bytes=0-${Math.min(1024 * 1024, fileSize - 1)}`
     });
   
-    c.header("Content-Range", `bytes 0-${Math.min(1024 * 1024, fileSize - 1)}/${fileSize}`);
-    c.header("Content-Length", Math.min(1024 * 1024, fileSize).toString());
+    c.header("Content-Length", fileSize.toString());
   
-    return new Response(nodeStreamToWebStream(body), {
-      status: HttpStatusCodes.PARTIAL_CONTENT,
+    return new Response(nodeStreamToWebStream(response), {
+      status: HttpStatusCodes.OK,
       headers: c.res.headers,
     });
   }
+  
+  
   
 
   // No range request - stream full file
