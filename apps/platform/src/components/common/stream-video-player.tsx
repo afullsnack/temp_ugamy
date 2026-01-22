@@ -755,9 +755,10 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onPlay={handlePlaying}
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
-                    preload="auto"
+                    controls={false}
                     playsInline
-                    {...{ "webkit-playsinline": "true" }}
+                    webkit-playsinline="true"
+                    preload={isiOS ? "metadata" : "auto"}
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
                     onCanPlay={handleCanPlay}
@@ -768,7 +769,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onProgress={handleProgress}
                     onContextMenu={(e) => e.preventDefault()}
                     onDragStart={(e) => e.preventDefault()}
-                    controls={isiOS}
                 >
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
