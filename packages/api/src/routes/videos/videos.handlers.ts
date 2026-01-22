@@ -199,8 +199,8 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
     c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
     c.header("Cache-Control", "public, max-age=3600");
     c.header("X-Content-Type-Options", "nosniff");
-    c.header("X-Frame-Options", "DENY");
-    c.header("Content-Security-Policy", "default-src 'self'");
+    // c.header("X-Frame-Options", "DENY");
+    // c.header("Content-Security-Policy", "default-src 'self'");
     c.header("Cross-Origin-Resource-Policy", "cross-origin");
     c.header("Content-Type", metadata.contentType || "video/mp4");
     c.header("Content-Disposition", `inline; filename=${key}`);
