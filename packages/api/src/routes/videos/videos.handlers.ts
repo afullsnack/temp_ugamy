@@ -236,14 +236,26 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   const rangeHeader = c.req.header("range");
 
   // Set common headers for all responses
-  c.header("Access-Control-Allow-Origin", "*");
+  const ALLOWED_ORIGINS = [
+    "https://staging.ugamy.io",
+    "https://dashboard.ugamy.io",
+  ];
+  
+  const origin = c.req.header("origin");
+
+if (origin && ALLOWED_ORIGINS.includes(origin)) {
+  c.header("Access-Control-Allow-Origin", origin);
+  c.header("Access-Control-Allow-Credentials", "true");
+}
+
   c.header("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
   c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
   c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
   c.header("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
-  c.header("Cross-Origin-Resource-Policy", "cross-origin");
   c.header("Content-Type", metadata.contentType || "video/mp4");
   c.header("Accept-Ranges", "bytes");
+  c.header("Content-Disposition", "inline");
+  c.header("X-Content-Type-Options", "nosniff");
 
   // Handle Range requests for video streaming
   if (rangeHeader) {
@@ -286,6 +298,23 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
       headers: c.res.headers,
     });
   }
+
+  if (!rangeHeader) {
+    const { body: response } = await tigrisClient.downloadFile({
+      bucket: env.BUCKET_NAME || "",
+      key: `videos/${key}`,
+    });
+  
+    c.header("Content-Length", fileSize.toString());
+  
+    return new Response(nodeStreamToWebStream(response), {
+      status: HttpStatusCodes.OK,
+      headers: c.res.headers,
+    });
+  }
+  
+  
+  
 
   // No range request - stream full file
   const { body: response } = await tigrisClient.downloadFile({

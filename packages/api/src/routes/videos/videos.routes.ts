@@ -118,7 +118,7 @@ export const stream = createRoute({
   responses: {
     [HttpStatusCodes.OK]: {
       content: {
-        "application/octet-stream": {
+        "video/mp4": {
           schema: z.any(),
         },
       },
