@@ -686,9 +686,9 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         }
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
-        // if (!isiOS) {
-        //     window.addEventListener("blur", handleBlur)
-        //   }        
+        if (!isiOS) {
+            window.addEventListener("blur", handleBlur)
+          }        
         document.addEventListener("contextmenu", handleContextMenu)
 
         return () => {
