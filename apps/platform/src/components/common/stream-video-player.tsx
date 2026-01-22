@@ -125,6 +125,8 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     const playbackSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
     const queryClient = useQueryClient()
+    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+
 
     // Get Video by Id
     const {
@@ -684,8 +686,10 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         }
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
-        window.addEventListener("blur", handleBlur)
-        document.addEventListener("contextmenu", handleContextMenu)
+        if (!isiOS) {
+            window.addEventListener("blur", handleBlur)
+          }        
+          document.addEventListener("contextmenu", handleContextMenu)
 
         return () => {
             document.removeEventListener("visibilitychange", handleVisibilityChange)
@@ -753,6 +757,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     poster={video.thumbnailUrl}
                     preload="auto"
                     playsInline
+                    {...{ "webkit-playsinline": "true" }}
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
                     onCanPlay={handleCanPlay}
@@ -763,6 +768,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onProgress={handleProgress}
                     onContextMenu={(e) => e.preventDefault()}
                     onDragStart={(e) => e.preventDefault()}
+                    controls={isiOS}
                 >
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
