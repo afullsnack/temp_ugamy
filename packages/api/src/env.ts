@@ -36,7 +36,6 @@ const EnvSchema = z.object({
   AWS_REGION: z.string().optional(),
   BUCKET_NAME: z.string().optional(),
 }).superRefine((input, ctx) => {
-  console.log("Database auth token", input.DATABASE_AUTH_TOKEN);
   if (input.NODE_ENV === "staging" && !input.DATABASE_AUTH_TOKEN) {
     ctx.addIssue({
       code: z.ZodIssueCode.invalid_type,

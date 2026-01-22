@@ -61,7 +61,7 @@ export function VideoPlayer({ courseId, videoId }: VideoPlayerProps) {
 
   useEffect(() => {
     fetchVideo()
-    fetchProgress()
+    // fetchProgress()
     return () => {
       if (progressUpdateRef.current) {
         clearInterval(progressUpdateRef.current)

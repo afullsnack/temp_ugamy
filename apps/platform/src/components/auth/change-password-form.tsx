@@ -23,10 +23,8 @@ const formSchema = z
         password: z
             .string()
             .min(8, { message: "Password must be at least 8 characters." })
-            .regex(/(?=.*[0-9!@#$%^&*])/, {
-                message: "Password must include a number or symbol.",
-            }),
-        confirmPassword: z.string(),
+            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/, "Password must include uppercase, lowercase, number, and special character"),
+        confirmPassword: z.string().min(1, "Confirm password is required"),
     })
     .refine((data) => data.password === data.confirmPassword, {
         path: ["confirmPassword"],
@@ -145,7 +143,7 @@ const ChangePasswordForm = () => {
                                         </button>
                                     </div>
                                     <p className="mt-1 text-xs text-gray-500 text-start">
-                                        (Min. 8 characters, include a number or symbol)
+                                        
                                     </p>
                                     <FormMessage />
                                 </FormItem>

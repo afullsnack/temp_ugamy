@@ -12,15 +12,19 @@ import { useSession } from "@/lib/auth-hooks"
 import DashboardFallbackSkeleton from "../ui/skeletons/dashboard-fallback-skeleton"
 
 const courseModules = [
-    { id: 1, title: "Getting Started with EA FC" },
-    { id: 2, title: "Basic Controls & Mechanics" },
-    { id: 3, title: "Skill Moves Fundamentals" },
-    { id: 4, title: "Advanced Skill Moves" },
-    { id: 5, title: "Formations & Tactics" },
-    { id: 6, title: "Attacking Strategies" },
-    { id: 7, title: "Defensive Mastery" },
-    { id: 8, title: "Set Pieces & Dead Balls" },
-    { id: 9, title: "Pro-Level Gameplay" },
+    { id: 1, title: "Introduction - 2:34" },
+    { id: 2, title: "Basics - 9:58" },
+    { id: 3, title: "Mentality - 10:03" },
+    { id: 4, title: "Game Settings - 12:40" },
+    { id: 5, title: "Formation - 12:56" },
+    { id: 6, title: "Defending - 28:00" },
+    { id: 7, title: "Attacking - 18:19" },
+    { id: 8, title: "Finishing - 10:14" },
+    { id: 9, title: "Play Locks - 11:29" },
+    { id: 10, title: "Best Playstyles - 4:46" },
+    { id: 11, title: "Skills Revisit - 11:45" },
+    { id: 12, title: "The End - 0:27" },
+
 ]
 
 export const CoursePoster = () => {
@@ -48,7 +52,7 @@ export const CoursePoster = () => {
             <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 md:px-12! lg:px-20!">
                 <div className="max-w-2xl space-y-6">
                     {/* Title */}
-                    <h1 className="text-3xl! font-black tracking-tight md:text-6xl! lg:text-7xl!">EA FC Complete Tutorial</h1>
+                    <h1 className="text-3xl! font-black tracking-tight md:text-6xl! lg:text-7xl!">Faruk's EAFC 26 Masterclass 1.0</h1>
 
                     {/* Meta Info */}
                     <div className="flex flex-wrap items-center gap-4 text-sm! font-medium md:text-base!">
@@ -60,7 +64,7 @@ export const CoursePoster = () => {
                         <span className="h-4 w-px bg-gray-500"></span>
                         <span>Beginner to Pro</span>
                         <span className="h-4 w-px bg-gray-500"></span>
-                        <span>9 Modules</span>
+                        <span>12 Modules</span>
                     </div>
 
                     {/* Description */}
