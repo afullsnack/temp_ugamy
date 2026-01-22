@@ -236,7 +236,18 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   const rangeHeader = c.req.header("range");
 
   // Set common headers for all responses
-  c.header("Access-Control-Allow-Origin", "*");
+  const ALLOWED_ORIGINS = [
+    "https://staging.ugamy.io",
+    "https://dashboard.ugamy.io",
+  ];
+  
+  const origin = c.req.header("origin");
+
+if (origin && ALLOWED_ORIGINS.includes(origin)) {
+  c.header("Access-Control-Allow-Origin", origin);
+  c.header("Access-Control-Allow-Credentials", "true");
+}
+
   c.header("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
   c.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
   c.header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
@@ -286,6 +297,23 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
       headers: c.res.headers,
     });
   }
+
+  if (!rangeHeader) {
+    const { body } = await tigrisClient.downloadFile({
+      bucket: env.BUCKET_NAME || "",
+      key: `videos/${key}`,
+      range: `bytes=0-${Math.min(1024 * 1024, fileSize - 1)}`
+    });
+  
+    c.header("Content-Range", `bytes 0-${Math.min(1024 * 1024, fileSize - 1)}/${fileSize}`);
+    c.header("Content-Length", Math.min(1024 * 1024, fileSize).toString());
+  
+    return new Response(nodeStreamToWebStream(body), {
+      status: HttpStatusCodes.PARTIAL_CONTENT,
+      headers: c.res.headers,
+    });
+  }
+  
 
   // No range request - stream full file
   const { body: response } = await tigrisClient.downloadFile({
