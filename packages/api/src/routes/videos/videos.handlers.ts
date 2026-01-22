@@ -1,3 +1,5 @@
+import type { Readable } from "node:stream";
+
 import { and, eq } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
@@ -9,6 +11,52 @@ import env from "@/env";
 import { TigrisClient } from "@/lib/asset-storage";
 
 import type { CreateVideoRoute, GetOneVideoRoute, LikeVideoRoute, ListVideosRoute, StreamVideoRoute, WatchedVideoRoute } from "./videos.routes";
+
+// Helper function to convert Node.js Readable to Web ReadableStream
+// This is critical for iOS Safari compatibility
+function nodeStreamToWebStream(nodeStream: Readable | ReadableStream | Blob | Buffer): ReadableStream {
+  // If it's already a Web ReadableStream, return it
+  if (nodeStream instanceof ReadableStream) {
+    return nodeStream;
+  }
+
+  // If it's a Buffer, create a simple stream
+  if (Buffer.isBuffer(nodeStream)) {
+    return new ReadableStream({
+      start(controller) {
+        controller.enqueue(new Uint8Array(nodeStream));
+        controller.close();
+      },
+    });
+  }
+
+  // If it's a Blob, use its stream method
+  if (nodeStream instanceof Blob) {
+    return nodeStream.stream();
+  }
+
+  // Must be a Node.js Readable stream - convert to Web ReadableStream
+  // This is essential for iOS Safari
+  const readable = nodeStream as Readable;
+  return new ReadableStream({
+    start(controller) {
+      readable.on("data", (chunk: Buffer) => {
+        controller.enqueue(new Uint8Array(chunk));
+      });
+
+      readable.on("end", () => {
+        controller.close();
+      });
+
+      readable.on("error", (err: Error) => {
+        controller.error(err);
+      });
+    },
+    cancel() {
+      readable.destroy();
+    },
+  });
+}
 
 export const create: AppRouteHandler<CreateVideoRoute> = async (c) => {
   const body = await c.req.parseBody();
@@ -227,13 +275,19 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
         range: `bytes=${start}-${end}`,
       });
 
-      // Set partial content headers
-      c.header("Content-Range", `bytes ${start}-${end}/${fileSize}`);
-      c.header("Content-Length", chunkSize.toString());
-      c.status(HttpStatusCodes.PARTIAL_CONTENT);
+    // Set partial content headers
+    c.header("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+    c.header("Content-Length", chunkSize.toString());
 
-      return c.body(response as ReadableStream, HttpStatusCodes.PARTIAL_CONTENT);
-    }
+    // Convert Node.js Readable stream to Web ReadableStream
+    // This is CRITICAL for iOS Safari compatibility
+    const webStream = nodeStreamToWebStream(response);
+
+    return new Response(webStream, {
+      status: HttpStatusCodes.PARTIAL_CONTENT,
+      headers: c.res.headers,
+    });
+  }
 
     // No range request - send full file
     const { body: response } = await tigrisClient.downloadFile({
@@ -244,12 +298,13 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
     c.header("Content-Length", fileSize.toString());
     c.status(HttpStatusCodes.OK);
 
-    return c.body(response as ReadableStream, HttpStatusCodes.OK);
-  }
-  catch (error: any) {
-    console.log(`Failed to stream video: `, { error })
-    throw error;
-  }
+  // Convert Node.js Readable stream to Web ReadableStream for iOS Safari
+  const webStream = nodeStreamToWebStream(response);
+
+  return new Response(webStream, {
+    status: HttpStatusCodes.OK,
+    headers: c.res.headers,
+  });
 };
 
 export const like: AppRouteHandler<LikeVideoRoute> = async (c) => {
