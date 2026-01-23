@@ -760,7 +760,6 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     muted
                     autoplay
                     playsinline
-                    {...{ "webkit-playsinline": "true" }}
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
                     onCanPlay={handleCanPlay}
