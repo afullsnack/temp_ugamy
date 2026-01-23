@@ -756,6 +756,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
                     loop
+                    muted
                     autoplay
                     playsinline
                     {...{ "webkit-playsinline": "true" }}
