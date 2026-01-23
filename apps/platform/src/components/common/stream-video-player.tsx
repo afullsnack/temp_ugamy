@@ -757,7 +757,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     poster={video.thumbnailUrl}
                     loop
                     autoplay
-                    playsInline
+                    playsinline
                     {...{ "webkit-playsinline": "true" }}
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
