@@ -755,7 +755,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onPlay={handlePlaying}
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
-                    preload="metadata"
+                    preload="auto"
                     loop
                     autoplay
                     playsinline
