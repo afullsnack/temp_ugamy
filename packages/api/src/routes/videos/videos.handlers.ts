@@ -245,61 +245,45 @@ export const stream: AppRouteHandler<StreamVideoRoute> = async (c) => {
   c.header("Content-Type", metadata.contentType || "video/mp4");
   c.header("Accept-Ranges", "bytes");
 
-  // Handle Range requests for video streaming
+  // iOS Safari FIX: Always use range-based responses
+  // iOS Safari REQUIRES 206 Partial Content for video streaming to work
+  // Parse range header or default to full file range
+  let start = 0;
+  let end = fileSize - 1;
+
   if (rangeHeader) {
     const parts = rangeHeader.replace(/bytes=/, "").split("-");
-    const start = Number.parseInt(parts[0], 10);
+    start = Number.parseInt(parts[0], 10) || 0;
     const requestedEnd = parts[1] ? Number.parseInt(parts[1], 10) : null;
-
-    // When end is not specified (bytes=X-), return the rest of the file from that point
-    // This is important for mobile browsers to read video metadata (moov atom)
-    const end = requestedEnd !== null
-      ? Math.min(requestedEnd, fileSize - 1)
-      : fileSize - 1;
-
-    const chunkSize = end - start + 1;
-
-    // Validate range
-    if (start >= fileSize) {
-      c.status(HttpStatusCodes.REQUESTED_RANGE_NOT_SATISFIABLE);
-      c.header("Content-Range", `bytes */${fileSize}`);
-      return c.body(null);
-    }
-
-    // Download the specified range
-    const { body: response } = await tigrisClient.downloadFile({
-      bucket: env.BUCKET_NAME || "",
-      key: `videos/${key}` || "",
-      range: `bytes=${start}-${end}`,
-    });
-
-    // Set partial content headers
-    c.header("Content-Range", `bytes ${start}-${end}/${fileSize}`);
-    c.header("Content-Length", chunkSize.toString());
-
-    // Convert Node.js Readable stream to Web ReadableStream
-    // This is CRITICAL for iOS Safari compatibility
-    const webStream = nodeStreamToWebStream(response);
-
-    return new Response(webStream, {
-      status: HttpStatusCodes.PARTIAL_CONTENT,
-      headers: c.res.headers,
-    });
+    end = requestedEnd !== null ? Math.min(requestedEnd, fileSize - 1) : fileSize - 1;
   }
 
-  // No range request - stream full file
+  const chunkSize = end - start + 1;
+
+  // Validate range
+  if (start >= fileSize) {
+    c.status(HttpStatusCodes.REQUESTED_RANGE_NOT_SATISFIABLE);
+    c.header("Content-Range", `bytes */${fileSize}`);
+    return c.body(null);
+  }
+
+  // Download the specified range
   const { body: response } = await tigrisClient.downloadFile({
     bucket: env.BUCKET_NAME || "",
     key: `videos/${key}` || "",
+    range: `bytes=${start}-${end}`,
   });
 
-  c.header("Content-Length", fileSize.toString());
+  // iOS Safari FIX: ALWAYS return 206 with Content-Range header
+  // This is REQUIRED for iOS Safari video playback
+  c.header("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+  c.header("Content-Length", chunkSize.toString());
 
   // Convert Node.js Readable stream to Web ReadableStream for iOS Safari
   const webStream = nodeStreamToWebStream(response);
 
   return new Response(webStream, {
-    status: HttpStatusCodes.OK,
+    status: HttpStatusCodes.PARTIAL_CONTENT,
     headers: c.res.headers,
   });
 };
