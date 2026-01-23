@@ -758,7 +758,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     controls={false}
                     playsInline
                     webkit-playsinline="true"
-                    preload={isiOS ? "metadata" : "auto"}
+                    preload="metadata"
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
                     onCanPlay={handleCanPlay}
