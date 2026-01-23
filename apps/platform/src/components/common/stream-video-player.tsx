@@ -21,6 +21,8 @@ import {
     Maximize,
     Minimize,
     Loader2,
+    AlertTriangle,
+    X,
 } from "lucide-react"
 import { env } from "@/env"
 import LikeVideoWidget from "./like video-widget"
@@ -114,6 +116,10 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
     // Security protection state
     const [isProtectionActive, setIsProtectionActive] = useState(false)
     const [protectionReason, setProtectionReason] = useState("")
+
+    // iOS device detection for disclaimer
+    const [isIOSDevice, setIsIOSDevice] = useState(false)
+    const [showIOSDisclaimer, setShowIOSDisclaimer] = useState(true)
 
     const videoRef = useRef<HTMLVideoElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -476,6 +482,17 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
         return () => window.removeEventListener("resize", checkIsMobile)
     }, [])
 
+    // Detect iOS devices (iPhone, iPad, iPod)
+    useEffect(() => {
+        const checkIsIOS = () => {
+            const userAgent = navigator.userAgent || navigator.vendor
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+            setIsIOSDevice(isIOS)
+        }
+        checkIsIOS()
+    }, [])
+
     useEffect(() => {
         const showControlsTemporarily = () => {
             setShowControls(true)
@@ -723,6 +740,29 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     WebkitTouchCallout: "none",
                 }}
             >
+                {/* iOS Device Disclaimer Banner */}
+                {isIOSDevice && showIOSDisclaimer && (
+                    <div className="absolute top-0 left-0 right-0 z-40 bg-amber-500/95 text-black px-4 py-3">
+                        <div className="flex items-start gap-3 max-w-3xl mx-auto">
+                            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 text-sm">
+                                <p className="font-semibold">iOS Device Detected</p>
+                                <p className="opacity-90">
+                                    For the best video streaming experience, we recommend using a laptop or Android device.
+                                    iOS devices may experience playback limitations due to Apple restrictions.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setShowIOSDisclaimer(false)}
+                                className="p-1 hover:bg-black/10 rounded transition-colors"
+                                aria-label="Dismiss"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Protection Overlay */}
                 {isProtectionActive && (
                     <div className="absolute inset-0 bg-black z-50 flex items-center justify-center">
@@ -755,9 +795,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onPlay={handlePlaying}
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
-                    preload="auto"
-                    loop
-                    autoplay
+                    preload="metadata"
                     playsInline
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
