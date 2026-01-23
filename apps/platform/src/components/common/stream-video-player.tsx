@@ -758,7 +758,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     preload="auto"
                     loop
                     autoplay
-                    playsinline
+                    playsInline
                     onLoadStart={handleLoadStart}
                     onLoadedData={handleLoadedData}
                     onCanPlay={handleCanPlay}
