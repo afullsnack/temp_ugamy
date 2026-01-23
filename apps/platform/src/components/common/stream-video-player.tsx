@@ -756,6 +756,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onPause={handlePause}
                     poster={video.thumbnailUrl}
                     preload="auto"
+                    muted
                     playsInline
                     {...{ "webkit-playsinline": "true" }}
                     onLoadStart={handleLoadStart}
