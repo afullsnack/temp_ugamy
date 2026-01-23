@@ -771,7 +771,7 @@ export const StreamVideoPlayer = ({ videoId, userId, playlist = [] }: VideoPlaye
                     onProgress={handleProgress}
                     onContextMenu={(e) => e.preventDefault()}
                     onDragStart={(e) => e.preventDefault()}
-                    controls="true"
+                    controls={isiOS}
                 >
                     <source src={`${apiUrl}/videos/stream/${video.key.split("/").pop()}`} type="video/mp4" />
                     Your browser does not support the video tag.
