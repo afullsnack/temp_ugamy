@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import axios from "axios"
 import CourseEpisodesTemplate from "@/components/common/course-episodes-templates"
-import { StreamVideoPlayer } from "@/components/common/stream-video-player"
+// import { StreamVideoPlayer } from "@/components/common/stream-video-player"
 import Topbar from "@/components/common/topbar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,6 +14,9 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router"
 import { ChevronLeft, Clock, Globe } from "lucide-react"
 import { formatDuration } from "@/lib/utils"
+import VStreamer from "@/components/common/stream-video-player-2"
+import type Player from "video.js/dist/types/player"
+import videojs from "video.js"
 
 export const Route = createFileRoute("/watch/$id/videos/$vid/watch")({
   component: RouteComponent,
@@ -78,6 +81,34 @@ function RouteComponent() {
 
   const progressPercentage =
     (course?.videos?.length ?? 0) > 0 ? (watchedVideos.size / (course?.videos?.length ?? 1)) * 100 : 0
+
+
+  // ====================================== VIDEOJS IMPL =========================================
+  const playerRef = useRef<Player | null>(null);
+
+  const videoJsOptions = {
+    autoplay: true,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    sources: [{
+      src: `${env.VITE_API_URL}/videos/stream/${video?.key.split("/").pop()}`,
+      type: 'video/mp4'
+    }]
+  };
+
+  const handlePlayerReady = (player: Player) => {
+    playerRef.current = player;
+
+    // You can handle player events here, for example:
+    player.on('waiting', () => {
+      videojs.log('player is waiting');
+    });
+
+    player.on('dispose', () => {
+      videojs.log('player will dispose');
+    });
+  };
 
   return (
     <div className="relative bg-gray-100 w-full min-h-screen h-fit space-y-[24px] lg:space-y-[36px]">
@@ -149,7 +180,13 @@ function RouteComponent() {
         {videoLoading || isPending ? (
           <Skeleton className="w-full aspect-video rounded-lg" />
         ) : (
-          <StreamVideoPlayer userId={user?.id as string} courseId={id} videoId={vid} />
+          <VStreamer
+            // userId={user?.id as string}
+            // courseId={id}
+            // videoId={vid}
+            options={videoJsOptions}
+            onReady={handlePlayerReady}
+          />
         )}
 
         {/* Other episodes */}
