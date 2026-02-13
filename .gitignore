@@ -27,3 +27,4 @@ jest
 
 # helix editor
 .helix
+.vercel
