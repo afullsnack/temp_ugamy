@@ -20,6 +20,7 @@ import videojs from "video.js"
 
 export const Route = createFileRoute("/watch/$id/videos/$vid/watch")({
   component: RouteComponent,
+  ssr: false,
 })
 
 function RouteComponent() {
