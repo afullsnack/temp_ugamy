@@ -16,11 +16,10 @@ import { ChevronLeft, Clock, Globe } from "lucide-react"
 import { formatDuration } from "@/lib/utils"
 import VStreamer from "@/components/common/stream-video-player-2"
 import type Player from "video.js/dist/types/player"
-import videojs from "video.js"
 
 export const Route = createFileRoute("/watch/$id/videos/$vid/watch")({
   component: RouteComponent,
-  ssr: false,
+  ssr: 'data-only',
 })
 
 function RouteComponent() {
@@ -103,11 +102,11 @@ function RouteComponent() {
 
     // You can handle player events here, for example:
     player.on('waiting', () => {
-      videojs.log('player is waiting');
+      console.log('player is waiting');
     });
 
     player.on('dispose', () => {
-      videojs.log('player will dispose');
+      console.log('player will dispose');
     });
   };
 

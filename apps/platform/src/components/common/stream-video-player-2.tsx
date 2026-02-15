@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useRef } from "react";
-import videojs from "video.js"
-
 
 
 export function VStreamer(props: { options?: any; onReady?: (player: any) => void }) {
@@ -20,9 +18,11 @@ export function VStreamer(props: { options?: any; onReady?: (player: any) => voi
       videoElement.classList.add('vjs-big-play-centered');
       videoRef.current?.appendChild(videoElement);
 
-      const player = playerRef.current = videojs(videoElement, props.options, () => {
-        videojs.log('player is ready');
-        props.onReady && props.onReady(player);
+      import("video.js").then(({ default: videojs }) => {
+        const player = playerRef.current = videojs(videoElement, props.options, () => {
+          videojs.log('player is ready');
+          props.onReady && props.onReady(player);
+        })
       });
 
       // You could update an existing player in the `else` block here
